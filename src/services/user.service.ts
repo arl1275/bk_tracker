@@ -21,9 +21,9 @@ export let get_all_entregadores_service = async (req : Request, res : Response) 
     }
 }
 
-//------------------------------------------------------------------
-//                      CRUD OF USERS
-//------------------------------------------------------------------
+//-----------------------------------------------------------------//
+//                      CRUD OF USERS                              //
+//-----------------------------------------------------------------//
 
 export let getAllUsuarios = async (req : Request, res : Response) => {
     try {
@@ -77,3 +77,15 @@ export let DelUser =async (req : Request, res : Response) => {
     }
 }
 
+//-----------------------------------------------------------------//
+//                      Check user sing                            //
+//-----------------------------------------------------------------//
+
+
+// export let PassUser = async (req : Request, res : Response) => {
+//     try{
+//         cosnt query = format('SELECT * FROM user WHERE ')
+//     }catch(err){
+//         res.status(500).json({ message : 'NO SE PUDO OBTENER LA RUTA DE ACCESO'})
+//     }
+// }
