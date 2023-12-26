@@ -45,20 +45,28 @@ export let getAllUsuarios = async (req : Request, res : Response) => {
 
 export let CreateUserService = async (req : Request, res : Response) => {
     try {
-        const {nombre, codEmpleado, rol} = req.body;
-        const newUser : usuario = {nombre: nombre, cod_empleado : codEmpleado, id_rol : rol};
-        const query = format('INSERT INTO usuarios (nombre, cod_empleado, id_role) VALUES %L', newUser);
-        connDB.query(query, (err, result)=>{
+        const {nombre, codEmpleado, rol, _Password , _QR} = req.body;
+        let val = 0;
+            if(rol === 'ENTREGADOR'){
+                val = 1;
+            }else if(rol === 'GUARDIA'){
+                val = 2;
+            }else{
+                val = 3;
+            }
+        const query = "INSERT INTO usuarios (nombre, cod_empleado, id_rol, _password, _qr) VALUES ($1, $2, $3, $4, $5)";
+        let values = [nombre, codEmpleado, val, _Password, _QR]
+        connDB.query(query, values,(err, result)=>{
             if (err) {
-                res.status(500).json({message : 'NO SE CREO USUARIO'});
+                console.log('EROR AL CREAR :', err)
+                res.status(500).json({message : 'NO SE CREO USUARIO EN DB'});
             } else {
                 res.status(200).json({message : 'SE CREO EL USUARIO'})
             }
         });        
     } catch (err) {
-        res.status(500).json({message : 'NO SE CREO USUARIO', err});
+        res.status(500).json({message : 'NO SE LLEGO A LA RUTA', err});
     }
-    
 }
 
 export let DelUser =async (req : Request, res : Response) => {
@@ -75,6 +83,35 @@ export let DelUser =async (req : Request, res : Response) => {
     } catch (err) {
         res.status(500).json({message : 'ERR PARA ELIMINAR EL USUARIO', err});
     }
+}
+
+export let UpdateUserService = async ( req : Request, res : Response) => {
+    try {
+        const {id, nombre, cod_empleado, id_rol, _password , _qr} = req.body;
+        // let val = 0;
+        //     if(id_rol === 'ENTREGADOR'){
+        //         val = 1;
+        //     }else if(id_rol === 'GUARDIA'){
+        //         val = 2;
+        //     }else{
+        //         val = 3;
+        //     }
+
+        const query = "UPDATE usuarios SET nombre = $1, cod_empleado = $2, _password = $3, _qr = $4 WHERE id = $5";
+        let values = [nombre, cod_empleado, _password, _qr, id];
+        connDB.query(query, values,(err, result)=>{
+            if (err) {
+                console.log('EROR AL CREAR :', err)
+                res.status(500).json({message : 'NO SE CREO USUARIO EN DB'});
+            } else {
+                res.status(200).json({message : 'SE CREO EL USUARIO'})
+            }
+        });  
+    } catch (err) {
+        console.log('ERROR TO UPDATE USER');
+        res.status(500).json({message : 'NO SE PUDO OBTENER RUTA PARA ACTUALIZAR USUARIO'})
+    }
+    
 }
 
 //-----------------------------------------------------------------//

@@ -1,9 +1,12 @@
 import { Router } from "express";
 const routerUser = Router();
-import { get_all_entregadores,
+import {
+        get_all_entregadores,
         create_User,
         delete_User,
-        see_all_users } from "../controllers/user.controller";
+        see_all_users,
+        update_user
+} from "../controllers/user.controller";
 
 // //admin routes
 
@@ -17,7 +20,7 @@ routerUser.post("/createuser", create_User);
 
 routerUser.delete("/deleteuser:", delete_User);
 
-// routerUser.put("/update_user:", update_user);
+routerUser.put("/update_user", update_user);
 
 // routerUser.put("/roleUpdate:", update_user_role);
 
