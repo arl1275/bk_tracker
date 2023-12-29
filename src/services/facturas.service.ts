@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { factura_form } from "../interfaces/factura.interface";
-import connDB from "../DBconnection/tracker_db";
+import connDB from "../utils/tracker_db";
 import format from "pg-format";
 
 //----------------------------------------------------

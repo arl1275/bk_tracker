@@ -4,14 +4,15 @@ import {
         CreateUserService,
         DelUser,
         getAllUsuarios,
-        UpdateUserService
+        UpdateUserService,
+        passUser_service
 } from "../services/user.service";
 
 // //routes thay we need
 
 export const get_all_entregadores = (req: Request, res: Response) => { get_all_entregadores_service(req, res) }; //loggin access
 
-// export const Emergency_log = (req: Request, res : Response) =>{};
+export const log_controller = (req: Request, res : Response) =>{passUser_service(req, res)};
 
 export const create_User = (req: Request, res: Response) => { CreateUserService(req, res) };
 

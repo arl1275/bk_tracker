@@ -1,7 +1,7 @@
 import { Response, Request } from "express";
-import connDB from "../DBconnection/tracker_db";
+import connDB from "../utils/tracker_db";
 import { ReqFacturas } from "../interfaces/reqfacturas.interface";
-import { validateLocaleAndSetLanguage } from "typescript";
+import { uploadImage } from "../utils/could";
 const format = require('pg-format')
 
 //--------------------------------------------------//
@@ -115,31 +115,22 @@ export const toTransitoService = async (req: Request, res: Response) => {
 
 export const toSincronizadoService = async (req: Request, res: Response) => {
     try {
-
         let valores : Array<ReqFacturas> = [];
         valores = await req.body;
-        //console.log('data BK: ', valores[0]);
-                
         const query = "SELECT * FROM tosincronizado ($1, $2, $3, $4, $5);";
         let errorOccurred = false;
-
         if(valores){
             for (let i = 0; i < valores.length; i++) {
                 const brutoFecha = valores[i].fech_hora_entrega
-                //console.log('formato fecha : ', brutoFecha);
-                
                 const id_fact = valores[i].id;
                 const namePic = "PIctest";
                 const nameSing = 'SINGtest';
                 const nameId = '122';
-             
                 connDB.query(query, [id_fact, brutoFecha, namePic, nameSing, nameId], (err, result) => {
                     if (err) {
-                        console.log('ERROR AL SINCRONIZAR : ', err);                 
-                        //res.status(500).json({ message: 'NO SE PUDO ENVIAR LA FACTURA A SINCRONIZAR' });
+                        console.log('ERROR AL SINCRONIZAR : ', err);
                     } else {
-                        console.log('FACTURA SE HA SINCRONIZADO');
-                        //res.status(200).json({ message: 'SE ENVIO A SINCRONIZAR' });
+                        console.log('FACTURA SE HA SINCRONIZADO', result.rows);
                     }
                 })
             }
@@ -149,7 +140,7 @@ export const toSincronizadoService = async (req: Request, res: Response) => {
             res.status(500).json({ message: 'NO SE ENVIARON LAS FACTURAS A TRANSITO' });
             console.log('SE GENERO UN ERROR AL OBTENER LA RUTA');
         } else {
-            console.log('SE SINCRONIZO LA FACTURA');
+            console.log('SE SINCRONIZO LA FACTURA',);
             res.status(200).json({ message: 'SE SINCRONIZO LA FACTURA' });
         }
 

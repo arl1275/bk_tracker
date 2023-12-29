@@ -40,14 +40,8 @@ app.use('/trans', routerTransportista);
 app.use('/entregas', routerEntregas);
 app.use('/cons', routerConsolidados);
 
-//******************test**************** */
-// app.use("/user", routerUser);
-// app.use("/Truck",routerTruck);
-
-//******************test**************** */
 
 //se enciende el servidor
 app.listen(3000, ()=>{
     console.log('Server en LINEA. En puerto :', 3000);
 });
-//final_confi

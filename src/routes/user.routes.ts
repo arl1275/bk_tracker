@@ -5,7 +5,8 @@ import {
         create_User,
         delete_User,
         see_all_users,
-        update_user
+        update_user,
+        log_controller
 } from "../controllers/user.controller";
 
 // //admin routes
@@ -22,7 +23,7 @@ routerUser.delete("/deleteuser:", delete_User);
 
 routerUser.put("/update_user", update_user);
 
-// routerUser.put("/roleUpdate:", update_user_role);
+routerUser.get("/auth/user", log_controller);
 
 // routerUser.get("/EMER:", Emergency_log);
 

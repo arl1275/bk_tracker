@@ -1,8 +1,8 @@
 import { Request, Response, query } from "express";
-import connDB from "../DBconnection/tracker_db";
+import connDB from "../utils/tracker_db";
 import { usuario } from "../interfaces/usuario.interface";
 import format from "pg-format";
-import { resolveModuleName } from "typescript";
+import { EncryptPassword } from "../utils/utils";
 
 export let get_all_entregadores_service = async (req : Request, res : Response) => {
     try{
@@ -43,9 +43,11 @@ export let getAllUsuarios = async (req : Request, res : Response) => {
     
 }
 
+// this is to create users
 export let CreateUserService = async (req : Request, res : Response) => {
     try {
         const {nombre, codEmpleado, rol, _Password , _QR} = req.body;
+        let hassPas = await EncryptPassword(_Password);
         let val = 0;
             if(rol === 'ENTREGADOR'){
                 val = 1;
@@ -55,7 +57,7 @@ export let CreateUserService = async (req : Request, res : Response) => {
                 val = 3;
             }
         const query = "INSERT INTO usuarios (nombre, cod_empleado, id_rol, _password, _qr) VALUES ($1, $2, $3, $4, $5)";
-        let values = [nombre, codEmpleado, val, _Password, _QR]
+        let values = [nombre, codEmpleado, val, hassPas, _QR]
         connDB.query(query, values,(err, result)=>{
             if (err) {
                 console.log('EROR AL CREAR :', err)
@@ -88,17 +90,9 @@ export let DelUser =async (req : Request, res : Response) => {
 export let UpdateUserService = async ( req : Request, res : Response) => {
     try {
         const {id, nombre, cod_empleado, id_rol, _password , _qr} = req.body;
-        // let val = 0;
-        //     if(id_rol === 'ENTREGADOR'){
-        //         val = 1;
-        //     }else if(id_rol === 'GUARDIA'){
-        //         val = 2;
-        //     }else{
-        //         val = 3;
-        //     }
-
+        const _hassPas = await EncryptPassword(_password)
         const query = "UPDATE usuarios SET nombre = $1, cod_empleado = $2, _password = $3, _qr = $4 WHERE id = $5";
-        let values = [nombre, cod_empleado, _password, _qr, id];
+        let values = [nombre, cod_empleado, _hassPas, _qr, id];
         connDB.query(query, values,(err, result)=>{
             if (err) {
                 console.log('EROR AL CREAR :', err)
@@ -119,10 +113,28 @@ export let UpdateUserService = async ( req : Request, res : Response) => {
 //-----------------------------------------------------------------//
 
 
-// export let PassUser = async (req : Request, res : Response) => {
-//     try{
-//         cosnt query = format('SELECT * FROM user WHERE ')
-//     }catch(err){
-//         res.status(500).json({ message : 'NO SE PUDO OBTENER LA RUTA DE ACCESO'})
-//     }
-// }
+export let passUser_service = async (req: Request, res: Response) => {
+    try {
+      const { user, _Password } = req.query;
+      console.log(user, _Password);
+      const query = format('SELECT nombre, _password, id_rol FROM usuarios WHERE nombre = %L AND _password = %L', user, _Password);
+      connDB.query(query, (err, result) => {
+        if (err) {
+          res.status(500).json({ message: 'ERROR AL REALIZAR LA CONSULTA' });
+        } else {
+          if (result.rows.length > 0) {
+            if(result.rows[0].id_rol === 2){
+                res.status(200).json({ message: 'Usuario válido' });
+            }else{
+                res.status(500).json({ message : 'NO ES UN ADMINISTRADOR'});
+            }
+            
+          } else {
+            res.status(401).json({ message: 'USUARIO INVALIDO' });
+          }
+        }
+      });
+    } catch (err) {
+      res.status(500).json({ message: 'NO SE PUDO OBTENER LA RUTA DE ACCESO' });
+    }
+  };

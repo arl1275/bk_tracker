@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import connDB from "../DBconnection/tracker_db";
+import connDB from "../utils/tracker_db";
 const format = require('pg-format')
 
 export const generate_consolidation_service = async (req: Request, res: Response) => {
