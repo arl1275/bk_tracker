@@ -138,3 +138,30 @@ export let passUser_service = async (req: Request, res: Response) => {
       res.status(500).json({ message: 'NO SE PUDO OBTENER LA RUTA DE ACCESO' });
     }
   };
+  
+
+export let passUser_appService = async (req: Request, res: Response) => {
+    try {
+      const { user, _Password } = req.query;
+      console.log(user, _Password);
+      const query = format('SELECT nombre, _password, id_rol FROM usuarios WHERE nombre = %L AND _password = %L', user, _Password);
+      connDB.query(query, (err, result) => {
+        if (err) {
+          res.status(500).json({ message: 'ERROR AL REALIZAR LA CONSULTA' });
+        } else {
+          if (result.rows.length > 0) {
+            if(result.rows[0].id_rol != 2){
+                res.status(200).json({ message: 'Usuario válido' });
+            }else{
+                res.status(500).json({ message : 'NO ES UN ADMINISTRADOR'});
+            }
+            
+          } else {
+            res.status(401).json({ message: 'USUARIO INVALIDO' });
+          }
+        }
+      });
+    } catch (err) {
+      res.status(500).json({ message: 'NO SE PUDO OBTENER LA RUTA DE ACCESO' });
+    }
+  };

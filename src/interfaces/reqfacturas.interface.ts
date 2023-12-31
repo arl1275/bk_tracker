@@ -18,3 +18,8 @@ export interface ReqFacturas{
     namePic?: string | FormData;
     state : string;
 }
+
+export interface SingFormat{
+    encoded : string,
+    pathName : string,
+}

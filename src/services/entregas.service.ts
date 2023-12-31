@@ -1,8 +1,8 @@
 import { Response, Request } from "express";
 import connDB from "../utils/tracker_db";
-import { ReqFacturas } from "../interfaces/reqfacturas.interface";
-import { uploadImage } from "../utils/could";
-const format = require('pg-format')
+import { ReqFacturas, SingFormat } from "../interfaces/reqfacturas.interface";
+import { FactSynchroHandler} from "../utils/could";
+import format from 'pg-format';
 
 //--------------------------------------------------//
 //                  GENERAL FUNCTIONS               //
@@ -120,17 +120,22 @@ export const toSincronizadoService = async (req: Request, res: Response) => {
         const query = "SELECT * FROM tosincronizado ($1, $2, $3, $4, $5);";
         let errorOccurred = false;
         if(valores){
+            //console.log('DATA IN BK : ',valores);
             for (let i = 0; i < valores.length; i++) {
-                const brutoFecha = valores[i].fech_hora_entrega
+
+                const brutoFecha = valores[i].fech_hora_entrega;
                 const id_fact = valores[i].id;
-                const namePic = "PIctest";
-                const nameSing = 'SINGtest';
-                const nameId = '122';
-                connDB.query(query, [id_fact, brutoFecha, namePic, nameSing, nameId], (err, result) => {
+                const dataImages = await  FactSynchroHandler(valores[i]);//uploadFileToCloudinary(valores[i], 'despacho_bodega', valores[i].ref_factura);
+                console.log('data from create : ', dataImages);
+                // const namePic = dataImages[1]; //await uploadImage(valores[i].namePic, valores[i].ref_factura);
+                // const nameSing = dataImages[0]//await uploadImage (valores[i].nameSing);
+                const nameId = 'yes';
+
+                connDB.query(query, [id_fact, brutoFecha, dataImages[1].toString(), dataImages[0].toString(), nameId], (err, result) => {
                     if (err) {
                         console.log('ERROR AL SINCRONIZAR : ', err);
                     } else {
-                        console.log('FACTURA SE HA SINCRONIZADO', result.rows);
+                        console.log('FACTURA SE HA SINCRONIZADO', dataImages);
                     }
                 })
             }

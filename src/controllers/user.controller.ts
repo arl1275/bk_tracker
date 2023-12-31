@@ -5,7 +5,8 @@ import {
         DelUser,
         getAllUsuarios,
         UpdateUserService,
-        passUser_service
+        passUser_service,
+        passUser_appService
 } from "../services/user.service";
 
 // //routes thay we need
@@ -19,6 +20,8 @@ export const create_User = (req: Request, res: Response) => { CreateUserService(
 export const delete_User = (req: Request, res: Response) => { DelUser(req, res) };
 
 export const update_user = (req: Request, res: Response) => { UpdateUserService(req, res) };
+
+export const log_appController = (req : Request, res : Response) => { passUser_appService(req, res)};
 
 // export const update_user_role = (req: Request, res : Response) =>{update_role(req, res)};
 
