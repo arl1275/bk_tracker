@@ -4,11 +4,11 @@ dotenv.config()
 //test XD
 // Configure the PostgreSQL connection
 const connDB = new Pool({
-  user: process.env.DBuser,
-  host: process.env.DBhost,
-  database: process.env.DBdatabase,
-  password: process.env.DBpassword,
-  port: 5432, // Default PostgreSQL port
+  user: 'postgres',
+  host: 'http://localhost:80',
+  database: 'postgres',
+  password: 'root123',
+  port: 80, // Default PostgreSQL port
 });
 
 // Test the connection

@@ -47,7 +47,7 @@ export let insert_data_for_test = async (req: Request, res : Response) =>{
         //console.log('datos a ingresar: ', req.body);
         connDB.query(insertquery, [ref_factura, cliente, cant_cajas, cant_unidades, list_empaque, ubicacion], (err, result )=>{
             if(err){
-                console.log('NO SE PUDO INSERTAR EN FACTURAS');
+                console.log('NO SE PUDO INSERTAR EN FACTURAS', err);
                 res.status(500).json({message : 'no se pudo ingresar factura'});
             }else{
                 console.log('SE INGRESO FACTURA');

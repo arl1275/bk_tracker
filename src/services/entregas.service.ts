@@ -119,27 +119,27 @@ export const toSincronizadoService = async (req: Request, res: Response) => {
         valores = await req.body;
         const query = "SELECT * FROM tosincronizado ($1, $2, $3, $4, $5);";
         let errorOccurred = false;
-        if(valores){
-            //console.log('DATA IN BK : ',valores);
-            for (let i = 0; i < valores.length; i++) {
+        // if(valores){
+        //     //console.log('DATA IN BK : ',valores);
+        //     for (let i = 0; i < valores.length; i++) {
 
-                const brutoFecha = valores[i].fech_hora_entrega;
-                const id_fact = valores[i].id;
-                const dataImages = await  FactSynchroHandler(valores[i]);//uploadFileToCloudinary(valores[i], 'despacho_bodega', valores[i].ref_factura);
-                console.log('data from create : ', dataImages);
-                // const namePic = dataImages[1]; //await uploadImage(valores[i].namePic, valores[i].ref_factura);
-                // const nameSing = dataImages[0]//await uploadImage (valores[i].nameSing);
-                const nameId = 'yes';
+        //         const brutoFecha = valores[i].fech_hora_entrega;
+        //         const id_fact = valores[i].id;
+        //         const dataImages = await  FactSynchroHandler(valores[i]);//uploadFileToCloudinary(valores[i], 'despacho_bodega', valores[i].ref_factura);
+        //         console.log('data from create : ', dataImages);
+        //         // const namePic = dataImages[1]; //await uploadImage(valores[i].namePic, valores[i].ref_factura);
+        //         // const nameSing = dataImages[0]//await uploadImage (valores[i].nameSing);
+        //         const nameId = 'yes';
 
-                connDB.query(query, [id_fact, brutoFecha, dataImages[1].toString(), dataImages[0].toString(), nameId], (err, result) => {
-                    if (err) {
-                        console.log('ERROR AL SINCRONIZAR : ', err);
-                    } else {
-                        console.log('FACTURA SE HA SINCRONIZADO', dataImages);
-                    }
-                })
-            }
-        }
+        //         connDB.query(query, [id_fact, brutoFecha, dataImages[1].toString(), dataImages[0].toString(), nameId], (err, result) => {
+        //             if (err) {
+        //                 console.log('ERROR AL SINCRONIZAR : ', err);
+        //             } else {
+        //                 console.log('FACTURA SE HA SINCRONIZADO', dataImages);
+        //             }
+        //         })
+        //     }
+        // }
     
         if (errorOccurred) {
             res.status(500).json({ message: 'NO SE ENVIARON LAS FACTURAS A TRANSITO' });

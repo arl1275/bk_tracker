@@ -45,11 +45,12 @@ export let get_camion_by_id_service =async (req : Request, res : Response) => {
 
 export let post_new_camion_service = async(req : Request, res : Response) =>{
   try {
-    const[placa, QR] = req.body;
+    const {placa, QR} = req.body;
     const query = 'INSERT INTO camiones (placa, QR) values ($1, $2)';
     connDB.query(query, [placa, QR], (err, result) =>{
       if(err){
         res.status(500).json({message : 'error al crear camion'});
+        console.log('ERROR : crear camion => ', err);
       }else{
         res.status(200).json({message : 'se creo camion'});
       }
