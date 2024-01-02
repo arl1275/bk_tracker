@@ -4,11 +4,11 @@ dotenv.config()
 //test XD
 // Configure the PostgreSQL connection
 const connDB = new Pool({
-  user: 'postgres',
-  host: 'http://localhost:80',
-  database: 'postgres',
-  password: 'root123',
-  port: 80, // Default PostgreSQL port
+  user: 'root',
+  host: 'localhost',
+  database: 'track',
+  password: 'root',
+  port: 5432, // Default PostgreSQL port
 });
 
 // Test the connection

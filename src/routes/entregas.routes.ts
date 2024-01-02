@@ -1,8 +1,11 @@
 const express = require('express');
 const routerEntregas = express.Router();
-import { get_all_entregas_controller, get_entrega_by_id_controller, gen_void_entrega_con, entregatoCargandoController,
-entregatoTransitoController,
-entregatoSincronizarController } from '../controllers/entregas.controller';
+import {
+    get_all_entregas_controller, get_entrega_by_id_controller, gen_void_entrega_con, entregatoCargandoController,
+    entregatoTransitoController,
+    entregatoSincronizarController,
+    getPicsOneFactController
+} from '../controllers/entregas.controller';
 
 //general functions
 
@@ -21,6 +24,8 @@ routerEntregas.put('/toTransito', entregatoTransitoController); // /entregas/toT
 
 routerEntregas.put('/toSincronizar', entregatoSincronizarController);// /entregas/toSincronizar
 
+// pics functions
 
+routerEntregas.get('/getFactPics', getPicsOneFactController)
 
 export default routerEntregas;

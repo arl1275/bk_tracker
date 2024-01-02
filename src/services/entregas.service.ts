@@ -1,8 +1,8 @@
 import { Response, Request } from "express";
 import connDB from "../utils/tracker_db";
-import { ReqFacturas, SingFormat } from "../interfaces/reqfacturas.interface";
-import { FactSynchroHandler} from "../utils/could";
-import format from 'pg-format';
+import { ReqFacturas} from "../interfaces/reqfacturas.interface";
+import {uploadFileToCloudinary } from "../utils/could";
+
 
 //--------------------------------------------------//
 //                  GENERAL FUNCTIONS               //
@@ -77,7 +77,7 @@ export const toCargandoService = async (req: Request, res: Response) => {
 export const toTransitoService = async (req: Request, res: Response) => {
     try {
         console.log('entro a service para enviar a transito');
-        
+
         const values: number[] = req.body;
         console.log(values)
 
@@ -115,32 +115,46 @@ export const toTransitoService = async (req: Request, res: Response) => {
 
 export const toSincronizadoService = async (req: Request, res: Response) => {
     try {
-        let valores : Array<ReqFacturas> = [];
+        let valores: Array<ReqFacturas> = [];
         valores = await req.body;
         const query = "SELECT * FROM tosincronizado ($1, $2, $3, $4, $5);";
         let errorOccurred = false;
-        // if(valores){
-        //     //console.log('DATA IN BK : ',valores);
-        //     for (let i = 0; i < valores.length; i++) {
+        console.log('upload data : ', valores);
+        
+        if (valores) {
+            for (let i = 0; i < valores.length; i++) {
+                // data to insert into DB
+                let picName :string = 'N/A';
+                let SingName : string = '';
+                // data to insert into Cloudinary
 
-        //         const brutoFecha = valores[i].fech_hora_entrega;
-        //         const id_fact = valores[i].id;
-        //         const dataImages = await  FactSynchroHandler(valores[i]);//uploadFileToCloudinary(valores[i], 'despacho_bodega', valores[i].ref_factura);
-        //         console.log('data from create : ', dataImages);
-        //         // const namePic = dataImages[1]; //await uploadImage(valores[i].namePic, valores[i].ref_factura);
-        //         // const nameSing = dataImages[0]//await uploadImage (valores[i].nameSing);
-        //         const nameId = 'yes';
+                const { nameSing, namePic, fech_hora_entrega, id, ref_factura } = valores[i];
 
-        //         connDB.query(query, [id_fact, brutoFecha, dataImages[1].toString(), dataImages[0].toString(), nameId], (err, result) => {
-        //             if (err) {
-        //                 console.log('ERROR AL SINCRONIZAR : ', err);
-        //             } else {
-        //                 console.log('FACTURA SE HA SINCRONIZADO', dataImages);
-        //             }
-        //         })
-        //     }
-        // }
-    
+
+                if (typeof nameSing === 'string') {
+                    SingName = await uploadFileToCloudinary(nameSing, 'despacho_bodega', ref_factura);
+                    if(valores[0].namePic){
+                        if(typeof namePic === 'string' && namePic != 'N/A'){
+                            let headPic = ref_factura + 'PICNAME';
+                            picName = await uploadFileToCloudinary(namePic, 'despacho_bodega', headPic )
+                        }
+                    }
+                } else {
+                    console.log('VALOR NO ES STRING', valores[0].nameSing);
+
+                }
+                console.log('fotos sing : ', SingName, ' fotos pic : ', picName);
+                connDB.query(query, [id, fech_hora_entrega, picName, SingName, ref_factura], (err, result) => {
+                    if (err) {
+                        console.log('ERROR AL SINCRONIZAR : ', err);
+                    } else {
+                        console.log('fotos sing : ', SingName.length, ' fotos pic : ', picName.length)
+                        console.log('FACTURA SE HA SINCRONIZADO');
+                    }
+                })
+            }
+        }
+
         if (errorOccurred) {
             res.status(500).json({ message: 'NO SE ENVIARON LAS FACTURAS A TRANSITO' });
             console.log('SE GENERO UN ERROR AL OBTENER LA RUTA');
@@ -155,3 +169,31 @@ export const toSincronizadoService = async (req: Request, res: Response) => {
     }
 }
 
+//--------------------------------------------------//
+//                IMAGE FUNCTIONS                   //
+//--------------------------------------------------//
+
+export const PicsToSend = async (req : Request, res : Response) => {
+    try {
+        const {id} = req.query;
+        const query = 'SELECT * FROM getpicsofonefact($1)';
+        
+        if(id != undefined){
+            connDB.query(query, [id], (err, result) => {
+                if (err) {
+                    console.log('ERROR AL ENVIAR FOTOS : ', err);
+                    res.status(500).json({ message: 'valor no existe', err });
+                } else {
+                    console.log('SE ENVIARON FOTOS DE FACTURA : ', id)
+                    res.status(200).json({ data: result.rows });
+                }
+            })
+        }else{
+            console.log('not a number');
+        }
+        
+    } catch (err) {
+        console.log('ERROR AL ACCEDER A RUTA : ', err)
+        res.status(500).json({message : 'NO SE PUDO ACCEDER A LA RUTA'})
+    }
+}
