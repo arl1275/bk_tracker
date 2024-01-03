@@ -131,5 +131,10 @@ export let facturas_with_EnTransito_state = async (req : Request, res : Response
     }  
 }
 
+//----------------------------------------------------
+//    Functions to get all in the APP
+//----------------------------------------------------
+
+
 
 

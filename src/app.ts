@@ -1,6 +1,7 @@
 //imports
 import { Request, Response, NextFunction} from 'express';
 import bodyParser = require('body-parser');
+import { getDataFromTempTable } from './utils/factDataProvider';
 
 
 require("dotenv").config({path: './.env'});
@@ -20,6 +21,9 @@ import routerConsolidados from './routes/consolidados.routes';
 
 const express = require("express");
 const app = express();
+
+getDataFromTempTable();
+
 
 app.use(cors());
 app.use(bodyParser.json({limit : '50mb'})); // for parsing application/json
