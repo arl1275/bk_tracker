@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import connDB from "../utils/tracker_db";
+import connDB from "../utils/psql_connection";
 import { ReqFacturas} from "../interfaces/reqfacturas.interface";
 import {uploadFileToCloudinary } from "../utils/could";
 

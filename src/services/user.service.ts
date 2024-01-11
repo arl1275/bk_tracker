@@ -1,5 +1,5 @@
 import { Request, Response, query } from "express";
-import connDB from "../utils/tracker_db";
+import connDB from "../utils/psql_connection";
 import { usuario } from "../interfaces/usuario.interface";
 import format from "pg-format";
 import { EncryptPassword, ComparedPassWord } from "../utils/utils";

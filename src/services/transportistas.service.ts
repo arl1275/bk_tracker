@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import connDB from "../utils/tracker_db";
+import connDB from "../utils/psql_connection";
 import format from "pg-format";
 
 //-------------------------------------------------------//
