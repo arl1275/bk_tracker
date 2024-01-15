@@ -23,7 +23,6 @@ export async function executeQuery(query: string) {
     const poolConnect = await pool.connect(); 
 
     const result = await poolConnect.request().query(query); 
-    console.log('adsfadsgvdf--------------')
     return result.recordset; 
   } catch (error) {
     throw new Error(`Error executing query: ${error}`);

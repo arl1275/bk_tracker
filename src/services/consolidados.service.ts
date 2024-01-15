@@ -5,40 +5,32 @@ const format = require('pg-format')
 export const generate_consolidation_service = async (req: Request, res: Response) => {
     try {
         const { camion, entregador, pais, transportista, facturas } = req.body;
-        const query = "SELECT crear_consolidado($1, $2, $3, $4, $5);";
+        const query = "SELECT crear_consolidado($1, $2, $3, $4, $5, $6);";
         const ent = parseInt(entregador[0]);
         const cam = parseInt(camion[0]);
         const values = facturas.map((factura: any) => [ent, transportista, cam, pais, factura.id]);
-        
-        // const val_ref = values[0].factura.id * 90;
-        // console.log('data ref : ', val_ref);
+        let ref_declaracion_envio = 0;    // this is to create the reference of Declaracion of Entrega
+        let errorOccurred = false;
 
-        //  connDB.query(`
-        //  INSERT INTO
-        //  envios (ref_envio, handler_type, validado_final) 
-        //  values('${val_ref}', 'COD_BARRAS', false) returning id;`, (err, result)=>{
-        //      if(!err){
-        //          console.log('respuesta del query : ', result.rows)
-        //          return result.rows;
-        //      }else{
-        //          console.log('NO SE CREO EL ENVIO')
-        //      }
-        //  })
-        
-
-
-        
-        let errorOccurred = false; 
+        for(let i = 0; i < values.length; i++){
+            let x = values[i]
+            ref_declaracion_envio += x[4];
+            //console.log(ref_declaracion_envio);
+        }
 
          for (let i = 0; i < values.length; i++) {
              await new Promise<void>((resolve, reject) => {
-                 connDB.query(query, values[i], (err, result) => {
-                     if (err) {
-                         console.error('Error al ejecutar la consulta:', err);
-                         errorOccurred = true;
-                     }
-                     resolve();
-                 });
+                if(ref_declaracion_envio){
+                    values[i].push(ref_declaracion_envio);
+                    console.log(values);
+                     connDB.query(query, values[i], (err, result) => {
+                         if (err) {
+                             console.error('Error al ejecutar la consulta:', err);
+                             errorOccurred = true;
+                         }
+                         resolve();
+                     });
+                }
              });
          }
 
