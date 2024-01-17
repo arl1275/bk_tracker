@@ -5,7 +5,8 @@ import {
     facturas_with_consolidado_service,
     facturas_with_EnPreparacion_state,
     facturas_with_EnTransito_state,
-    getMaster_Facturas_service
+    getMaster_Facturas_service,
+    get_boxesOneFact_service
 } from "../services/facturas.service";
 
 
@@ -22,3 +23,5 @@ export const get_all_Enpreparacion_fact_service = (req: Request, res: Response) 
 export const get_all_EnTransito_fact_Controller = ( req : Request, res : Response) => { facturas_with_EnTransito_state(req, res) };
 
 export const get_all_master_facturas_controller  = (req : Request, res : Response) => {getMaster_Facturas_service(req, res)};
+
+export const get_boxes_oneFact = (req : Request, res : Response) => { get_boxesOneFact_service(req, res) };

@@ -7,7 +7,8 @@ import {
         get_all_facturas_with_deliver_controller,
         get_all_Enpreparacion_fact_service,
         get_all_EnTransito_fact_Controller,
-        get_all_master_facturas_controller
+        get_all_master_facturas_controller,
+        get_boxes_oneFact
 } from "../controllers/facturas.controller";
 
 const routerFacturas = express.Router();
@@ -33,9 +34,8 @@ routerFacturas.get('/getFacturasEnTransito', get_all_EnTransito_fact_Controller)
 // will return all invoices in "Sincronizado" state
 routerFacturas.get('/get_all_invoices_with_only_Sincronizado_state');
 
-routerFacturas.get('/get_all_information_of_one_invoice');
-
-routerFacturas.get('/get_validate_inovoice_state');
+// get all the boxes of one factura
+routerFacturas.get('/getBoxesFact', get_boxes_oneFact);
 
 //just for develop things
 routerFacturas.post('/test_insert', insert_fact_test);

@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { factura_form } from "../interfaces/factura.interface";
 import { get_all_facturas_without_state } from "../utils/query_provider";
+import { get_boxes_one_fact } from "../utils/main_query_provider";
 import connDB from "../utils/psql_connection";
 import format from "pg-format";
+import { getEffectiveConstraintOfTypeParameter } from "typescript";
 
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
@@ -135,6 +137,24 @@ export let facturas_with_EnTransito_state = async (req: Request, res: Response) 
 //    Functions to get all in the APP
 //----------------------------------------------------
 
-
+export let get_boxesOneFact_service = async (req : Request, res : Response) =>{
+    try {
+        const {id_fact} = req.query;
+        connDB.query(get_boxes_one_fact(), [id_fact], (err, ressult)=>{
+            if(err){
+                console.log('no se obtubieron las cajas : ', err);
+                res.status(500).json({message : 'no se obtubo las cajas'});
+            }else{
+                console.log('SE OBTUBIERON LAS CAJAS');
+                res.status(200).json({data : ressult.rows});
+            }
+        })
+        
+    } catch (err) {
+        console.log('NO SE PUDIERON OBTENER LAS CAJAS :', err)
+        res.status(500).json({message : 'error to get boxes'})
+    }
+    
+}
 
 

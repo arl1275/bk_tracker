@@ -89,6 +89,14 @@ export const queryBoxFact= ( albaran : string ) =>{
   GROUP BY ListaEmpaque, Caja, NumeroCaja;`
 }
 
+export const get_boxes_one_fact = ()=>{
+  return `SELECT DISTINCT c.caja
+  FROM facturas f
+  INNER JOIN albaranes a ON f.id = a.id_factura
+  INNER JOIN cajas c ON a.id = c.id_albaranes
+  WHERE f.id = $1;`
+}
+
 
 //---------------------------------------------------------//
 //             FUNCTION TO INSERT INTO DB AX INFO          //

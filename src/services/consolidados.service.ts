@@ -77,3 +77,21 @@ export const get_all_consolidados = async (req: Response, res: Response) => {
         res.status(500).json({ message: 'error al obtner ruta de todos los consolidados' })
     }
 }
+
+//-----------------------------------------------------------
+
+export const get_all_decalaraciones = async(req : Request, res : Response)=>{
+    try {
+        let query = 'SELECT * FROM get_ref_dec_envio();';
+        connDB.query(query, (err, result) =>{
+            if(err){
+                res.status(500).json({message : ' no se pudo enviar a las declaraciones de envio'});
+            }else{
+                res.status(200).json({data : result.rows});
+            }
+        })
+    }catch(err){
+        console.log('ERROR AL OBTENER DECLARACIONES DE ENVIO');
+        res.status(500).json({message : ' no se pudo acceder a las declaraciones de envio'});
+    }
+}
