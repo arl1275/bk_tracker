@@ -16,12 +16,11 @@ const mininumDateAllowed = '2023-12-1';                     // valor para captar
 export const queryFact: string = `
 SELECT 
     DISTINCT Factura,
-    COUNT(NumeroCaja) AS Cant_Cajas,
+    COUNT(Caja) AS Cant_Cajas,
     SUM(cantidad) AS Cant_Unidades,
     CuentaCliente,
     NombreCliente,
     calle,
-    COUNT(DISTINCT Albaran) as cant_albaranes,
     PedidoVenta
 FROM IMGetAllPackedBoxesInSB 
 WHERE 
