@@ -1,8 +1,7 @@
 //imports
 import { Request, Response, NextFunction} from 'express';
 import bodyParser = require('body-parser');
-import { getDataFromTempTable } from './utils/factDataProvider';
-
+import { syncroData_AX } from './utils/syncro_functions/synchro';
 
 require("dotenv").config({path: './.env'});
 const cors = require('cors');
@@ -11,9 +10,9 @@ const cors = require('cors');
 import routerFacturas from './routes/facturas.routes';
 import routerCamiones from './routes/camion.routes';
 import routerUser from './routes/user.routes';
-import routerTransportista = require('./routes/transportistas.routes');
+import routerDec_env from './routes/declaracion_env.routes';
 import routerEntregas from './routes/entregas.routes';
-import routerConsolidados from './routes/consolidados.routes';
+// import routerConsolidados from './routes/consolidados.routes';
 
 //import connDB from '../DBconnection/tracker_db'
 
@@ -22,8 +21,7 @@ import routerConsolidados from './routes/consolidados.routes';
 const express = require("express");
 const app = express();
 
-getDataFromTempTable();
-
+syncroData_AX()
 
 app.use(cors());
 app.use(bodyParser.json({limit : '50mb'})); // for parsing application/json
@@ -37,12 +35,11 @@ app.get("/about", (req : Request, res : Response)=>{
     res.send('Esto es un apartado aparte.');
 })
 
-app.use("/fact", routerFacturas);
+app.use("/facturas", routerFacturas);
 app.use("/camiones", routerCamiones);
-app.use('/user', routerUser);
-app.use('/trans', routerTransportista);
-app.use('/entregas', routerEntregas);
-app.use('/cons', routerConsolidados);
+app.use('/usuarios', routerUser);
+app.use('/decEnv', routerDec_env);
+// app.use('/dec_envio', routerConsolidados);
 
 
 //se enciende el servidor

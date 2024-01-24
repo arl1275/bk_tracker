@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import connDB from "../utils/psql_connection";
+import connDB from "../utils/db/localDB_config";
 
 
 //----------------------------------------------------
@@ -45,9 +45,9 @@ export let get_camion_by_id_service =async (req : Request, res : Response) => {
 
 export let post_new_camion_service = async(req : Request, res : Response) =>{
   try {
-    const {placa, QR} = req.body;
-    const query = 'INSERT INTO camiones (placa, QR) values ($1, $2)';
-    connDB.query(query, [placa, QR], (err, result) =>{
+    const {placa, QR, modelo} = req.body;
+    const query = 'INSERT INTO camiones (placa, modelo, qr) values ($1, $2, $3)';
+    connDB.query(query, [placa, QR, modelo], (err, result) =>{
       if(err){
         res.status(500).json({message : 'error al crear camion'});
         console.log('ERROR : crear camion => ', err);
@@ -80,7 +80,7 @@ export let update_placa_camion_service =async (req : Request, res : Response) =>
 export let update_QR_camion_service =async (req : Request, res : Response) => {
   try {
     const [id, QR] = req.body;
-    const query = 'UPDATE camiones SET QR = ($1) WHERE id = ($2)';
+    const query = 'UPDATE camiones SET qr = ($1) WHERE id = ($2)';
     connDB.query(query, [QR, id], (err, result) =>{
       if(err){
         res.status(500).json({message : 'ERROR al modificar QR'});

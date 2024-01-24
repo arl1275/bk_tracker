@@ -25,6 +25,6 @@ export async function executeQuery(query: string) {
     const result = await poolConnect.request().query(query); 
     return result.recordset; 
   } catch (error) {
-    throw new Error(`Error executing query: ${error}`);
+    throw new Error(`Error executing query =>: ${error}`);
   }
 }

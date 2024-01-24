@@ -1,23 +1,22 @@
 import { Request, Response } from "express";
-import { factura_form } from "../interfaces/factura.interface";
-import { get_all_facturas_without_state } from "../utils/query_provider";
-import { get_boxes_one_fact } from "../utils/main_query_provider";
-import connDB from "../utils/psql_connection";
+import connDB from "../utils/db/localDB_config";
 import format from "pg-format";
-import { getEffectiveConstraintOfTypeParameter } from "typescript";
+import { factura } from "../interfaces/db_interfeces/Axproveider";
+import { uploadFileToCloudinary } from "../utils/db/cloudinary_config";
 
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
 //----------------------------------------------------
 
+// EN USO
 export let get_all_facturas_service = async (req: Request, res: Response) => {
     try {
-        connDB.query('SELECT * FROM facturas;', (err, result) => {
+        connDB.query('SELECT * FROM resumen_facturas();', (err, result) => {
             if (err) {
                 console.error('Error executing query:', err);
             } else {
                 res.status(200).json({ data: result.rows });
-                console.log('Se obtubieron todas las facturas');
+                //console.log('Se obtubieron todas las facturas');
             }
         });
     } catch (err) {
@@ -25,49 +24,8 @@ export let get_all_facturas_service = async (req: Request, res: Response) => {
     }
 };
 
-export let get_all_factiras_in_null_state_service = async (req: Request, res: Response) => {
-    try {
-        connDB.query(get_all_facturas_without_state, (err, result) => {
-            if (err) {
-                console.log('Error executing query:', err);
-                res.status(500).json({ error: 'error al ejecutar query' });
-            } else {
-                res.status(200).json({ data: result.rows });
-                console.log("SE OBTUBIERON TODAS LAS FACTURAS SIN CONSOLIDAR");
-            }
-        });
-    } catch (err) {
-        res.status(500).json({ data: err });
-    }
-};
-
-export let insert_data_for_test = async (req: Request, res: Response) => {
-    let response;
-    const insertquery = 'SELECT * FROM createfact($1, $2, $3)';
-    const { ref_factura, cliente, cant_cajas, cant_unidades, list_empaque, ubicacion } = req.body;
-    try {
-        //console.log('datos a ingresar: ', req.body);
-        connDB.query(insertquery, [ref_factura, cant_cajas, cant_unidades], (err, result) => {
-            if (err || result.rows === null) {
-                console.log('NO SE PUDO INSERTAR EN FACTURAS', err);
-                res.status(500).json({ message: 'no se pudo ingresar factura' });
-            } else {
-                console.log('SE INGRESO FACTURA');
-                res.status(200).json({ message: 'SE INGRESO LA FACTURA' });
-            }
-        })
-    } catch (err) {
-        res.status(500).json({ data: err });
-        console.log('NO INGRESO A LA INSERCION DE FACTURAS');
-    }
-}
-
-//----------------------------------------------------
-//    Functions to get Facts in different states
-//----------------------------------------------------
-
-export let getMaster_Facturas_service = async (req: Request, res: Response) => {
-    const query = format('SELECT * FROM get_all_facturas_status();');
+export let get_facturas_actives = async (req: Request, res: Response) => {
+    const query = format('SELECT * FROM resumen_facturas_activos();');
     try {
         connDB.query(query, (err, result) => {
             if (err) {
@@ -83,78 +41,198 @@ export let getMaster_Facturas_service = async (req: Request, res: Response) => {
     }
 }
 
-export let facturas_with_consolidado_service = async (req: Request, res: Response) => {
-    const query = 'SELECT * FROM get_all_facturas_in_process();';
+export let get_facturas_all = async (req: Request, res: Response) => {
+    const query = format('SELECT * FROM resumen_all_facturas();');
     try {
         connDB.query(query, (err, result) => {
             if (err) {
-                res.status(500).json({ message: 'IMPOSIBLE OBTENER facturas: ', err });
+                res.status(500).json({ message: 'IMPOSIBLE OBTENER TODAS LAS FACTURAS: ', err });
             } else {
-                console.log("SE OBTUBIERON TODAS LAS FACTURAS EN PROCESO")
+                console.log("SE OBTUBIERON TODAS LAS FACTURAS DESDE LA VISTA ADMIN");
                 res.status(200).json({ data: result.rows });
             }
         })
     } catch (err) {
-        console.log('err :', err)
-        res.status(500).json({ message: 'IMPOSIBLE OBTENER facturas' });
-    }
-
-}
-
-export let facturas_with_EnPreparacion_state = async (req: Request, res: Response) => {
-    try {
-        const query = 'SELECT * FROM get_all_facturas_enpreparacion();';
-        connDB.query(query, (err, result) => {
-            if (err) {
-                res.status(500).json({ message: 'NO SE OBTUBIERON LAS FACTURAS EN PREPARACION' });
-            } else {
-                console.log('SE OBTUBIERON TODAS LAS FACTURAS EN PREPARACION')
-                res.status(200).json({ data: result.rows });
-            }
-        })
-    } catch (error) {
-        res.status(500).json({ message: 'NO SE OBTUBIERON LAS FACTURAS EN PREPARACION' });
-    }
-};
-
-export let facturas_with_EnTransito_state = async (req: Request, res: Response) => {
-    try {
-        const query = 'SELECT * FROM get_all_facturas_entransito();';
-        connDB.query(query, (err, result) => {
-            if (err) {
-                res.status(500).json({ message: 'NO SE OBTUBIERON LAS FACTURAS EN TRANSITO' });
-            } else {
-                console.log('SE OBTUBIERON TODAS LAS FACTURAS EN TRANSITO')
-                res.status(200).json({ data: result.rows });
-            }
-        })
-    } catch (error) {
-        res.status(500).json({ message: 'NO SE OBTUBIERON LAS FACTURAS EN TRANSITO' });
+        console.log('NO SE PUDO INGRESAR A LA RUTA');
+        res.status(500).json({ mesage: 'ERROR AL OBTENER RUTA' })
     }
 }
 
-//----------------------------------------------------
-//    Functions to get all in the APP
-//----------------------------------------------------
-
-export let get_boxesOneFact_service = async (req : Request, res : Response) =>{
+export let change_preparacion_service = async ( req: Request, res: Response ) => {
     try {
-        const {id_fact} = req.query;
-        connDB.query(get_boxes_one_fact(), [id_fact], (err, ressult)=>{
+        const {factura} = req.body;
+        const lista_facturas : factura[] = factura;
+        const query = 'SELECT * FROM change_state_to_enpreparacion($1);';
+        let is_err;
+
+        for (let i = 0; i < lista_facturas.length; i++) {
+            const factura_ = lista_facturas[i].Factura;
+            connDB.query(query, [factura_], (err, result)=>{
+                if(err){
+                    console.log('NO SE PUDO ENVIAR A PREPARACION : ', err);
+                    is_err = true;
+                }else{
+                    console.log('SE ENVIO A PREPARACION : ', factura_);
+                    is_err = false
+                }
+            })
+        }
+
+        if(is_err === true){
+            res.status(500).json({ message : 'ERROR AL ENVIAR A PREPARACION'});
+        }else{
+            res.status(200).json({ message : 'SE ENVIARON LAS FACTURAS A PREPARACION'});
+        }
+        
+    } catch (err) {
+        console.log('ERROR AL ALCANZAR RUTA DE A PREPARACION : ', err);
+        res.status(500).json({ message : 'ERROR AL ALCANZAR RUTA DE A PREPARACION'});
+    }
+}
+
+//EN USO
+export let change_transito_service = async ( req: Request, res: Response ) => {
+    try {
+        const data = req.body;
+        const query = 'SELECT * FROM change_state_to_entransito($1);'; // the $1, is the referencence of the factura
+        let is_err;
+        //console.log(' DATA GETS : ', data, req.body);
+         for (let i = 0; i < data.length; i++) {
+             const factura_ = data[i];
+            //console.log('fact => ', factura_)
+              connDB.query(query, [factura_], (err, result)=>{
+                  if(err){
+                      console.log('NO SE PUDO ENVIAR A TRANSITO : ', err);
+                      is_err = true;
+                  }else{
+                      console.log('SE ENVIO A TRANSITO : ', factura_);
+                      is_err = false
+                  }
+              })
+         }
+
+        if(is_err === true){
+            res.status(500).json({ message : 'ERROR AL ENVIAR A TRANSITO'});
+        }else{
+            res.status(200).json({ message : 'SE ENVIARON LAS FACTURAS A TRANSITO'});
+        }
+        
+    } catch (err) {
+        console.log('ERROR AL ALCANZAR RUTA DE TRANSITO : ', err);
+        res.status(500).json({ message : 'ERROR AL ALCANZAR RUTA DE TRANSITO'});
+    }
+}
+
+export let change_sincronizado_service = async ( req: Request, res: Response) => {
+    try {
+        const {factura} = req.body;
+        const lista_facturas : factura[] = factura;
+        const query = 'SELECT * FROM  change_state_to_sincronizado($1, $2);';
+        let is_err;
+
+        for (let i = 0; i < lista_facturas.length; i++) {
+            const factura_ = lista_facturas[i].Factura;
+
+            connDB.query(query, [factura_, ], (err, result)=>{
+                if(err){
+                    console.log('NO SE PUDO ENVIAR A TRANSITO : ', err);
+                    is_err = true;
+                }else{
+                    console.log('SE ENVIO A TRANSITO : ', factura_);
+                    is_err = false
+                }
+            })
+        }
+
+        if(is_err === true){
+            res.status(500).json({ message : 'ERROR AL ENVIAR A TRANSITO'});
+        }else{
+            res.status(200).json({ message : 'SE ENVIARON LAS FACTURAS A TRANSITO'});
+        }
+        
+    } catch (err) {
+        console.log('ERROR AL ALCANZAR RUTA DE TRANSITO : ', err);
+        res.status(500).json({ message : 'ERROR AL ALCANZAR RUTA DE TRANSITO'});
+    }
+}
+
+// EN USO
+export let get_cajas_one_fact = async ( req: Request, res: Response ) =>{
+    try {
+        const {factura} = req.query;
+        const query = 'SELECT * FROM get_boxes_oneFact($1);'
+        connDB.query(query, [factura], (err, result)=>{
             if(err){
-                console.log('no se obtubieron las cajas : ', err);
-                res.status(500).json({message : 'no se obtubo las cajas'});
+                console.log('NO SE PUEDIERON OBTENER LAS CAJAS : ', err);
+                res.status(500).json({ message : ' NO SE PUDO OBTENER LAs CAJAS'})
             }else{
-                console.log('SE OBTUBIERON LAS CAJAS');
-                res.status(200).json({data : ressult.rows});
+                console.log('SE PUEDIERON OBTENER LAS CAJAS');
+                res.status(200).json({ data : result.rows})
             }
         })
         
     } catch (err) {
-        console.log('NO SE PUDIERON OBTENER LAS CAJAS :', err)
-        res.status(500).json({message : 'error to get boxes'})
+        console.log('NO SE PUDO OBTENER LA RUTA DE CAJAS');
+        res.status(500).json({ message : ' NO SE PUDO OBTENER LA RUTA DE CAJAS'})
     }
-    
 }
 
+// en uso
+export let get_facturas_en_transito =async ( req: Request, res: Response ) => {
+    try {
+        const query = 'SELECT * FROM get_transito_facturas();';
+        connDB.query(query, (err, result)=>{
+            if(err){
+                console.log('ERROR AL OBTENER FACTURAS EN TRANSITO : ', err);
+                res.status(500).json({message : 'no se pudo obtener las facturas en transito'});
+            }else{
+                console.log('SE OBTUBIERON LAS FACTURAS EN TRANSITO');
+                res.status(200).json({ data : result.rows });
+            }
+        })
+    } catch (err) {
+        console.log('NO SE PUDO ALCANZAR LA RUTA DE OBTENER FACTURAS EN TRANSITO');
+        res.status(500).json({ message : 'no se pudo obtener las facturas en transito'});
+    }
+}
 
+export let subir_fotos = async ( req: Request, res: Response ) => {
+    try {
+        const data = req.body;
+        //console.log('fotos : ', data);
+        const query = 'SELECT * FROM sincro_fact( $1, $2, $3, $4, $5);'; //fact text, foto text, firma text, detalle_ent text
+        let error;
+
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            const firma_ = await uploadFileToCloudinary(element.nameSing, 'bodega_despacho', element.factura);
+            const foto_ = await uploadFileToCloudinary(element.namePic, 'bodega_despacho', element.factura + '_foto');
+            //console.log('fotos subidas, firma: ', firma_, '   foto: ', foto_);
+            
+            if(firma_ != null && foto_ != null){
+                connDB.query(query, [element.factura, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
+                    if(err){
+                        error = false;
+                        console.log('ERROR AL CREAR FOTOS : ', err);
+                    }else{
+                        error = true;
+                    }
+                });
+            }else{
+                console.log('NO SE GENERARON LAS FOTOS');
+                res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
+            }
+        }
+
+        if(error == false){
+            console.log('NO SE PUDO GENERAR LA SINCRONIZACION');
+            res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
+        }else{
+            console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZO');
+            res.status(200).json({ message : 'SE GENERO LA SINCRONIZACION'});
+        }
+    } catch (err) {
+        console.log('ERROR AL OBTENER RUTA DE SYNCRONIZACION : ', err);
+        res.status(500).json({ message : 'NO SE PUEDE OBTENER RUTA DE SYNCRONIZACION DE FACTURAS' });
+    }
+}

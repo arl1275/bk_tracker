@@ -1,7 +1,4 @@
 import * as cloudinary from 'cloudinary';
-import { ReadStream } from 'fs';
-import fs from 'fs';
-import { ReqFacturas } from '../interfaces/reqfacturas.interface';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -38,14 +35,14 @@ export const uploadFileToCloudinary = (imagen : string , folder: string, nameFac
         console.log('SE CREO FACTURA DE: ', uploadOptions.public_id);
         const data = resolve(result?.secure_url);
         if(typeof result?.secure_url === 'string'){
+          //console.log('link the foto : ', data);
           return data; 
         }else{
-          return 'NO ES UN STRING';
+          return null;
         }
       }
     });
 
 
   });
- // return [returNamePic, returNameSing];
 };

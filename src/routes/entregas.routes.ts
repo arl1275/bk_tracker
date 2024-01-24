@@ -18,7 +18,7 @@ routerEntregas.post('/genEntregas', gen_void_entrega_con);
 
 // state functions
 
-routerEntregas.put('/toCargando', entregatoCargandoController);
+routerEntregas.put('/toPreparacion', entregatoCargandoController);
 
 routerEntregas.put('/toTransito', entregatoTransitoController); // /entregas/toTransito
 

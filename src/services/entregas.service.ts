@@ -1,7 +1,7 @@
 import { Response, Request } from "express";
-import connDB from "../utils/psql_connection";
-import { ReqFacturas} from "../interfaces/reqfacturas.interface";
-import {uploadFileToCloudinary } from "../utils/could";
+import connDB from "../utils/db/localDB_config";
+import { ReqFacturas} from "../interfaces/ft_interfaces/reqfacturas.interface";
+import {uploadFileToCloudinary } from "../utils/db/cloudinary_config";
 
 
 //--------------------------------------------------//

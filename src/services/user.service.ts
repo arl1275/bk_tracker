@@ -1,12 +1,12 @@
 import { Request, Response, query } from "express";
-import connDB from "../utils/psql_connection";
-import { usuario } from "../interfaces/usuario.interface";
+import connDB from "../utils/db/localDB_config";
+import { usuario } from "../interfaces/ft_interfaces/usuario.interface";
 import format from "pg-format";
-import { EncryptPassword, ComparedPassWord } from "../utils/utils";
+import { EncryptPassword, ComparedPassWord } from "../utils/handle_passwords/utils";
 
 export let get_all_entregadores_service = async (req: Request, res: Response) => {
   try {
-    connDB.query('SELECT * FROM usuarios WHERE id_rol = 1;', (err, result) => {
+    connDB.query('SELECT id, nombre FROM users WHERE id_role = 3;', (err, result) => {
       if (err) {
         console.error('Error executing query:', err);
         res.status(500).json({ message: 'error al obtener entregadores' });
@@ -27,7 +27,7 @@ export let get_all_entregadores_service = async (req: Request, res: Response) =>
 
 export let getAllUsuarios = async (req: Request, res: Response) => {
   try {
-    const query = 'SELECT * FROM usuarios;';
+    const query = 'SELECT * FROM users;';
     connDB.query(query, (err, result) => {
       if (err) {
         res.status(500).json({ message: 'ERR AL OBTENER TODOS LOS USUARIOS' });
@@ -50,13 +50,13 @@ export let CreateUserService = async (req: Request, res: Response) => {
     let hassPas = await EncryptPassword(_Password);
     let val = 0;
     if (rol === 'ENTREGADOR') {
-      val = 1;
+      val = 3;
     } else if (rol === 'GUARDIA') {
       val = 2;
     } else {
       val = 3;
     }
-    const query = "INSERT INTO usuarios (nombre, cod_empleado, id_rol, _password, _qr) VALUES ($1, $2, $3, $4, $5)";
+    const query = "INSERT INTO users (nombre, cod_empleado, id_role, hashed_password, qr) VALUES ($1, $2, $3, $4, $5);";
     let values = [nombre, codEmpleado, val, hassPas, _QR]
     connDB.query(query, values, (err, result) => {
       if (err) {
@@ -146,9 +146,7 @@ export let passUser_appService = async (req: Request, res: Response) => {
     console.log(user, _Password);
     if (typeof _Password === 'string') {
       
-      
-
-      const query = format('SELECT nombre, _password, id_rol FROM usuarios WHERE nombre = %L AND _password = %L', user, await EncryptPassword(_Password));
+      const query = format('SELECT nombre, _password, id_rol FROM users WHERE nombre = %L AND _password = %L', user, await EncryptPassword(_Password));
       connDB.query(query, (err, result) => {
         if (err) {
           res.status(500).json({ message: 'ERROR AL REALIZAR LA CONSULTA' });

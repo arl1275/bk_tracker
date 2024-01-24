@@ -2,46 +2,36 @@ const express = require('express')
 import { Request, Response } from "express";
 import {
         get_all_facturas_controller,
-        get_all_facturas_in_null_state_controller
-        , insert_fact_test,
-        get_all_facturas_with_deliver_controller,
-        get_all_Enpreparacion_fact_service,
-        get_all_EnTransito_fact_Controller,
-        get_all_master_facturas_controller,
-        get_boxes_oneFact
+        get_all_facturas_actives,
+        get_all_facturas_,
+        get_cajas_controller,
+        toTransito_controller,
+        getTransFact_controller,
+        postFotos_controller
 } from "../controllers/facturas.controller";
+import routerEntregas from "./entregas.routes";
 
 const routerFacturas = express.Router();
 
-
-// this will send all the invoices that where made, without taken "state in consideration"
+// get all facturas without state
 routerFacturas.get('/get_all_facturas', get_all_facturas_controller);//
 
-// will return all invoices in "null" state (the new invoices created)
-routerFacturas.get('/get_all_facturas_in_null_state', get_all_facturas_in_null_state_controller);
+// get all facturas actives
+routerFacturas.get('/get_all_actives', get_all_facturas_actives);
 
-// will return all invoices in "En Preparacion" state
-routerFacturas.get('/getFacturasWithEntrega', get_all_facturas_with_deliver_controller);
+// get all facturas 
+routerFacturas.get('/getallfacts', get_all_facturas_);
 
-routerFacturas.get('/factEnPreparacion', get_all_Enpreparacion_fact_service);
+// get the cajas of one factura
+routerFacturas.get('/getCajas', get_cajas_controller);
 
-// will return all invoices in "Cargando" state
-routerFacturas.get('/get_all_invoices_with_only_Cargando_state');
+//change factura to transito
+routerFacturas.put('/toTransito', toTransito_controller);
 
-// will return all invoices in "En Transito" state
-routerFacturas.get('/getFacturasEnTransito', get_all_EnTransito_fact_Controller);
+// to get facturas in transito
+routerFacturas.get('/getEnTransFact', getTransFact_controller);
 
-// will return all invoices in "Sincronizado" state
-routerFacturas.get('/get_all_invoices_with_only_Sincronizado_state');
-
-// get all the boxes of one factura
-routerFacturas.get('/getBoxesFact', get_boxes_oneFact);
-
-//just for develop things
-routerFacturas.post('/test_insert', insert_fact_test);
-
-//ADMIN VIEW
-routerFacturas.get('/adminFact', get_all_master_facturas_controller);
-
+// sincronizar y subir fotos
+routerFacturas.put('/SubirFotosFact', postFotos_controller); //         /facturas/SubirFotosFact
 
 export default routerFacturas;
