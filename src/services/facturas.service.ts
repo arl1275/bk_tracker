@@ -237,3 +237,21 @@ export let subir_fotos = async ( req: Request, res: Response ) => {
         res.status(500).json({ message : 'NO SE PUEDE OBTENER RUTA DE SYNCRONIZACION DE FACTURAS' });
     }
 }
+
+export let getHistoFact_service =async ( req: Request, res: Response ) => {
+    try {
+        const query = 'SELECT * FROM get_summary_data();';
+        connDB.query(query, (err, result)=>{
+            if(err){
+                console.log('ERROR AL OBTENER DATA : ', err);
+                res.status(500).json({ message : 'NO SE PUDO OBTENER RUTA'});
+            }else{
+                console.log('SE OBTUBIERON LOS HISTORICOS');
+                res.status(200).json({data : result.rows});
+            }
+        })
+    } catch (err) {
+        console.log('ERROR AL OBTENER RUTA: ', err);
+        res.status(500).json({ message : 'NO SE PUDO OBTENER RUTA'});
+    }
+}

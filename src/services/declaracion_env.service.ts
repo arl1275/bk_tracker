@@ -105,7 +105,7 @@ export const putDecEnv_serive =async ( req : Request, res : Response) => {
         
     }
 }
-
+// en uso
 export const getFacts_one_dec =async (  req : Request, res : Response ) => {
     try {
         const {dec_envio} = req.query;

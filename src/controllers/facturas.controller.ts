@@ -6,7 +6,8 @@ import {
     get_cajas_one_fact,
     change_transito_service,
     get_facturas_en_transito,
-    subir_fotos
+    subir_fotos,
+    getHistoFact_service
 } from "../services/facturas.service";
 
 
@@ -23,4 +24,6 @@ export const toTransito_controller = (req: Request, res: Response) => { change_t
 export const getTransFact_controller = (req: Request, res: Response) => {  get_facturas_en_transito(req, res) };
 
 export const postFotos_controller = (req: Request, res: Response) => { subir_fotos(req, res)};
+
+export const getHistoFact_controller = (req: Request, res: Response) => { getHistoFact_service(req, res)};
 

@@ -1,5 +1,5 @@
-import connDB from '../db/localDB_config';
-import { pedidoventa, factura, albaran, caja } from '../../interfaces/db_interfeces/Axproveider';
+import connDB from '../../db/localDB_config';
+import { pedidoventa, factura, albaran, caja } from '../../../interfaces/db_interfeces/Axproveider';
 import {
   val_if_fact_exist,
   val_if_pedido_venta,

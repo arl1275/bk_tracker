@@ -8,8 +8,8 @@ import {
         toTransito_controller,
         getTransFact_controller,
         postFotos_controller,
+        getHistoFact_controller
 } from "../controllers/facturas.controller";
-import routerEntregas from "./entregas.routes";
 
 const routerFacturas = express.Router();
 
@@ -34,6 +34,8 @@ routerFacturas.get('/getEnTransFact', getTransFact_controller);
 // sincronizar y subir fotos
 routerFacturas.put('/SubirFotosFact', postFotos_controller); //         /facturas/SubirFotosFact
 
-routerFacturas.get('/getFactActives', get_all_facturas_actives)
+routerFacturas.get('/getFactActives', get_all_facturas_actives);
+
+routerFacturas.get('/getHistoFact', getHistoFact_controller);
 
 export default routerFacturas;
