@@ -7,7 +7,7 @@ import {
         get_cajas_controller,
         toTransito_controller,
         getTransFact_controller,
-        postFotos_controller
+        postFotos_controller,
 } from "../controllers/facturas.controller";
 import routerEntregas from "./entregas.routes";
 
@@ -16,7 +16,7 @@ const routerFacturas = express.Router();
 // get all facturas without state
 routerFacturas.get('/get_all_facturas', get_all_facturas_controller);//
 
-// get all facturas actives
+// get all facturas actives NO USED
 routerFacturas.get('/get_all_actives', get_all_facturas_actives);
 
 // get all facturas 
@@ -34,6 +34,6 @@ routerFacturas.get('/getEnTransFact', getTransFact_controller);
 // sincronizar y subir fotos
 routerFacturas.put('/SubirFotosFact', postFotos_controller); //         /facturas/SubirFotosFact
 
-routerFacturas.get('/getFactActuves',)
+routerFacturas.get('/getFactActives', get_all_facturas_actives)
 
 export default routerFacturas;

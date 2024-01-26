@@ -25,13 +25,13 @@ export let get_all_facturas_service = async (req: Request, res: Response) => {
 };
 
 export let get_facturas_actives = async (req: Request, res: Response) => {
-    const query = format('SELECT * FROM resumen_facturas_activos();');
+    const query = format('SELECT * FROM get_facts_active();');
     try {
         connDB.query(query, (err, result) => {
             if (err) {
-                res.status(500).json({ message: 'IMPOSIBLE OBTENER TODAS LAS FACTURAS: ', err });
+                res.status(500).json({ message: 'IMPOSIBLE OBTENER TODAS LAS FACTURAS ACTIVAS: ', err });
             } else {
-                console.log("SE OBTUBIERON TODAS LAS FACTURAS DESDE LA VISTA ADMIN");
+                console.log("SE OBTUBIERON TODAS LAS FACTURAS ACTIVAS");
                 res.status(200).json({ data: result.rows });
             }
         })
@@ -196,6 +196,7 @@ export let get_facturas_en_transito =async ( req: Request, res: Response ) => {
     }
 }
 
+// en uso
 export let subir_fotos = async ( req: Request, res: Response ) => {
     try {
         const data = req.body;
