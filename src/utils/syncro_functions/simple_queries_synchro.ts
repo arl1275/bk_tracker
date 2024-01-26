@@ -9,7 +9,7 @@
 
 const paisFilter = 'Honduras';                              // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                      // valor para setear las ubicaciones
-const mininumDateAllowed = '2023-12-1';                     // valor para captar las facturas mas antiguas
+const mininumDateAllowed = '2023-12-31';                     // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -38,6 +38,27 @@ WHERE
 //---------------------------------------------------------//
 //             QUERY TO GET FACTURAS FROM AX_DB            //
 //---------------------------------------------------------//
+
+//---------------------------------- THIS IS THE CORRECT WAY TO INSERT---------------------------------
+// SELECT 
+//     PedidoVenta, 
+//     NombreCliente, 
+//     CuentaCliente, 
+//     COALESCE(NULLIF(Factura, ''), CONCAT(Albaran, ' - G')) AS Factura, 
+//     Albaran
+// FROM IMGetAllPackedBoxesInSB 
+// WHERE 
+//     Pais = 'Honduras'
+//     AND ciudad = 'San Pedro Sula'
+//     AND fecha >= '2023-12-01'
+// GROUP BY 
+//     PedidoVenta,
+//     NombreCliente,
+//     CuentaCliente, 
+//     Factura, 
+//     Albaran;
+
+
 
 export const query_get_pedidoventas = () =>{
   return `
@@ -78,8 +99,7 @@ export const query_get_albarans_of_a_factura = (factura: string) => {
          Departamento,
          ciudad,
          calle,
-         ubicacion,
-         empacador
+         ubicacion
      FROM IMGetAllPackedBoxesInSB 
      WHERE 
          fecha >= '${mininumDateAllowed}' 

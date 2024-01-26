@@ -10,9 +10,13 @@ export const EncryptPassword =async (_password: string) => {
     return hasshedPAs;
 }
 
-export const ComparedPassWord =async (LogPassword : string, DBPassword : string) => {
-    const match = await bcrypt.compare(LogPassword, DBPassword);
+export const ComparedPassWord = async (LogPassword : string, DBPassword : string) => {
+    try {
+        const match = await bcrypt.compare(LogPassword, DBPassword);
     return match;
+    } catch (err) {
+      return false;   
+    }
 }
 
 //--------------------------------------------------------------------//

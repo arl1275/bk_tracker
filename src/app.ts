@@ -11,7 +11,7 @@ import routerFacturas from './routes/facturas.routes';
 import routerCamiones from './routes/camion.routes';
 import routerUser from './routes/user.routes';
 import routerDec_env from './routes/declaracion_env.routes';
-import routerEntregas from './routes/entregas.routes';
+//import routerEntregas from './routes/entregas.routes';
 // import routerConsolidados from './routes/consolidados.routes';
 
 //import connDB from '../DBconnection/tracker_db'

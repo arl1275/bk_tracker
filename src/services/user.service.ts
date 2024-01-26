@@ -48,14 +48,20 @@ export let CreateUserService = async (req: Request, res: Response) => {
   try {
     const { nombre, codEmpleado, rol, _Password, _QR } = req.body;
     let hassPas = await EncryptPassword(_Password);
+
     let val = 0;
-    if (rol === 'ENTREGADOR') {
-      val = 3;
-    } else if (rol === 'GUARDIA') {
+
+    // THIS IS TO SELECT THE ROLE OF THE NEW USER
+    if (rol === '1') {
+      val = 1;
+    } else if (rol === '2') {
       val = 2;
-    } else {
+    } else if (rol === '3'){
       val = 3;
+    }else if (rol === '4'){
+      val = 4;
     }
+
     const query = "INSERT INTO users (nombre, cod_empleado, id_role, hashed_password, qr) VALUES ($1, $2, $3, $4, $5);";
     let values = [nombre, codEmpleado, val, hassPas, _QR]
     connDB.query(query, values, (err, result) => {
@@ -115,16 +121,42 @@ export let UpdateUserService = async (req: Request, res: Response) => {
 
 export let passUser_service = async (req: Request, res: Response) => {
   try {
-    const { user, _Password } = req.query;
-    console.log(user, _Password);
-    const query = format('SELECT nombre, _password, id_rol FROM usuarios WHERE nombre = %L AND _password = %L', user, _Password);
-    connDB.query(query, (err, result) => {
+    const { user, _password } = req.query;
+    console.log(user, _password);
+    const query = 'SELECT nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
+
+    connDB.query(query,[user], async (err, result) => {
+
       if (err) {
+        console.log('ERROR AL ENVIAR A VALIDAR USUARIO : ', err);
         res.status(500).json({ message: 'ERROR AL REALIZAR LA CONSULTA' });
       } else {
+
         if (result.rows.length > 0) {
-          if (result.rows[0].id_rol === 2) {
-            res.status(200).json({ message: 'Usuario válido' });
+          if (result.rows[0].id_role === 1 || result.rows[0].id_role ===  4) {
+
+            if(typeof _password === 'string'){
+
+              const valid = await ComparedPassWord(_password, result.rows[0].hashed_password);
+
+              if(valid){
+                const usurario = {
+                  nombre : result.rows[0].nombre,
+                  cod_empleado : result.rows[0].cod_empleado,
+                  type_ : result.rows[0].id_role
+                }
+                console.log('SE INGRESO VIA FRONT-END KELLER-CHECK');
+                res.status(200).json({ data : usurario});
+              }else{
+                res.status
+              }
+
+            }else{
+              console.log('LA CONTRASEÑA NO ES UN STRING');
+              res.status(500).json({message : 'la contraseña no es un string'});
+            }
+                        
+          
           } else {
             res.status(500).json({ message: 'NO ES UN ADMINISTRADOR' });
           }
@@ -132,42 +164,68 @@ export let passUser_service = async (req: Request, res: Response) => {
         } else {
           res.status(401).json({ message: 'USUARIO INVALIDO' });
         }
+        
       }
     });
-  } catch (err) {
+
+  }catch(err) {
     res.status(500).json({ message: 'NO SE PUDO OBTENER LA RUTA DE ACCESO' });
   }
+
 };
 
 
 export let passUser_appService = async (req: Request, res: Response) => {
   try {
-    const { user, _Password } = req.query;
-    console.log(user, _Password);
-    if (typeof _Password === 'string') {
-      
-      const query = format('SELECT nombre, _password, id_rol FROM users WHERE nombre = %L AND _password = %L', user, await EncryptPassword(_Password));
-      connDB.query(query, (err, result) => {
-        if (err) {
-          res.status(500).json({ message: 'ERROR AL REALIZAR LA CONSULTA' });
-        } else {
-          if (result.rows.length > 0) {
-            if (result.rows[0].id_rol != 2) {
-              res.status(200).json({ data: result.rows });
-            } else {
-              res.status(500).json({ message: 'NO ES UN USUARIO VALIDO' });
+    const { user, _password } = req.query;
+  console.log(user, _password);
+  const query = 'SELECT nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
+
+  connDB.query(query,[user], async (err, result) => {
+
+    if (err) {
+      console.log('ERROR AL ENVIAR A VALIDAR USUARIO : ', err);
+      res.status(500).json({ message: 'ERROR AL REALIZAR LA CONSULTA' });
+    } else {
+
+      if (result.rows.length > 0) {
+        if (result.rows[0].id_role === 2 || result.rows[0].id_role ===  3) {
+
+          if(typeof _password === 'string'){
+
+            const valid = await ComparedPassWord(_password, result.rows[0].hashed_password);
+
+            if(valid){
+              const usurario = {
+                nombre : result.rows[0].nombre,
+                cod_empleado : result.rows[0].cod_empleado,
+                type_ : result.rows[0].id_role
+              }
+              console.log('SE INGRESO VIA APP-END KELLER-CHECK');
+              res.status(200).json({ data : usurario});
+            }else{
+              res.status
             }
 
-          } else {
-            res.status(401).json({ message: 'USUARIO INVALIDO' });
+          }else{
+            console.log('LA CONTRASEÑA NO ES UN STRING');
+            res.status(500).json({message : 'la contraseña no es un string'});
           }
+                      
+        
+        } else {
+          res.status(500).json({ message: 'NO ES UN GUARDIA O ENTREGADOR' });
         }
-      });
-    }else{
-      console.log('VALOR NO VALIDO : ', _Password)
-      res.status(401).json({ message : 'NO ES UN STRING'})
+
+      } else {
+        res.status(401).json({ message: 'USUARIO INVALIDO' });
+      }
+      
     }
+  });
   } catch (err) {
-    res.status(500).json({ message: 'NO SE PUDO OBTENER LA RUTA DE ACCESO' });
+  console.log('ERROR : ', err);
+  res.status(500).json({message : 'no se pudo ingresar a la ruta'}) 
   }
-};
+}
+

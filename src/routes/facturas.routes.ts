@@ -34,4 +34,6 @@ routerFacturas.get('/getEnTransFact', getTransFact_controller);
 // sincronizar y subir fotos
 routerFacturas.put('/SubirFotosFact', postFotos_controller); //         /facturas/SubirFotosFact
 
+routerFacturas.get('/getFactActuves',)
+
 export default routerFacturas;
