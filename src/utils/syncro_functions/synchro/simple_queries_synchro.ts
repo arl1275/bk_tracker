@@ -9,42 +9,22 @@
 
 const paisFilter = 'Honduras';                              // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                      // valor para setear las ubicaciones
-const mininumDateAllowed = '2023-12-31';                     // valor para captar las facturas mas antiguas
+const mininumDateAllowed = '2023-12-15';                     // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
-export const get_all_facturas_without_state = `
-SELECT 
-    DISTINCT 
-    f.ref_factura,
-    f.id,
-    c.lista_empaque, 
-    f.cliente_nombre, 
-    f.cant_cajas, 
-    f.cant_unidades,
-    f.created_at,
-    f.pedidoventa,
-    al.albaran
-FROM 
-    facturas f 
-INNER JOIN 
-    albaranes al ON al.id_factura = f.id 
-INNER JOIN 
-    cajas c ON c.id_albaranes = al.id 
-WHERE 
-    f.id_consolidado IS NULL;`
-;
-
-//---------------------------------------------------------//
-//             QUERY TO GET FACTURAS FROM AX_DB            //
-//---------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
+//                                                                                                     //
+//                              THIS QUERIES ARE FOR GET THE DATA FROM AX                              //
+//                                                                                                     //
+//-----------------------------------------------------------------------------------------------------//
 
 //---------------------------------- THIS IS THE CORRECT WAY TO INSERT---------------------------------
 // SELECT 
 //     PedidoVenta, 
 //     NombreCliente, 
 //     CuentaCliente, 
-//     COALESCE(NULLIF(Factura, ''), CONCAT(Albaran, ' - G')) AS Factura, 
+//     COALESCE(NULLIF(Factura, ''),Albaran) AS Factura, 
 //     Albaran
 // FROM IMGetAllPackedBoxesInSB 
 // WHERE 
@@ -59,7 +39,9 @@ WHERE
 //     Albaran;
 
 
-
+//-----------------------------------------------------------------------------------------------------//
+// this query is to get all the pedidos de venta 
+//-----------------------------------------------------------------------------------------------------//
 export const query_get_pedidoventas = () =>{
   return `
   SELECT 
@@ -72,16 +54,20 @@ export const query_get_pedidoventas = () =>{
     AND ciudad = '${ciudadFilter}'
     AND Factura IS NOT NULL
     AND fecha >= '${mininumDateAllowed}'
+    AND fecha <= '2023-12-22'
   GROUP BY 
     PedidoVenta,
     NombreCliente,
     CuentaCliente;`;
 }
 
+//-----------------------------------------------------------------------------------------------------//
+// this query is to get all facturas of one pedido de venta
+//-----------------------------------------------------------------------------------------------------//
 export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
    return `
    SELECT 
-    DISTINCT Factura
+   distinct COALESCE(NULLIF(Factura, ''),Albaran) AS Factura
    FROM IMGetAllPackedBoxesInSB 
    WHERE 
     Pais = '${paisFilter}'
@@ -90,7 +76,9 @@ export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
     AND fecha >= '${mininumDateAllowed}';
     `;
   }
-
+//-----------------------------------------------------------------------------------------------------//
+// this query is to get all the albaranes of one factura
+//-----------------------------------------------------------------------------------------------------//
 export const query_get_albarans_of_a_factura = (factura: string) => {
   return `
       SELECT DISTINCT
@@ -108,6 +96,30 @@ export const query_get_albarans_of_a_factura = (factura: string) => {
          AND Factura = '${factura}';`;
 }
 
+//-----------------------------------------------------------------------------------------------------//
+// this query is to get all the albaran of one albaran that is beein inserted as factura
+//-----------------------------------------------------------------------------------------------------//
+export const query_get_albaran_of_albaran_inserted_as_factura = ( albaran : string, pedido_venta : string) => {
+  return `
+  SELECT DISTINCT
+         Albaran,
+         Pais,
+         Departamento,
+         ciudad,
+         calle,
+         ubicacion
+     FROM IMGetAllPackedBoxesInSB 
+     WHERE 
+         fecha >= '${mininumDateAllowed}' 
+         AND Pais= '${paisFilter}' 
+         AND ciudad = '${ciudadFilter}' 
+         AND Albaran = '${albaran}'
+         AND PedidoVenta = '${pedido_venta}';`;
+}
+
+//-----------------------------------------------------------------------------------------------------//
+// this query is to get all the albaranes of one factura
+//-----------------------------------------------------------------------------------------------------//
 export const query_get_boxes_of_an_albaran = (albaran: string) => {
   return `
   SELECT
@@ -131,6 +143,9 @@ GROUP BY
   `
 }
 
+//-----------------------------------------------------------------------------------------------------//
+// this query is to get all cajas of one albaran
+//-----------------------------------------------------------------------------------------------------//
 export const get_boxes_one_fact = () => {
   return `SELECT DISTINCT c.caja
       FROM facturas f
@@ -139,9 +154,11 @@ export const get_boxes_one_fact = () => {
       WHERE f.id = $1;`
 }
 
-//---------------------------------------------------------//
-//          QUERY TO PUSH FACTURAS IN POSTGRES_DB          //
-//---------------------------------------------------------//
+//-----------------------------------------------------------------------------------------------------//
+//                                                                                                     //
+//                      THIS QUERIES ARE FOR THE INSERTION IN THE LOCAL DB                             //
+//                                                                                                     //
+//-----------------------------------------------------------------------------------------------------//
 
 export const val_if_pedido_venta = () => {
   return `SELECT EXISTS (SELECT 1 FROM pedidoventas WHERE pedidoventa = $1);`

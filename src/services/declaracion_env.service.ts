@@ -80,6 +80,7 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
     }
 };
 
+// no in use
 export const getDecEnv_serive = async ( req : Request, res : Response) => {
     try {
         const query = 'SELECT * FROM get_dec_env();';
@@ -130,5 +131,45 @@ export const getFacts_one_dec =async (  req : Request, res : Response ) => {
     } catch (err) {
         console.log('ERROR AL OBTENENER RUTA DE FACTURAS : ', err);
         res.status(500).json({ message : 'error para obtener las facturas'})
+    }
+}
+
+// en uso
+export const getDecEnvios_service =async (req : Request , res : Response) => {
+    try {
+        const query = 'SELECT * FROM get_dec_envio_info();';
+        connDB.query(query, (err, result)=>{
+            if(err){
+                console.log('ERROR PARA OBTENER DECLARACIONES ENVIO : ', err);
+                res.status(500).json({ message : 'NO SE PUDO OBTENER LAS DECLARACIONES DE ENVIO'});
+            }else{
+                console.log('SE OBTUBO LAS DECLARACIONES DE ENVIO');
+                res.status(200).json({ data : result.rows});
+            }
+        })
+    } catch (err) {
+        console.log('NO SE PUDO OBTENER LAS DECLARACIONES DE ENVIO', err);
+        res.status(500).json({ message : 'NO SE PUDO OBTENER LAS DECLARACIONES DE ENVIO'});
+    }
+}
+
+//en uso
+export const putDecEnv_service =async ( req : Request , res : Response ) => {
+    try {
+        const data = req.body;
+        console.log('=0=>', data);
+        const query = 'SELECT * FROM set_change_decenvio($1, $2, $3);';
+        connDB.query(query, [data.cam, data.use, data.decenv], (err, result)=>{
+            if(err){
+                console.log('NO SE PUDO HACER EL CAMBIO', err);
+                res.status(500).json({ message : 'NO SE PUDO HACER CAMBIO DE LA DECLARACIONES DE ENVIO'});
+            }else{
+                console.log('SE HIZO CAMBIO DE DECLARACION DE ENVIO');
+                res.status(200).json({ message : 'SE HIZO CAMBIO DE DECLARACION DE ENVIO'});
+            }
+        })
+    } catch (err) {
+        console.log('NO SE PUDO OBTER RUTA LAS DECLARACIONES DE ENVIO', err);
+        res.status(500).json({ message : 'NO SE PUDO OBTENER RUTA LAS DECLARACIONES DE ENVIO'});
     }
 }
