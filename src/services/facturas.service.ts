@@ -3,6 +3,7 @@ import connDB from "../utils/db/localDB_config";
 import format from "pg-format";
 import { factura } from "../interfaces/db_interfeces/Axproveider";
 import { uploadFileToCloudinary } from "../utils/db/cloudinary_config";
+import { QueryResult } from "pg";
 
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
@@ -238,6 +239,7 @@ export let subir_fotos = async ( req: Request, res: Response ) => {
     }
 }
 
+// en uso
 export let getHistoFact_service =async ( req: Request, res: Response ) => {
     try {
         const query = 'SELECT * FROM get_summary_data();';
@@ -253,5 +255,82 @@ export let getHistoFact_service =async ( req: Request, res: Response ) => {
     } catch (err) {
         console.log('ERROR AL OBTENER RUTA: ', err);
         res.status(500).json({ message : 'NO SE PUDO OBTENER RUTA'});
+    }
+}
+
+// en uso
+export let getCajasOneFact_service = async (req: Request, res: Response) => {
+    try {
+      interface CajaProps {
+        id_fact: number;
+        fact: string;
+        albaran: string;
+        caja: string;
+        cantidad: number;
+      }
+  
+      const { data } = req.query;
+      let error = false;
+      let cajas_arr: CajaProps[] = [];
+      const query = 'SELECT * FROM get_cajas_of_fact($1, $2);';
+  
+      if (Array.isArray(data)) {
+        await Promise.all(
+          data.map(async (element: any) => {
+            let id_ = parseInt(element.id_fact);
+            let factura: string = '';
+  
+            if (typeof element.fact === 'string') factura = element.fact;
+  
+            try {
+              const result = await new Promise<QueryResult<CajaProps>>((resolve, reject) => {
+                connDB.query(query, [id_, factura], (err, result) => {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve(result);
+                  }
+                });
+              });
+  
+              cajas_arr.push(...result.rows);
+            } catch (err) {
+              error = true;
+            }
+          })
+        );
+      }
+  
+      if (error === false && cajas_arr.length > 0) {
+        //console.log('data a mandar : ', cajas_arr);
+        console.log('SE OBTUVIERON LAS CAJAS');
+        res.status(200).json({ data: cajas_arr });
+      } else {
+        res.status(500).json({ message: 'Error obtaining cajas' });
+        console.log('Failed to obtain cajas');
+      }
+    } catch (err) {
+      console.error('Error in getCajasOneFact_service:', err);
+      res.status(500).json({ message: 'Failed to obtain cajas' });
+    }
+  };
+  
+  
+
+export let getAdminFacts_service = async ( req: Request, res: Response ) => {
+    try {
+        const query = 'SELECT * FROM get_invoice_info();';
+        connDB.query(query, (err, result)=>{
+            if(err){
+                console.log('ERROR AL OBTENER DATA :', err);
+                res.status(500).json({ message : 'ERROR AL OBTENER DATA'});
+            }else{
+                console.log('SE OBTUBIERON LAS FACTURAS ADMIN');
+                res.status(200).json({data : result.rows});
+            }
+        })
+    } catch (err) {
+        console.log('ERRO AL OBTENER LA RUTA :', err);
+        res.status(500).json({ message : 'ERROR AL OBTENER RUTA'});
     }
 }

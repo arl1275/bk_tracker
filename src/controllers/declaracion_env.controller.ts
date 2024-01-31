@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {
-    getDecEnv_serive, // no in use
+    getDecEnv_serive, // this is for app use, don't delete it
     postNewDecEnv_service,
     getFacts_one_dec,
     putDecEnv_serive,
@@ -17,5 +17,7 @@ export const putDecEnv = async (req: Request, res: Response) => { putDecEnv_seri
 export const getFactsDecEnv = async (req: Request, res: Response) => { getFacts_one_dec(req, res) };
 
 export const putDecEnv_controller = async (req: Request, res: Response) => { putDecEnv_service(req, res) };
+
+export const getDecEnv_appService =async (req: Request, res: Response) => { getDecEnv_serive(req, res) };
 
 

@@ -157,7 +157,7 @@ export const getDecEnvios_service =async (req : Request , res : Response) => {
 export const putDecEnv_service =async ( req : Request , res : Response ) => {
     try {
         const data = req.body;
-        console.log('=0=>', data);
+        //console.log('=0=>', data);
         const query = 'SELECT * FROM set_change_decenvio($1, $2, $3);';
         connDB.query(query, [data.cam, data.use, data.decenv], (err, result)=>{
             if(err){

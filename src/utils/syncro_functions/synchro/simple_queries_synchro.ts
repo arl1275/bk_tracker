@@ -9,7 +9,7 @@
 
 const paisFilter = 'Honduras';                              // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                      // valor para setear las ubicaciones
-const mininumDateAllowed = '2023-12-15';                     // valor para captar las facturas mas antiguas
+const mininumDateAllowed = '2024-1-1';                     // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -54,7 +54,6 @@ export const query_get_pedidoventas = () =>{
     AND ciudad = '${ciudadFilter}'
     AND Factura IS NOT NULL
     AND fecha >= '${mininumDateAllowed}'
-    AND fecha <= '2023-12-22'
   GROUP BY 
     PedidoVenta,
     NombreCliente,

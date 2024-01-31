@@ -8,7 +8,9 @@ import {
         toTransito_controller,
         getTransFact_controller,
         postFotos_controller,
-        getHistoFact_controller
+        getHistoFact_controller,
+        getCajasFAct_controller,
+        getAdminFacts_controller
 } from "../controllers/facturas.controller";
 
 const routerFacturas = express.Router();
@@ -37,5 +39,10 @@ routerFacturas.put('/SubirFotosFact', postFotos_controller); //         /factura
 routerFacturas.get('/getFactActives', get_all_facturas_actives);
 
 routerFacturas.get('/getHistoFact', getHistoFact_controller);
+
+routerFacturas.get('/adminFact', getAdminFacts_controller);
+
+// para sincronizar cajas en la app
+routerFacturas.get('/app/getCajasOneFact', getCajasFAct_controller);
 
 export default routerFacturas;
