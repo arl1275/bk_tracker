@@ -9,7 +9,8 @@ import {
     subir_fotos,
     getHistoFact_service,
     getCajasOneFact_service,
-    getAdminFacts_service
+    getAdminFacts_service,
+    change_state_to_null
 } from "../services/facturas.service";
 
 
@@ -32,4 +33,6 @@ export const getHistoFact_controller = (req: Request, res: Response) => { getHis
 export const getCajasFAct_controller = (req: Request, res: Response) => { getCajasOneFact_service(req, res)};
 
 export const getAdminFacts_controller = (req: Request, res: Response) => { getAdminFacts_service(req, res)};
+
+export const toNullState_controller = ( req : Request, res : Response ) => { change_state_to_null(req, res)}
 

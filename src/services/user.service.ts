@@ -2,7 +2,7 @@ import { Request, Response, query } from "express";
 import connDB from "../utils/db/localDB_config";
 import { usuario } from "../interfaces/ft_interfaces/usuario.interface";
 import format from "pg-format";
-import { EncryptPassword, ComparedPassWord } from "../utils/handle_passwords/utils";
+import { EncryptPassword_, ComparedPassWord } from "../utils/handle_passwords/utils";
 
 export let get_all_entregadores_service = async (req: Request, res: Response) => {
   try {
@@ -47,7 +47,7 @@ export let getAllUsuarios = async (req: Request, res: Response) => {
 export let CreateUserService = async (req: Request, res: Response) => {
   try {
     const { nombre, codEmpleado, rol, _Password, _QR } = req.body;
-    let hassPas = await EncryptPassword(_Password);
+    let hassPas = await EncryptPassword_(_Password);
 
     let val = 0;
 
@@ -96,19 +96,21 @@ export let DelUser = async (req: Request, res: Response) => {
 export let UpdateUserService = async (req: Request, res: Response) => {
   try {
     const { id, nombre, cod_empleado, id_rol, _password, _qr } = req.body;
-    const _hassPas = await EncryptPassword(_password)
-    const query = "UPDATE usuarios SET nombre = $1, cod_empleado = $2, _password = $3, _qr = $4 WHERE id = $5";
+    //console.log('nueva contraseña : ', _password, ' tipo : ', typeof _password);
+    const _hassPas = await EncryptPassword_(`${_password}`);
+    
+    const query = "UPDATE users SET nombre = $1, cod_empleado = $2, hashed_password = $3, qr = $4 WHERE id = $5";
     let values = [nombre, cod_empleado, _hassPas, _qr, id];
-    connDB.query(query, values, (err, result) => {
+    connDB.query(query, values, (err) => {
       if (err) {
-        console.log('EROR AL CREAR :', err)
+        console.log('EROR AL MODIFICAR :', err)
         res.status(500).json({ message: 'NO SE CREO USUARIO EN DB' });
       } else {
         res.status(200).json({ message: 'SE CREO EL USUARIO' })
       }
     });
   } catch (err) {
-    console.log('ERROR TO UPDATE USER');
+    console.log('ERROR TO UPDATE USER', err);
     res.status(500).json({ message: 'NO SE PUDO OBTENER RUTA PARA ACTUALIZAR USUARIO' })
   }
 
@@ -179,7 +181,7 @@ export let passUser_appService = async (req: Request, res: Response) => {
   try {
     const { user, _password } = req.query;
   console.log(user, _password);
-  const query = 'SELECT nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
+  const query = 'SELECT id, qr, nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
 
   connDB.query(query,[user], async (err, result) => {
 
@@ -197,8 +199,10 @@ export let passUser_appService = async (req: Request, res: Response) => {
 
             if(valid){
               const usurario = {
+                id_user : result.rows[0].id,
                 nombre : result.rows[0].nombre,
                 cod_empleado : result.rows[0].cod_empleado,
+                qr : result.rows[0].qr,
                 type_ : result.rows[0].id_role
               }
               console.log('SE INGRESO VIA APP-END KELLER-CHECK');

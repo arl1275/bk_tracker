@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, query } from "express";
 import connDB from "../utils/db/localDB_config";
 import format from "pg-format";
 import { factura } from "../interfaces/db_interfeces/Axproveider";
@@ -181,13 +181,15 @@ export let get_cajas_one_fact = async ( req: Request, res: Response ) =>{
 // en uso
 export let get_facturas_en_transito =async ( req: Request, res: Response ) => {
     try {
-        const query = 'SELECT * FROM get_transito_facturas();';
-        connDB.query(query, (err, result)=>{
+        const {id} = req.query;
+        console.log('data de get facturas : ', req.query);
+        const query = 'SELECT * FROM get_transito_facturas($1);';
+        connDB.query(query, [id] , (err, result)=>{
             if(err){
                 console.log('ERROR AL OBTENER FACTURAS EN TRANSITO : ', err);
                 res.status(500).json({message : 'no se pudo obtener las facturas en transito'});
             }else{
-                console.log('SE OBTUBIERON LAS FACTURAS EN TRANSITO');
+                console.log('SE OBTUBIERON LAS FACTURAS EN TRANSITO DE : ', id);
                 res.status(200).json({ data : result.rows });
             }
         })
@@ -315,8 +317,7 @@ export let getCajasOneFact_service = async (req: Request, res: Response) => {
     }
   };
   
-  
-
+// en uso
 export let getAdminFacts_service = async ( req: Request, res: Response ) => {
     try {
         const query = 'SELECT * FROM get_invoice_info();';
@@ -332,5 +333,31 @@ export let getAdminFacts_service = async ( req: Request, res: Response ) => {
     } catch (err) {
         console.log('ERRO AL OBTENER LA RUTA :', err);
         res.status(500).json({ message : 'ERROR AL OBTENER RUTA'});
+    }
+}
+
+// en uso
+
+export let change_state_to_null = async ( req : Request, res : Response) => {
+    try {
+        const { factura } = req.query;
+        let val = ''
+        if(typeof factura === 'string') val = factura
+        const query = 'SELECT * FROM change_state_to_null_state($1);';
+
+        connDB.query(query, [val], (err, result)=>{
+            if(err){
+                console.log('ERROR NO SE PUDO HACER CAMBIO DE FACTURA', err);
+                res.status(500).json({ message : 'NO SE PUDO HACER EL CAMBIO DE LA FACTURA'});
+            }else{
+                console.log('SE REALIZO EL CAMBIO DE FACTURA');
+                res.status(200).json({ message : 'SE REALIZO EL CAMBIO DE LA FACTURA A NULL'})
+            }
+        })
+
+
+    } catch (err) {
+        console.log('ERROR NO SE PUDO HACER CAMBIO DE FACTURA', err);
+        res.status(500).json({ message : 'NO SE PUDO HACER EL CAMBIO DE LA FACTURA'});
     }
 }

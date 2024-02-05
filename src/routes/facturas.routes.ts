@@ -10,7 +10,8 @@ import {
         postFotos_controller,
         getHistoFact_controller,
         getCajasFAct_controller,
-        getAdminFacts_controller
+        getAdminFacts_controller,
+        toNullState_controller
 } from "../controllers/facturas.controller";
 
 const routerFacturas = express.Router();
@@ -44,5 +45,7 @@ routerFacturas.get('/adminFact', getAdminFacts_controller);
 
 // para sincronizar cajas en la app
 routerFacturas.get('/app/getCajasOneFact', getCajasFAct_controller);
+
+routerFacturas.get('/toNullState', toNullState_controller);
 
 export default routerFacturas;

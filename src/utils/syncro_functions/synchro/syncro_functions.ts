@@ -37,10 +37,10 @@ export const val_insert_pedidoventas_nuevas =async (id_ : string) => {
   });
 }
 
-export const val_insert_facturas_nuevas = async (data: string): Promise<boolean> => {
+export const val_insert_facturas_nuevas = async (factura: string, pedido : string): Promise<boolean> => {
   return new Promise<boolean>((resolve, reject) => {
     try {
-      connDB.query(val_if_fact_exist(), [data], (err, result) => {
+      connDB.query(val_if_fact_exist(), [factura, pedido], (err, result) => {
         if (err) {
           console.error('Error executing query : ', err);
           reject(err); // Reject the promise in case of an error

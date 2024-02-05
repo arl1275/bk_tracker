@@ -5,10 +5,13 @@ const saltRounds = 10;
 //--------------------------------------------------------------------//
 //                    ENCRIPTACION DE CONTRASEÑAS                     //                
 //--------------------------------------------------------------------//
-export const EncryptPassword =async (_password: string) => {
-    const hasshedPAs = await bcrypt.hash(_password, saltRounds);
+export const EncryptPassword_ =  (_password: string) => {
+    //console.log('constraseña : ', _password, ' tipo :', typeof _password);
+    const hasshedPAs =  bcrypt.hash(_password, 10);
+    console.log('SE MODIFICO CONTRASEÑA DE USUARIO');
     return hasshedPAs;
 }
+
 
 export const ComparedPassWord = async (LogPassword : string, DBPassword : string) => {
     try {

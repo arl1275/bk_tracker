@@ -22,11 +22,11 @@ routerUser.post("/createuser", create_User);
 
 routerUser.delete("/deleteuser:", delete_User);
 
-routerUser.put("/update_user", update_user);
+routerUser.put("/update_user", update_user); // /usuarios/update_user
 
 routerUser.get("/auth/user", log_controller);
 
-routerUser.get("/auth/app", log_appController);
+routerUser.get("/auth/app", log_appController); //usuarios/auth/app
 
 // routerUser.get("/EMER:", Emergency_log);
 

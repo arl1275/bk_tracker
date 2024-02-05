@@ -65,16 +65,43 @@ export const query_get_pedidoventas = () =>{
 //-----------------------------------------------------------------------------------------------------//
 export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
    return `
-   SELECT 
-   distinct COALESCE(NULLIF(Factura, ''),Albaran) AS Factura
-   FROM IMGetAllPackedBoxesInSB 
-   WHERE 
-    Pais = '${paisFilter}'
-    AND ciudad = '${ciudadFilter}'
-    AND PedidoVenta = '${pedido}'
-    AND fecha >= '${mininumDateAllowed}';
+   SELECT
+   CASE
+       WHEN (Factura IS NOT NULL OR Factura != '') AND AlbaranCount = 1 THEN
+           Factura
+       WHEN (Factura IS NULL OR Factura = '') AND AlbaranCount = 1 THEN
+           Albaran
+       WHEN (Factura IS NOT NULL OR Factura != '') AND AlbaranCount >= 2 THEN
+           CONCAT(Factura, ' ', Albaran)
+   END AS Factura
+FROM (
+   SELECT distinct
+   Factura,
+   Albaran,
+   COUNT(*) OVER (PARTITION BY Albaran) AS AlbaranCount
+   FROM
+       IMGetAllPackedBoxesInSB
+   WHERE
+       Pais = '${paisFilter}'
+       AND Ciudad = '${ciudadFilter}'
+       AND fecha >= '${mininumDateAllowed}'
+       AND pedidoventa = '${pedido}'
+   --and factura = '00207341'
+ group by Factura, albaran
+) AS Subquery;
     `;
   }
+
+
+  // SELECT 
+  //  distinct COALESCE(NULLIF(Factura, ''),Albaran) AS Factura
+  //  FROM IMGetAllPackedBoxesInSB 
+  //  WHERE 
+  //   Pais = '${paisFilter}'
+  //   AND ciudad = '${ciudadFilter}'
+  //   AND PedidoVenta = '${pedido}'
+  //   AND fecha >= '${mininumDateAllowed}';
+  //   `
 //-----------------------------------------------------------------------------------------------------//
 // this query is to get all the albaranes of one factura
 //-----------------------------------------------------------------------------------------------------//
@@ -113,7 +140,8 @@ export const query_get_albaran_of_albaran_inserted_as_factura = ( albaran : stri
          AND Pais= '${paisFilter}' 
          AND ciudad = '${ciudadFilter}' 
          AND Albaran = '${albaran}'
-         AND PedidoVenta = '${pedido_venta}';`;
+         AND PedidoVenta = '${pedido_venta}'
+         AND (factura is null or factura ='');`;
 }
 
 //-----------------------------------------------------------------------------------------------------//
@@ -164,7 +192,10 @@ export const val_if_pedido_venta = () => {
 }
 
 export const val_if_fact_exist = () =>{
-  return `SELECT EXISTS (SELECT 1 FROM facturas WHERE factura = $1);`;
+  return `SELECT EXISTS (
+    SELECT 1 FROM pedidoventas p 
+    INNER JOIN facturas f on p.id = f.id_pedidoventas
+    WHERE f.factura = $1 and p.pedidoventa = $2);`;
 }
 
 export const insert_pedido_venta = () => {
