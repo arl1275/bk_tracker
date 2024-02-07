@@ -3,11 +3,11 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 const connDB = new Pool({
-  user: 'root',
-  host: 'localhost',
-  database: 'track',
-  password: 'root',
-  port: 5432, // Default PostgreSQL port
+  user : process.env.DBuser,
+  host : process.env.DBhost,
+  database : process.env.DBdatabase,
+  password : process.env.DBpassword,
+  port : 5432, // Default PostgreSQL port
 });
 
 connDB.query('SELECT NOW()', (err, res) => {

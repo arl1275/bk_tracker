@@ -227,6 +227,7 @@ export let passUser_appService = async (req: Request, res: Response) => {
       
     }
   });
+  
   } catch (err) {
   console.log('ERROR : ', err);
   res.status(500).json({message : 'no se pudo ingresar a la ruta'}) 

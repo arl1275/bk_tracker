@@ -343,6 +343,7 @@ export let change_state_to_null = async ( req : Request, res : Response) => {
         const { factura } = req.query;
         let val = ''
         if(typeof factura === 'string') val = factura
+                                     
         const query = 'SELECT * FROM change_state_to_null_state($1);';
 
         connDB.query(query, [val], (err, result)=>{
