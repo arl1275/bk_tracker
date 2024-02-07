@@ -9,7 +9,7 @@
 
 const paisFilter = 'Honduras';                              // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                      // valor para setear las ubicaciones
-const mininumDateAllowed = '2024-1-1';                     // valor para captar las facturas mas antiguas
+const mininumDateAllowed = '2024-01-01';                     // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -73,6 +73,8 @@ export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
            Albaran
        WHEN (Factura IS NOT NULL OR Factura != '') AND AlbaranCount >= 2 THEN
            CONCAT(Factura, ' ', Albaran)
+      WHEN (Factura IS NULL OR Factura = '') AND AlbaranCount >= 2 THEN 
+          Albaran
    END AS Factura
 FROM (
    SELECT distinct
