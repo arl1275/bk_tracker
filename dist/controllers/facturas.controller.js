@@ -24,4 +24,3 @@ const getAdminFacts_controller = (req, res) => { (0, facturas_service_1.getAdmin
 exports.getAdminFacts_controller = getAdminFacts_controller;
 const toNullState_controller = (req, res) => { (0, facturas_service_1.change_state_to_null)(req, res); };
 exports.toNullState_controller = toNullState_controller;
-//# sourceMappingURL=facturas.controller.js.map

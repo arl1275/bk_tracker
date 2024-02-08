@@ -14,4 +14,3 @@ routerEntregas.put('/toSincronizar', entregas_controller_1.entregatoSincronizarC
 // pics functions
 routerEntregas.get('/getFactPics', entregas_controller_1.getPicsOneFactController);
 exports.default = routerEntregas;
-//# sourceMappingURL=entregas.routes.js.map

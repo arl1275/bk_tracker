@@ -21,4 +21,3 @@ const generate_dec_env = () => {
     `;
 };
 exports.generate_dec_env = generate_dec_env;
-//# sourceMappingURL=works_querys.js.map

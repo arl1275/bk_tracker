@@ -132,4 +132,3 @@ const insert_boxes_ = (data, id_) => __awaiter(void 0, void 0, void 0, function*
     });
 });
 exports.insert_boxes_ = insert_boxes_;
-//# sourceMappingURL=syncro_functions.js.map

@@ -25,4 +25,3 @@ exports.entregatoSincronizarController = entregatoSincronizarController;
 //----------------------------------------------------
 let getPicsOneFactController = (req, res) => { (0, entregas_service_1.PicsToSend)(req, res); };
 exports.getPicsOneFactController = getPicsOneFactController;
-//# sourceMappingURL=entregas.controller.js.map

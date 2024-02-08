@@ -22,7 +22,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' })); // for parsing application/json
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.get("/conn", (req, res) => {
+app.get("/", (req, res) => {
     res.status(200).json({ message: 'is conn' });
 });
 app.use("/facturas", facturas_routes_1.default);
@@ -34,4 +34,3 @@ app.use('/decEnv', declaracion_env_routes_1.default);
 app.listen(3000, () => {
     console.log('Server en LINEA. En puerto :', 3000);
 });
-//# sourceMappingURL=index.js.map

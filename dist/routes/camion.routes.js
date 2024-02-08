@@ -11,4 +11,3 @@ routerFacturas.put('/updatePlaca', camion_controller_1.update_placa_camion_contr
 routerFacturas.put('/updateQR', camion_controller_1.update_QR_camion_controller);
 routerFacturas.delete('/DeloneCamion', camion_controller_1.delete_one_camion_controller);
 exports.default = routerFacturas;
-//# sourceMappingURL=camion.routes.js.map

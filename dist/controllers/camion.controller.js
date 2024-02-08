@@ -19,4 +19,3 @@ const update_QR_camion_controller = (req, res) => { (0, camion_service_1.update_
 exports.update_QR_camion_controller = update_QR_camion_controller;
 const delete_one_camion_controller = (req, res) => { (0, camion_service_1.delete_one_camion_service)(req, res); };
 exports.delete_one_camion_controller = delete_one_camion_controller;
-//# sourceMappingURL=camion.controller.js.map

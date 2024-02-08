@@ -19,4 +19,3 @@ exports.log_appController = log_appController;
 // //admin routes
 const see_all_users = (req, res) => { (0, user_service_1.getAllUsuarios)(req, res); };
 exports.see_all_users = see_all_users;
-//# sourceMappingURL=user.controller.js.map

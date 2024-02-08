@@ -217,4 +217,3 @@ const insert_boxes = () => {
   VALUES (CURRENT_TIMESTAMP, $1, $2, $3, $4, $5);`;
 };
 exports.insert_boxes = insert_boxes;
-//# sourceMappingURL=simple_queries_synchro.js.map

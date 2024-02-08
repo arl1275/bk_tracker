@@ -27,7 +27,7 @@ app.use(cors());
 app.use(bodyParser.json({limit : '50mb'})); // for parsing application/json
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-app.get("/conn", (req : Request, res : Response)=>{
+app.get("/", (req : Request, res : Response)=>{
     res.status(200).json({message : 'is conn'});
 })
 

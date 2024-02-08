@@ -24,4 +24,3 @@ routerFacturas.get('/adminFact', facturas_controller_1.getAdminFacts_controller)
 routerFacturas.get('/app/getCajasOneFact', facturas_controller_1.getCajasFAct_controller);
 routerFacturas.get('/toNullState', facturas_controller_1.toNullState_controller);
 exports.default = routerFacturas;
-//# sourceMappingURL=facturas.routes.js.map

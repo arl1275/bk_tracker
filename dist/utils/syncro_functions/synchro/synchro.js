@@ -51,4 +51,3 @@ function syncroData_AX() {
 }
 exports.syncroData_AX = syncroData_AX;
 ;
-//# sourceMappingURL=synchro.js.map

@@ -14,4 +14,3 @@ const insert_albaran_as_fact = (pedido) => {
 	 AND albaran is not null`;
 };
 exports.insert_albaran_as_fact = insert_albaran_as_fact;
-//# sourceMappingURL=albaran_synchro.js.map

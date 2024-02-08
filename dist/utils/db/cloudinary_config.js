@@ -68,4 +68,3 @@ const uploadFileToCloudinary = (imagen, folder, nameFact) => {
     });
 };
 exports.uploadFileToCloudinary = uploadFileToCloudinary;
-//# sourceMappingURL=cloudinary_config.js.map

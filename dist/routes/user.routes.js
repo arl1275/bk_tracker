@@ -14,4 +14,3 @@ routerUser.get("/auth/user", user_controller_1.log_controller);
 routerUser.get("/auth/app", user_controller_1.log_appController); //usuarios/auth/app
 // routerUser.get("/EMER:", Emergency_log);
 exports.default = routerUser;
-//# sourceMappingURL=user.routes.js.map

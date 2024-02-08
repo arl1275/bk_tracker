@@ -23,4 +23,3 @@ const putDecEnv_controller = (req, res) => __awaiter(void 0, void 0, void 0, fun
 exports.putDecEnv_controller = putDecEnv_controller;
 const getDecEnv_appService = (req, res) => __awaiter(void 0, void 0, void 0, function* () { (0, declaracion_env_service_1.getDecEnv_serive)(req, res); });
 exports.getDecEnv_appService = getDecEnv_appService;
-//# sourceMappingURL=declaracion_env.controller.js.map

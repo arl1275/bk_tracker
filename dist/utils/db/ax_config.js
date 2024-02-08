@@ -62,4 +62,3 @@ function executeQuery(query) {
     });
 }
 exports.executeQuery = executeQuery;
-//# sourceMappingURL=ax_config.js.map

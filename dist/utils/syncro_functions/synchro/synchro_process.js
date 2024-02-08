@@ -88,4 +88,3 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.NORMAL_insert_process_of_synchro = NORMAL_insert_process_of_synchro;
-//# sourceMappingURL=synchro_process.js.map

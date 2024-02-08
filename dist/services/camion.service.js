@@ -127,4 +127,3 @@ let delete_one_camion_service = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.delete_one_camion_service = delete_one_camion_service;
-//# sourceMappingURL=camion.service.js.map

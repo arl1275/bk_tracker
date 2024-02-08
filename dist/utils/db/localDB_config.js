@@ -42,4 +42,3 @@ connDB.query('SELECT NOW()', (err, res) => {
     }
 });
 exports.default = connDB;
-//# sourceMappingURL=localDB_config.js.map
