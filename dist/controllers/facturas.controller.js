@@ -1,0 +1,27 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.toNullState_controller = exports.getAdminFacts_controller = exports.getCajasFAct_controller = exports.getHistoFact_controller = exports.postFotos_controller = exports.getTransFact_controller = exports.toTransito_controller = exports.get_cajas_controller = exports.get_all_facturas_ = exports.get_all_facturas_actives = exports.get_all_facturas_controller = void 0;
+const facturas_service_1 = require("../services/facturas.service");
+const get_all_facturas_controller = (req, res) => { (0, facturas_service_1.get_all_facturas_service)(req, res); };
+exports.get_all_facturas_controller = get_all_facturas_controller;
+const get_all_facturas_actives = (req, res) => { (0, facturas_service_1.get_facturas_actives)(req, res); };
+exports.get_all_facturas_actives = get_all_facturas_actives;
+const get_all_facturas_ = (req, res) => { (0, facturas_service_1.get_facturas_all)(req, res); };
+exports.get_all_facturas_ = get_all_facturas_;
+const get_cajas_controller = (req, res) => { (0, facturas_service_1.get_cajas_one_fact)(req, res); };
+exports.get_cajas_controller = get_cajas_controller;
+const toTransito_controller = (req, res) => { (0, facturas_service_1.change_transito_service)(req, res); };
+exports.toTransito_controller = toTransito_controller;
+const getTransFact_controller = (req, res) => { (0, facturas_service_1.get_facturas_en_transito)(req, res); };
+exports.getTransFact_controller = getTransFact_controller;
+const postFotos_controller = (req, res) => { (0, facturas_service_1.subir_fotos)(req, res); };
+exports.postFotos_controller = postFotos_controller;
+const getHistoFact_controller = (req, res) => { (0, facturas_service_1.getHistoFact_service)(req, res); };
+exports.getHistoFact_controller = getHistoFact_controller;
+const getCajasFAct_controller = (req, res) => { (0, facturas_service_1.getCajasOneFact_service)(req, res); };
+exports.getCajasFAct_controller = getCajasFAct_controller;
+const getAdminFacts_controller = (req, res) => { (0, facturas_service_1.getAdminFacts_service)(req, res); };
+exports.getAdminFacts_controller = getAdminFacts_controller;
+const toNullState_controller = (req, res) => { (0, facturas_service_1.change_state_to_null)(req, res); };
+exports.toNullState_controller = toNullState_controller;
+//# sourceMappingURL=facturas.controller.js.map
