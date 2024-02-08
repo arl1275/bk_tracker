@@ -10,6 +10,7 @@
     "@types/node-cron": "^3.0.11",
     "@types/pg": "^8.10.9",
     "@types/pg-format": "^1.0.5",
+    "@webpack-cli/generators": "^3.0.7",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cloudinary": "^1.41.1",
@@ -20,12 +21,18 @@
     "jsonwebtoken": "^9.0.2",
     "mssql": "^10.0.1",
     "node-cron": "^3.0.3",
-    "pg": "^8.11.3",
+    "pg": "^8.11.3", 
     "pg-format": "^1.0.4",
+    "ts-loader": "^9.5.1",
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "tsc --build --clean"
+    "build": "webpack",
+    "clean": "tsc --build --clean",
+    "start": "node ./dist/app.js"
+  },
+  "devDependencies": {
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4"
   }
 }
