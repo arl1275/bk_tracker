@@ -47,20 +47,23 @@ export const NORMAL_insert_process_of_synchro = async () => {
         //------------------------------------------------------------------------------------------------------------//
                          const facturas_: factura[] = await executeQuery(query_get_facts_of_a_pedidoVenta(pedido.PedidoVenta));                  
                          for (let j = 0; j < facturas_.length; j++) {
-                             const fact: factura = facturas_[j];
-
+                            //console.log(' DATA DE FACTURA ::: ', facturas_);
+                             const fact = facturas_[j];
+                            //console.log('data de una factura :: ', fact, typeof fact);
                              if (fact) { // fact.Factura.startWith('AL')
+                                
                                 const exist_factura = await val_insert_facturas_nuevas(fact.Factura, pedido.PedidoVenta);                        // values if the factura already exist in LOCAL_DB
 
                                  if (exist_factura === false) {
                                      const id_factura = await insert_factura_(fact, id_pedido);                                                  // insert the factura and return the id
 
                                      if (id_factura) {
+                                        console.log('ID DE FACTURA ====> ', id_factura);
                                         //----------------------------------------------------------------------------------------------------//
                                          //                  THIS IS TO HANDLE THE ALBARANES THAT DOES NOT HAVE FACTURA                        //
                                          //----------------------------------------------------------------------------------------------------//
                                          let albaran_ : albaran[];
-
+                                            
                                          if(fact.Factura.startsWith('AL')){ // if an albaran was inserted as factura, the get the albaran of that albaran
                                              console.log('SE INSERTO COMO ALBARAN : ', fact.Factura);                                                                           
                                              albaran_ = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura(fact.Factura, pedido.PedidoVenta))

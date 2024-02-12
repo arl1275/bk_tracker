@@ -62,14 +62,10 @@ const query_get_facts_of_a_pedidoVenta = (pedido) => {
     return `
    SELECT
    CASE
-       WHEN (Factura IS NOT NULL OR Factura != '') AND AlbaranCount = 1 THEN
-           Factura
-       WHEN (Factura IS NULL OR Factura = '') AND AlbaranCount = 1 THEN
-           Albaran
-       WHEN (Factura IS NOT NULL OR Factura != '') AND AlbaranCount >= 2 THEN
-           CONCAT(Factura, ' ', Albaran)
-      WHEN (Factura IS NULL OR Factura = '') AND AlbaranCount >= 2 THEN 
-          Albaran
+       WHEN ( Factura != '') AND AlbaranCount = 1 THEN Factura
+       WHEN (Factura IS NULL or factura = '') AND AlbaranCount = 1 THEN Albaran
+       WHEN ( Factura != '') AND AlbaranCount > 1 THEN CONCAT(Factura, ' ', Albaran)
+	    WHEN ( Factura = '') AND AlbaranCount > 1 THEN Albaran
    END AS Factura
 FROM (
    SELECT distinct
@@ -85,8 +81,7 @@ FROM (
        AND pedidoventa = '${pedido}'
    --and factura = '00207341'
  group by Factura, albaran
-) AS Subquery;
-    `;
+) AS Subquery; `;
 };
 exports.query_get_facts_of_a_pedidoVenta = query_get_facts_of_a_pedidoVenta;
 // SELECT 

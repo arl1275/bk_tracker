@@ -33,12 +33,15 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                         //------------------------------------------------------------------------------------------------------------//
                         const facturas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_facts_of_a_pedidoVenta)(pedido.PedidoVenta));
                         for (let j = 0; j < facturas_.length; j++) {
+                            console.log(' DATA DE FACTURA ::: ', facturas_);
                             const fact = facturas_[j];
+                            console.log('data de una factura :: ', fact, typeof fact);
                             if (fact) { // fact.Factura.startWith('AL')
                                 const exist_factura = yield (0, syncro_functions_1.val_insert_facturas_nuevas)(fact.Factura, pedido.PedidoVenta); // values if the factura already exist in LOCAL_DB
                                 if (exist_factura === false) {
                                     const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact, id_pedido); // insert the factura and return the id
                                     if (id_factura) {
+                                        console.log('ID DE FACTURA ====> ', id_factura);
                                         //----------------------------------------------------------------------------------------------------//
                                         //                  THIS IS TO HANDLE THE ALBARANES THAT DOES NOT HAVE FACTURA                        //
                                         //----------------------------------------------------------------------------------------------------//
