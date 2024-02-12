@@ -9,7 +9,7 @@
 
 const paisFilter = 'Honduras';                              // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                      // valor para setear las ubicaciones
-const mininumDateAllowed = '2024-01-01';                     // valor para captar las facturas mas antiguas
+const mininumDateAllowed = '2024-02-10';                     // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
