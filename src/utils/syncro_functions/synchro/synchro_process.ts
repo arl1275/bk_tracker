@@ -47,9 +47,9 @@ export const NORMAL_insert_process_of_synchro = async () => {
         //------------------------------------------------------------------------------------------------------------//
                          const facturas_: factura[] = await executeQuery(query_get_facts_of_a_pedidoVenta(pedido.PedidoVenta));                  
                          for (let j = 0; j < facturas_.length; j++) {
-                            //console.log(' DATA DE FACTURA ::: ', facturas_);
+                            
                              const fact = facturas_[j];
-                            //console.log('data de una factura :: ', fact, typeof fact);
+                            
                              if (fact) { // fact.Factura.startWith('AL')
                                 
                                 const exist_factura = await val_insert_facturas_nuevas(fact.Factura, pedido.PedidoVenta);                        // values if the factura already exist in LOCAL_DB

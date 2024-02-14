@@ -212,7 +212,7 @@ let passUser_appService = (req, res) => __awaiter(void 0, void 0, void 0, functi
                                 res.status(200).json({ data: usurario });
                             }
                             else {
-                                res.status;
+                                res.status(500).json({ message: 'usuario invalido' });
                             }
                         }
                         else {

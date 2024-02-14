@@ -176,7 +176,6 @@ export let passUser_service = async (req: Request, res: Response) => {
 
 };
 
-
 export let passUser_appService = async (req: Request, res: Response) => {
   try {
     const { user, _password } = req.query;
@@ -208,7 +207,7 @@ export let passUser_appService = async (req: Request, res: Response) => {
               console.log('SE INGRESO VIA APP-END KELLER-CHECK');
               res.status(200).json({ data : usurario});
             }else{
-              res.status
+              res.status(500).json({ message : 'usuario invalido'});
             }
 
           }else{

@@ -70,7 +70,7 @@ export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
        WHEN ( Factura != '') AND AlbaranCount = 1 THEN Factura
        WHEN (Factura IS NULL or factura = '') AND AlbaranCount = 1 THEN Albaran
        WHEN ( Factura != '') AND AlbaranCount > 1 THEN CONCAT(Factura, ' ', Albaran)
-	    WHEN ( Factura = '') AND AlbaranCount > 1 THEN Albaran
+	     WHEN ( Factura = '') AND AlbaranCount > 1 THEN Albaran
    END AS Factura
 FROM (
    SELECT distinct
@@ -89,18 +89,6 @@ FROM (
 ) AS Subquery; `;
   }
 
-
-  // SELECT 
-  //  distinct COALESCE(NULLIF(Factura, ''),Albaran) AS Factura
-  //  FROM IMGetAllPackedBoxesInSB 
-  //  WHERE 
-  //   Pais = '${paisFilter}'
-  //   AND ciudad = '${ciudadFilter}'
-  //   AND PedidoVenta = '${pedido}'
-  //   AND fecha >= '${mininumDateAllowed}';
-  //   `
-//-----------------------------------------------------------------------------------------------------//
-// this query is to get all the albaranes of one factura
 //-----------------------------------------------------------------------------------------------------//
 export const query_get_albarans_of_a_factura = (factura: string) => {
   return `
