@@ -19,7 +19,7 @@ const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
     try {
         const { declaracion_env, id_cam, id_user } = req.body;
         let _id_ = 0;
-        // primero creamos la declaracion de envio y guardamos el ID
+        let _dec_ = 0;
         const result = yield new Promise((resolve, reject) => {
             localDB_config_1.default.query((0, works_querys_1.generate_dec_env)(), [id_cam, id_user], (err, result) => {
                 if (err) {
@@ -29,6 +29,7 @@ const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
                 else {
                     console.log('SE CREO LA DECLARACION DE ENVIO');
                     _id_ = result.rows[0].id;
+                    _dec_ = result.rows[0].declaracionenvio;
                     resolve(result);
                 }
             });
@@ -71,11 +72,12 @@ const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
                     });
                 }
                 catch (err) {
-                    // Handle specific error if needed
+                    console.log('ERRORES PARA CAMBIAR ESTADO DE FACTUARAS : ', err);
                 }
             }
             if (error === false) {
-                res.status(200).json({ message: 'SE CREO LAS REFERENCIAS Y DECLARACION' });
+                console.log('SE CREO LAS DECLARACIONES DE ENVIO');
+                res.status(200).json({ data: _dec_ });
             }
             else {
                 res.status(500).json({ message: 'NO CREO LAS REFERENCIAS Y DECLARACION' });

@@ -124,7 +124,6 @@ export let UpdateUserService = async (req: Request, res: Response) => {
 export let passUser_service = async (req: Request, res: Response) => {
   try {
     const { user, _password } = req.query;
-    console.log(user, _password);
     const query = 'SELECT nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
 
     connDB.query(query,[user], async (err, result) => {
@@ -150,7 +149,8 @@ export let passUser_service = async (req: Request, res: Response) => {
                 console.log('SE INGRESO VIA FRONT-END KELLER-CHECK');
                 res.status(200).json({ data : usurario});
               }else{
-                res.status
+                console.log('SE INTENGO INGRESAR AL KELLER')
+                res.status(500)
               }
 
             }else{
@@ -164,7 +164,7 @@ export let passUser_service = async (req: Request, res: Response) => {
           }
 
         } else {
-          res.status(401).json({ message: 'USUARIO INVALIDO' });
+          res.status(500).json({ message: 'USUARIO INVALIDO' });
         }
         
       }
@@ -179,7 +179,7 @@ export let passUser_service = async (req: Request, res: Response) => {
 export let passUser_appService = async (req: Request, res: Response) => {
   try {
     const { user, _password } = req.query;
-  console.log(user, _password);
+
   const query = 'SELECT id, qr, nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
 
   connDB.query(query,[user], async (err, result) => {

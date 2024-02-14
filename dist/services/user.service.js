@@ -140,7 +140,6 @@ exports.UpdateUserService = UpdateUserService;
 let passUser_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user, _password } = req.query;
-        console.log(user, _password);
         const query = 'SELECT nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
         localDB_config_1.default.query(query, [user], (err, result) => __awaiter(void 0, void 0, void 0, function* () {
             if (err) {
@@ -162,7 +161,8 @@ let passUser_service = (req, res) => __awaiter(void 0, void 0, void 0, function*
                                 res.status(200).json({ data: usurario });
                             }
                             else {
-                                res.status;
+                                console.log('SE INTENGO INGRESAR AL KELLER');
+                                res.status(500);
                             }
                         }
                         else {
@@ -175,7 +175,7 @@ let passUser_service = (req, res) => __awaiter(void 0, void 0, void 0, function*
                     }
                 }
                 else {
-                    res.status(401).json({ message: 'USUARIO INVALIDO' });
+                    res.status(500).json({ message: 'USUARIO INVALIDO' });
                 }
             }
         }));
@@ -188,7 +188,6 @@ exports.passUser_service = passUser_service;
 let passUser_appService = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user, _password } = req.query;
-        console.log(user, _password);
         const query = 'SELECT id, qr, nombre, hashed_password, id_role, cod_empleado FROM users WHERE nombre = $1';
         localDB_config_1.default.query(query, [user], (err, result) => __awaiter(void 0, void 0, void 0, function* () {
             if (err) {

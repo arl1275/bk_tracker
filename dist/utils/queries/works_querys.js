@@ -8,7 +8,7 @@ const generate_dec_env = () => {
         (
             SELECT num
             FROM (
-                SELECT generate_series(1, 100000) AS num
+                SELECT generate_series(1, 1000000) AS num
             ) AS numbered_rows
             ORDER BY random()
             LIMIT 1
@@ -17,7 +17,7 @@ const generate_dec_env = () => {
         (SELECT id FROM camiones WHERE placa = $1), 
         (SELECT id FROM users WHERE nombre = $2)
     )
-    RETURNING id;
+    RETURNING id, declaracionenvio;
     `;
 };
 exports.generate_dec_env = generate_dec_env;

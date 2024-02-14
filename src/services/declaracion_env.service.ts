@@ -8,7 +8,8 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
     try {
         const { declaracion_env, id_cam, id_user } = req.body;
         let _id_: number = 0;
-        // primero creamos la declaracion de envio y guardamos el ID
+        let _dec_ : number = 0;
+
         const result = await new Promise((resolve, reject) => {
             connDB.query(generate_dec_env(), [id_cam, id_user], (err, result) => {
                 if (err) {
@@ -17,6 +18,7 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
                 } else {
                     console.log('SE CREO LA DECLARACION DE ENVIO');
                     _id_ = result.rows[0].id;
+                    _dec_ = result.rows[0].declaracionenvio;
                     resolve(result);
                 }
             });
@@ -62,12 +64,13 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
 
 
                 } catch (err) {
-                    // Handle specific error if needed
+                    console.log('ERRORES PARA CAMBIAR ESTADO DE FACTUARAS : ', err);
                 }
             }
 
             if (error === false) {
-                res.status(200).json({ message: 'SE CREO LAS REFERENCIAS Y DECLARACION' });
+                console.log('SE CREO LAS DECLARACIONES DE ENVIO')
+                res.status(200).json({ data : _dec_});
             } else {
                 res.status(500).json({ message: 'NO CREO LAS REFERENCIAS Y DECLARACION' });
             }
