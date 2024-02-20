@@ -13,7 +13,7 @@ import {
 //              THIS FILE HAVE THE FUNCTIONS TO SYNCRO FACTS WITH AX            //
 //------------------------------------------------------------------------------//
 
-export const val_insert_pedidoventas_nuevas =async (id_ : string) => {
+export const val_insert_pedidoventas_nuevas = async (id_ : string) => {
   return new Promise<boolean>((resolve, reject) => {
     try {
       const exist = false;

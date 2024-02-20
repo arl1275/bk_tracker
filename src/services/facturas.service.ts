@@ -4,6 +4,8 @@ import format from "pg-format";
 import { factura } from "../interfaces/db_interfeces/Axproveider";
 import { uploadFileToCloudinary } from "../utils/db/cloudinary_config";
 import { QueryResult } from "pg";
+import { sendEmail_transito } from "../utils/reports/mail_body";
+import { sendEmail_Entregados } from "../utils/reports/mail.body_syncro";
 
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
@@ -92,37 +94,71 @@ export let change_preparacion_service = async ( req: Request, res: Response ) =>
 }
 
 //EN USO
-export let change_transito_service = async ( req: Request, res: Response ) => {
-    try {
-        const data = req.body;
-        const query = 'SELECT * FROM change_state_to_entransito($1);'; // the $1, is the referencence of the factura
-        let is_err;
-        //console.log(' DATA GETS : ', data, req.body);
-         for (let i = 0; i < data.length; i++) {
-             const factura_ = data[i];
-            //console.log('fact => ', factura_)
-              connDB.query(query, [factura_], (err, result)=>{
-                  if(err){
-                      console.log('NO SE PUDO ENVIAR A TRANSITO : ', err);
-                      is_err = true;
-                  }else{
-                      console.log('SE ENVIO A TRANSITO : ', factura_);
-                      is_err = false
-                  }
-              })
-         }
+// export let change_transito_service = async ( req: Request, res: Response ) => {
+//     try {
+//         let data_to_mail : string[] = [];                                   // this is to save the facturas references, to generate an Email.
+//         const data = req.body;
+//         console.log('DATA DESDE LA APP :::' , data);
+//         const query = 'SELECT * FROM change_state_to_entransito($1);'; // the $1, is the referencence of the factura
+//         let is_err;
 
-        if(is_err === true){
-            res.status(500).json({ message : 'ERROR AL ENVIAR A TRANSITO'});
-        }else{
-            res.status(200).json({ message : 'SE ENVIARON LAS FACTURAS A TRANSITO'});
-        }
+//          for (let i = 0; i < data.length; i++) {
+//              const factura_ = data[i];
+//             let result = await connDB.query(query, [factura_], (err, result)=>{
+//                   if(err){
+//                       console.log('NO SE PUDO ENVIAR A TRANSITO : ', err);
+//                       is_err = true;
+//                   }else{
+//                       console.log('SE ENVIO A TRANSITO : ', factura_);
+//                       data_to_mail.push(factura_);
+//                       is_err = false
+//                   }
+//               })
+//          }
+
+//         if(is_err === true){
+//             res.status(500).json({ message : 'ERROR AL ENVIAR A TRANSITO'});
+//         }else{
+//             console.log('DESDE LA RUTA :::', data_to_mail);
+//             await sendEmail_transito(data_to_mail);
+//             res.status(200).json({ message : 'SE ENVIARON LAS FACTURAS A TRANSITO'});
+//         }
         
+//     } catch (err) {
+//         console.log('ERROR AL ALCANZAR RUTA DE TRANSITO : ', err);
+//         res.status(500).json({ message : 'ERROR AL ALCANZAR RUTA DE TRANSITO'});
+//     }
+// }
+
+export let change_transito_service = async (req: Request, res: Response) => {
+    try {
+        let data_to_mail: string[] = []; // Array para guardar las referencias de las facturas
+        const data = req.body;
+        console.log('DATA DESDE LA APP:', data);
+        const query = 'SELECT * FROM change_state_to_entransito($1);'; // La variable $1 es la referencia de la factura
+
+        for (let i = 0; i < data.length; i++) {
+            const factura_ = data[i];
+            try {
+                const result = await connDB.query(query, [factura_]);
+                console.log('SE ENVIO A TRANSITO:', factura_);
+                data_to_mail.push(factura_);
+            } catch (err) {
+                console.log('NO SE PUDO ENVIAR A TRANSITO:', err);
+                res.status(500).json({ message: 'ERROR AL ENVIAR A TRANSITO' });
+                return; // Termina la ejecución de la función si hay un error
+            }
+        }
+
+        console.log('DESDE LA RUTA:', data_to_mail);
+        await sendEmail_transito(data_to_mail);
+        res.status(200).json({ message: 'SE ENVIARON LAS FACTURAS A TRANSITO' });
     } catch (err) {
-        console.log('ERROR AL ALCANZAR RUTA DE TRANSITO : ', err);
-        res.status(500).json({ message : 'ERROR AL ALCANZAR RUTA DE TRANSITO'});
+        console.log('ERROR AL ALCANZAR RUTA DE TRANSITO:', err);
+        res.status(500).json({ message: 'ERROR AL ALCANZAR RUTA DE TRANSITO' });
     }
 }
+
 
 export let change_sincronizado_service = async ( req: Request, res: Response) => {
     try {
@@ -200,46 +236,95 @@ export let get_facturas_en_transito =async ( req: Request, res: Response ) => {
 }
 
 // en uso
-export let subir_fotos = async ( req: Request, res: Response ) => {
+// export let subir_fotos = async ( req: Request, res: Response ) => {
+//     try {
+//         const data = req.body;
+//         const query = 'SELECT * FROM sincro_fact( $1, $2, $3, $4, $5);'; 
+//         let fact_list_to_mail : string[] = [];                                                                  // this save the facturas to send an email.
+//         let error;
+//         //console.log('data from APK :: ', data)
+//         for (let i = 0; i < data.length; i++) {
+//             const element = data[i];
+
+//             const firma_ = await uploadFileToCloudinary(element.nameSing, 'bodega_despacho', element.factura);
+//             const foto_ = await uploadFileToCloudinary(element.namePic, 'bodega_despacho', element.factura + '_foto');
+            
+//             if(firma_ != null && foto_ != null){
+//                 connDB.query(query, [element.factura, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
+//                     if(err){
+//                         error = false;
+//                         console.log('ERROR AL CREAR FOTOS : ', err);
+//                     }else{
+//                         fact_list_to_mail.push(element.factura);
+//                         error = true;
+//                     }
+//                 });
+//             }else{
+//                 console.log('NO SE GENERARON LAS FOTOS');
+//                 res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
+//             }
+//         }
+
+//         if(error == false){
+//             console.log('NO SE PUDO GENERAR LA SINCRONIZACION');
+//             res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
+//         }else{
+//             console.log('data to send file ::: ', fact_list_to_mail)
+//             console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZO');
+//             sendEmail_Entregados(fact_list_to_mail);
+//             res.status(200).json({ message : 'SE GENERO LA SINCRONIZACION'});
+//         }
+//     } catch (err) {
+//         console.log('ERROR AL OBTENER RUTA DE SYNCRONIZACION : ', err);
+//         res.status(500).json({ message : 'NO SE PUEDE OBTENER RUTA DE SYNCRONIZACION DE FACTURAS' });
+//     }
+// }
+
+export let subir_fotos = async (req: Request, res: Response) => {
     try {
         const data = req.body;
-        //console.log('fotos : ', data);
-        const query = 'SELECT * FROM sincro_fact( $1, $2, $3, $4, $5);'; //fact text, foto text, firma text, detalle_ent text
-        let error;
+        const query = 'SELECT * FROM sincro_fact($1, $2, $3, $4, $5);'; 
+        let fact_list_to_mail: string[] = []; // Array para guardar las facturas para enviar un correo electrónico
 
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
+
             const firma_ = await uploadFileToCloudinary(element.nameSing, 'bodega_despacho', element.factura);
             const foto_ = await uploadFileToCloudinary(element.namePic, 'bodega_despacho', element.factura + '_foto');
-            //console.log('fotos subidas, firma: ', firma_, '   foto: ', foto_);
             
-            if(firma_ != null && foto_ != null){
-                connDB.query(query, [element.factura, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
-                    if(err){
-                        error = false;
-                        console.log('ERROR AL CREAR FOTOS : ', err);
-                    }else{
-                        error = true;
-                    }
-                });
-            }else{
+            if (firma_ != null && foto_ != null) {
+                try {
+                    await new Promise<void>((resolve, reject) => {
+                        connDB.query(query, [element.factura, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
+                            if (err) {
+                                console.log('ERROR AL CREAR FOTOS:', err);
+                                reject(err);
+                            } else {
+                                fact_list_to_mail.push(element.factura);
+                                resolve();
+                            }
+                        });
+                    });
+                } catch (error) {
+                    throw error;
+                }
+            } else {
                 console.log('NO SE GENERARON LAS FOTOS');
-                res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
+                res.status(500).json({ message: 'NO SE PUDO GENERAR LAS FOTOS' });
+                return;
             }
         }
 
-        if(error == false){
-            console.log('NO SE PUDO GENERAR LA SINCRONIZACION');
-            res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
-        }else{
-            console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZO');
-            res.status(200).json({ message : 'SE GENERO LA SINCRONIZACION'});
-        }
+        console.log('data to send file:', fact_list_to_mail);
+        console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZARON');
+        await sendEmail_Entregados(fact_list_to_mail);
+        res.status(200).json({ message: 'SE GENERO LA SINCRONIZACION' });
     } catch (err) {
-        console.log('ERROR AL OBTENER RUTA DE SYNCRONIZACION : ', err);
-        res.status(500).json({ message : 'NO SE PUEDE OBTENER RUTA DE SYNCRONIZACION DE FACTURAS' });
+        console.log('ERROR AL OBTENER RUTA DE SYNCRONIZACION:', err);
+        res.status(500).json({ message: 'NO SE PUEDE OBTENER RUTA DE SYNCRONIZACION DE FACTURAS' });
     }
 }
+
 
 // en uso
 export let getHistoFact_service =async ( req: Request, res: Response ) => {

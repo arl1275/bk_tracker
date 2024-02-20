@@ -29,14 +29,15 @@ export const NORMAL_insert_process_of_synchro = async () => {
         //------------------------------------------------------------------------------------------------------------//
 
         const pedidoventas_: pedidoventa[] = await executeQuery(query_get_pedidoventas());                                                     
-        //console.log(pedidoventas_);
+
          if (pedidoventas_.length > 0) {
             
              for (let i = 0; i < pedidoventas_.length; i++) {
                  const pedido: pedidoventa = pedidoventas_[i];
                  const exist_pedido = await val_insert_pedidoventas_nuevas(pedido.PedidoVenta);
 
-                 if (exist_pedido === false) {    // VALIDATES IF THE PEDIDO VENTA ALREADY EXIST
+                // VALIDATES IF THE PEDIDO VENTA ALREADY EXIST
+                 if (exist_pedido === false) {
 
                      const id_pedido = await insert_pedidoVenta(pedido);                                                  
                      console.log('   PEDIDO VENTA INSERTADO: ', pedido.PedidoVenta);
@@ -97,6 +98,8 @@ export const NORMAL_insert_process_of_synchro = async () => {
                              }
                          }
                      }
+                 }else{
+                    console.log('PEDIDO DE VENTA YA EXISTE')
                  }
              }
          } else {

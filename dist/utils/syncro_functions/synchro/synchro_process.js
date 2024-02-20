@@ -19,12 +19,12 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
         //                              THIS PART OBTAIN THE PEDIDOS FROM AX
         //------------------------------------------------------------------------------------------------------------//
         const pedidoventas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_pedidoventas)());
-        //console.log(pedidoventas_);
         if (pedidoventas_.length > 0) {
             for (let i = 0; i < pedidoventas_.length; i++) {
                 const pedido = pedidoventas_[i];
                 const exist_pedido = yield (0, syncro_functions_1.val_insert_pedidoventas_nuevas)(pedido.PedidoVenta);
-                if (exist_pedido === false) { // VALIDATES IF THE PEDIDO VENTA ALREADY EXIST
+                // VALIDATES IF THE PEDIDO VENTA ALREADY EXIST
+                if (exist_pedido === false) {
                     const id_pedido = yield (0, syncro_functions_1.insert_pedidoVenta)(pedido);
                     console.log('   PEDIDO VENTA INSERTADO: ', pedido.PedidoVenta);
                     if (id_pedido) {
@@ -77,6 +77,9 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                             }
                         }
                     }
+                }
+                else {
+                    console.log('PEDIDO DE VENTA YA EXISTE');
                 }
             }
         }
