@@ -9,7 +9,7 @@
 
 const paisFilter = 'Honduras';                              // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                      // valor para setear las ubicaciones
-const mininumDateAllowed = '2024-02-10';                     // valor para captar las facturas mas antiguas
+const mininumDateAllowed = obtenerFechaActual();                     // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -19,24 +19,18 @@ const mininumDateAllowed = '2024-02-10';                     // valor para capta
 //                                                                                                     //
 //-----------------------------------------------------------------------------------------------------//
 
-//---------------------------------- THIS IS THE CORRECT WAY TO INSERT---------------------------------
-// SELECT 
-//     PedidoVenta, 
-//     NombreCliente, 
-//     CuentaCliente, 
-//     COALESCE(NULLIF(Factura, ''),Albaran) AS Factura, 
-//     Albaran
-// FROM IMGetAllPackedBoxesInSB 
-// WHERE 
-//     Pais = 'Honduras'
-//     AND ciudad = 'San Pedro Sula'
-//     AND fecha >= '2023-12-01'
-// GROUP BY 
-//     PedidoVenta,
-//     NombreCliente,
-//     CuentaCliente, 
-//     Factura, 
-//     Albaran;
+function agregarCeroALaIzquierda(numero: number): string {
+  return numero < 10 ? `0${numero}` : `${numero}`;
+}
+
+function obtenerFechaActual(): string {
+  const fechaActual = new Date();
+  const año = fechaActual.getFullYear();
+  const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
+  const dia = agregarCeroALaIzquierda(fechaActual.getDate());
+  
+  return `${año}-${mes}-${dia}`;
+}
 
 
 //-----------------------------------------------------------------------------------------------------//
