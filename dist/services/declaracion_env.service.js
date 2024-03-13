@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.putDecEnv_service = exports.getDecEnvios_service = exports.getFacts_one_dec = exports.putDecEnv_serive = exports.getDecEnv_serive = exports.postNewDecEnv_service = void 0;
+exports.getDecEnv_appEncabezadoService = exports.putDecEnv_service = exports.getDecEnvios_service = exports.getFacts_one_dec = exports.putDecEnv_serive = exports.getDecEnv_serive = exports.postNewDecEnv_service = void 0;
 const works_querys_1 = require("../utils/queries/works_querys");
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,12 +38,11 @@ const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
             let query = 'SELECT * FROM refers_to_dec_envio( $1, $2 );';
             let error = false;
             for (let i = 0; i < declaracion_env.length; i++) {
-                // this is to referes to the dec_envio
                 const element = declaracion_env[i];
-                console.log('REFERENCIAS PARA DEC_ENV: ', element.factura, _id_);
+                const id_fact = element.id_factura;
                 try {
                     yield new Promise((resolve, reject) => {
-                        localDB_config_1.default.query(query, [element.factura, _id_], (err, result) => {
+                        localDB_config_1.default.query(query, [id_fact, _id_], (err, result) => {
                             if (err) {
                                 console.log('ERROR PARA REFERENCIAR LAS FACTURAS : ', err);
                                 error = true;
@@ -55,10 +54,9 @@ const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
                             }
                         });
                     });
-                    // this is to create entregas
                     const create_entreaga_by_factura = 'SELECT * FROM change_state_to_enPreparacion($1);';
                     yield new Promise((resolve, reject) => {
-                        localDB_config_1.default.query(create_entreaga_by_factura, [element.factura], (err, result) => {
+                        localDB_config_1.default.query(create_entreaga_by_factura, [id_fact], (err, result) => {
                             if (err) {
                                 console.log('ERROR PARA REFERENCIAR LAS FACTURAS : ', err);
                                 error = true;
@@ -173,7 +171,6 @@ exports.getDecEnvios_service = getDecEnvios_service;
 const putDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.body;
-        //console.log('=0=>', data);
         const query = 'SELECT * FROM set_change_decenvio($1, $2, $3);';
         localDB_config_1.default.query(query, [data.cam, data.use, data.decenv], (err, result) => {
             if (err) {
@@ -192,3 +189,24 @@ const putDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.putDecEnv_service = putDecEnv_service;
+const getDecEnv_appEncabezadoService = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id_dec_env } = req.query;
+        const query = 'SELECT * FROM get_encabezado_dec_env($1);';
+        localDB_config_1.default.query(query, [id_dec_env], (err, response) => {
+            if (err) {
+                console.log('ERROR AL OBTENER EL ENCABEZADO : ', err);
+                res.status(500).json({ message: 'error al procesar' });
+            }
+            else {
+                console.log('SE OBTUBO EL ENCABEZADO DE DECLARACION DE ENVIO');
+                res.status(200).json({ data: response.rows });
+            }
+        });
+    }
+    catch (err) {
+        console.log('NO SE PUDO OBTENER EL ENCABEZADO');
+        res.status(500).json({ message: 'error al procesar' });
+    }
+});
+exports.getDecEnv_appEncabezadoService = getDecEnv_appEncabezadoService;

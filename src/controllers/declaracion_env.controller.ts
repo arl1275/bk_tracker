@@ -5,7 +5,9 @@ import {
     getFacts_one_dec,
     putDecEnv_serive,
     getDecEnvios_service,
-    putDecEnv_service
+    putDecEnv_service,
+    getDecEnv_appEncabezadoService
+    
 } from "../services/declaracion_env.service";
 
 export const getDecEnv_controller = async (req: Request, res: Response) => { getDecEnvios_service(req, res) };
@@ -19,5 +21,7 @@ export const getFactsDecEnv = async (req: Request, res: Response) => { getFacts_
 export const putDecEnv_controller = async (req: Request, res: Response) => { putDecEnv_service(req, res) };
 
 export const getDecEnv_appService =async (req: Request, res: Response) => { getDecEnv_serive(req, res) };
+
+export const getDecEnv_appEncabezado =async (req: Request, res: Response) => { getDecEnv_appEncabezadoService(req, res) };
 
 

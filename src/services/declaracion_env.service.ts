@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import { generate_dec_env } from "../utils/queries/works_querys";
 import connDB from "../utils/db/localDB_config";
-import format from "pg-format";
-import { factura } from "../interfaces/db_interfeces/Axproveider";
+
 
 export const postNewDecEnv_service = async (req: Request, res: Response) => {
     try {
         const { declaracion_env, id_cam, id_user } = req.body;
         let _id_: number = 0;
         let _dec_ : number = 0;
-
+       
         const result = await new Promise((resolve, reject) => {
             connDB.query(generate_dec_env(), [id_cam, id_user], (err, result) => {
                 if (err) {
@@ -29,13 +28,14 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
             let error: boolean = false;
 
             for (let i = 0; i < declaracion_env.length; i++) {
-                // this is to referes to the dec_envio
+                
                 const element = declaracion_env[i];
-                console.log('REFERENCIAS PARA DEC_ENV: ', element.factura, _id_);
+                const id_fact : number = element.id_factura
 
                 try {
-                    await new Promise((resolve, reject) => {
-                        connDB.query(query, [element.factura, _id_], (err, result) => {
+
+                    await new Promise((resolve, reject) => {           
+                        connDB.query( query , [ id_fact , _id_ ], ( err, result ) => {
                             if (err) {
                                 console.log('ERROR PARA REFERENCIAR LAS FACTURAS : ', err);
                                 error = true;
@@ -47,21 +47,20 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
                         });
                     });
 
-                // this is to create entregas
-                const create_entreaga_by_factura = 'SELECT * FROM change_state_to_enPreparacion($1);';
-                await new Promise((resolve, reject) => {
-                    connDB.query(create_entreaga_by_factura, [element.factura], (err, result) => {
-                        if (err) {
-                            console.log('ERROR PARA REFERENCIAR LAS FACTURAS : ', err);
-                            error = true;
-                            reject(err);
-                        } else {
-                            console.log('SE GENERO REFERENCIAR LAS FACTURAS');
-                            resolve(result);
-                        }
+                    const create_entreaga_by_factura = 'SELECT * FROM change_state_to_enPreparacion($1);';
+                    await new Promise((resolve, reject) => {
+                        
+                        connDB.query(create_entreaga_by_factura, [id_fact], (err, result) => {
+                            if (err) {
+                                console.log('ERROR PARA REFERENCIAR LAS FACTURAS : ', err);
+                                error = true;
+                                reject(err);
+                            } else {
+                                console.log('SE GENERO REFERENCIAR LAS FACTURAS');
+                                resolve(result);
+                            }
+                        });
                     });
-                });
-
 
                 } catch (err) {
                     console.log('ERRORES PARA CAMBIAR ESTADO DE FACTUARAS : ', err);
@@ -77,6 +76,7 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
         } else {
             console.log('no se genero el id de declaracion de envio : ', _id_);
         }
+
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'NO SE PUDO INGRESAR LA DECLARACION DE ENVIO' });
@@ -160,7 +160,6 @@ export const getDecEnvios_service =async (req : Request , res : Response) => {
 export const putDecEnv_service =async ( req : Request , res : Response ) => {
     try {
         const data = req.body;
-        //console.log('=0=>', data);
         const query = 'SELECT * FROM set_change_decenvio($1, $2, $3);';
         connDB.query(query, [data.cam, data.use, data.decenv], (err, result)=>{
             if(err){
@@ -174,5 +173,26 @@ export const putDecEnv_service =async ( req : Request , res : Response ) => {
     } catch (err) {
         console.log('NO SE PUDO OBTER RUTA LAS DECLARACIONES DE ENVIO', err);
         res.status(500).json({ message : 'NO SE PUDO OBTENER RUTA LAS DECLARACIONES DE ENVIO'});
+    }
+}
+
+export const getDecEnv_appEncabezadoService = async (req : Request, res : Response) => {
+    try {
+        const { id_dec_env } = req.query;
+        const query = 'SELECT * FROM get_encabezado_dec_env($1);';
+
+        connDB.query(query, [id_dec_env], (err, response) => {
+            if(err){
+                console.log('ERROR AL OBTENER EL ENCABEZADO : ', err);
+                res.status(500).json({ message : 'error al procesar'})
+            }else{
+                console.log('SE OBTUBO EL ENCABEZADO DE DECLARACION DE ENVIO');
+                res.status(200).json({ data : response.rows })
+            }
+        })
+
+    } catch (err) {
+        console.log('NO SE PUDO OBTENER EL ENCABEZADO');
+        res.status(500).json({ message : 'error al procesar'})
     }
 }

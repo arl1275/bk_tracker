@@ -6,7 +6,8 @@ import {
     putDecEnv,
     getFactsDecEnv,
     putDecEnv_controller,
-    getDecEnv_appService
+    getDecEnv_appService,
+    getDecEnv_appEncabezado
 } from "../controllers/declaracion_env.controller";
 const routerDec_env = express.Router();
 
@@ -21,5 +22,7 @@ routerDec_env.get('/FactsDecEnv', getFactsDecEnv);
 routerDec_env.put('/putDecEnv', putDecEnv_controller);
 
 routerDec_env.get('/app/getDec_env', getDecEnv_appService);
+
+routerDec_env.get('/app/getEncabezado', getDecEnv_appEncabezado);
 
 export default routerDec_env;

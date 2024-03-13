@@ -9,4 +9,5 @@ routerDec_env.put('/closeDecEnv', declaracion_env_controller_1.putDecEnv);
 routerDec_env.get('/FactsDecEnv', declaracion_env_controller_1.getFactsDecEnv);
 routerDec_env.put('/putDecEnv', declaracion_env_controller_1.putDecEnv_controller);
 routerDec_env.get('/app/getDec_env', declaracion_env_controller_1.getDecEnv_appService);
+routerDec_env.get('/app/getEncabezado', declaracion_env_controller_1.getDecEnv_appEncabezado);
 exports.default = routerDec_env;

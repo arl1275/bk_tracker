@@ -16,7 +16,6 @@ exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasO
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
-const mail_body_1 = require("../utils/reports/mail_body");
 const mail_body_syncro_1 = require("../utils/reports/mail.body_syncro");
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
@@ -24,13 +23,13 @@ const mail_body_syncro_1 = require("../utils/reports/mail.body_syncro");
 // EN USO
 let get_all_facturas_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        localDB_config_1.default.query('SELECT * FROM resumen_facturas();', (err, result) => {
+        const query = 'SELECT * FROM resumen_facturas_para_despacho()';
+        localDB_config_1.default.query(query, (err, result) => {
             if (err) {
                 console.error('Error executing query:', err);
             }
             else {
                 res.status(200).json({ data: result.rows });
-                //console.log('Se obtubieron todas las facturas');
             }
         });
     }
@@ -162,7 +161,7 @@ let change_transito_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
             }
         }
         console.log('DESDE LA RUTA:', data_to_mail);
-        yield (0, mail_body_1.sendEmail_transito)(data_to_mail);
+        //await sendEmail_transito(data_to_mail);
         res.status(200).json({ message: 'SE ENVIARON LAS FACTURAS A TRANSITO' });
     }
     catch (err) {
@@ -301,7 +300,7 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (firma_ != null && foto_ != null) {
                 try {
                     yield new Promise((resolve, reject) => {
-                        localDB_config_1.default.query(query, [element.factura, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
+                        localDB_config_1.default.query(query, [element.factura_id, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
                             if (err) {
                                 console.log('ERROR AL CREAR FOTOS:', err);
                                 reject(err);

@@ -23,5 +23,30 @@ export const ComparedPassWord = async (LogPassword : string, DBPassword : string
 }
 
 //--------------------------------------------------------------------//
-//                               PIC HANDLERS                         //                
+//                            DATE GENERATORS                         //                
 //--------------------------------------------------------------------//
+
+function agregarCeroALaIzquierda(numero: number): string {
+    return numero < 10 ? `0${numero}` : `${numero}`;
+  }
+  
+export function obtenerFechaActual(): string {                      // this function is to get the today date, to sync funtions
+    const fechaActual = new Date();
+    const año = fechaActual.getFullYear();
+    const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
+    const dia = agregarCeroALaIzquierda(fechaActual.getDate());
+
+    return `${año}-${mes}-${dia}`;
+}
+
+export function obtenerFechaConAtraso( props : number) {
+    const fechaActual = new Date();
+    fechaActual.setDate(fechaActual.getDate() - props); // Restar 3 días
+
+    const año = fechaActual.getFullYear();
+    const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
+    const dia = agregarCeroALaIzquierda(fechaActual.getDate());
+
+    return `${año}-${mes}-${dia}`;
+}
+

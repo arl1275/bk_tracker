@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDecEnv_appService = exports.putDecEnv_controller = exports.getFactsDecEnv = exports.putDecEnv = exports.postNewDecEnv_controller = exports.getDecEnv_controller = void 0;
+exports.getDecEnv_appEncabezado = exports.getDecEnv_appService = exports.putDecEnv_controller = exports.getFactsDecEnv = exports.putDecEnv = exports.postNewDecEnv_controller = exports.getDecEnv_controller = void 0;
 const declaracion_env_service_1 = require("../services/declaracion_env.service");
 const getDecEnv_controller = (req, res) => __awaiter(void 0, void 0, void 0, function* () { (0, declaracion_env_service_1.getDecEnvios_service)(req, res); });
 exports.getDecEnv_controller = getDecEnv_controller;
@@ -23,3 +23,5 @@ const putDecEnv_controller = (req, res) => __awaiter(void 0, void 0, void 0, fun
 exports.putDecEnv_controller = putDecEnv_controller;
 const getDecEnv_appService = (req, res) => __awaiter(void 0, void 0, void 0, function* () { (0, declaracion_env_service_1.getDecEnv_serive)(req, res); });
 exports.getDecEnv_appService = getDecEnv_appService;
+const getDecEnv_appEncabezado = (req, res) => __awaiter(void 0, void 0, void 0, function* () { (0, declaracion_env_service_1.getDecEnv_appEncabezadoService)(req, res); });
+exports.getDecEnv_appEncabezado = getDecEnv_appEncabezado;

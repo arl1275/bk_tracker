@@ -14,12 +14,12 @@ import { sendEmail_Entregados } from "../utils/reports/mail.body_syncro";
 // EN USO
 export let get_all_facturas_service = async (req: Request, res: Response) => {
     try {
-        connDB.query('SELECT * FROM resumen_facturas();', (err, result) => {
+        const query = 'SELECT * FROM resumen_facturas_para_despacho()'
+        connDB.query( query, (err, result) => {
             if (err) {
                 console.error('Error executing query:', err);
             } else {
                 res.status(200).json({ data: result.rows });
-                //console.log('Se obtubieron todas las facturas');
             }
         });
     } catch (err) {
@@ -151,7 +151,7 @@ export let change_transito_service = async (req: Request, res: Response) => {
         }
 
         console.log('DESDE LA RUTA:', data_to_mail);
-        await sendEmail_transito(data_to_mail);
+        //await sendEmail_transito(data_to_mail);
         res.status(200).json({ message: 'SE ENVIARON LAS FACTURAS A TRANSITO' });
     } catch (err) {
         console.log('ERROR AL ALCANZAR RUTA DE TRANSITO:', err);
@@ -295,7 +295,7 @@ export let subir_fotos = async (req: Request, res: Response) => {
             if (firma_ != null && foto_ != null) {
                 try {
                     await new Promise<void>((resolve, reject) => {
-                        connDB.query(query, [element.factura, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
+                        connDB.query(query, [element.factura_id, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
                             if (err) {
                                 console.log('ERROR AL CREAR FOTOS:', err);
                                 reject(err);

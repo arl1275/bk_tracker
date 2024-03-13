@@ -1,7 +1,4 @@
 "use strict";
-//---------------------------------------------------------------------------------//
-// THIS FILE IS TO EXPORT QUERIES THAT ARE USED IN OTHERS FILES TO SYNCRO AX DATA  //
-//---------------------------------------------------------------------------------//
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports.insert_pedido_venta = exports.val_if_fact_exist = exports.val_if_pedido_venta = exports.get_boxes_one_fact = exports.query_get_boxes_of_an_albaran = exports.query_get_albaran_of_albaran_inserted_as_factura = exports.query_get_albarans_of_a_factura = exports.query_get_facts_of_a_pedidoVenta = exports.query_get_pedidoventas = void 0;
 //---------------------------------------------------------//
@@ -9,42 +6,38 @@ exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports
 //---------------------------------------------------------//
 const paisFilter = 'Honduras'; // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula'; // valor para setear las ubicaciones
-const mininumDateAllowed = obtenerFechaActual(); // valor para captar las facturas mas antiguas
+const mininumDateAllowed = '2024-03-01'; //obtenerFechaActual();           // valor para captar las facturas mas antiguas
+const clients_1 = require("../../special_clients/clients");
 //---------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
 //                              THIS QUERIES ARE FOR GET THE DATA FROM AX                              //
 //                                                                                                     //
 //-----------------------------------------------------------------------------------------------------//
-function agregarCeroALaIzquierda(numero) {
-    return numero < 10 ? `0${numero}` : `${numero}`;
-}
-function obtenerFechaActual() {
-    const fechaActual = new Date();
-    const año = fechaActual.getFullYear();
-    const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
-    const dia = agregarCeroALaIzquierda(fechaActual.getDate());
-    return `${año}-${mes}-${dia}`;
-}
 //-----------------------------------------------------------------------------------------------------//
 // this query is to get all the pedidos de venta 
 //-----------------------------------------------------------------------------------------------------//
 const query_get_pedidoventas = () => {
     return `
   SELECT 
-    PedidoVenta,
-    NombreCliente,
-    CuentaCliente
-  FROM IMGetAllPackedBoxesInSB 
-  WHERE 
-    Pais = '${paisFilter}'
-    AND ciudad = '${ciudadFilter}'
-    AND Factura IS NOT NULL
-    AND fecha >= '${mininumDateAllowed}'
-  GROUP BY 
-    PedidoVenta,
-    NombreCliente,
-    CuentaCliente;`;
+  PedidoVenta,
+  NombreCliente,
+  CuentaCliente
+FROM IMGetAllPackedBoxesInSB
+WHERE 
+  (
+      (Pais = '${paisFilter}' AND ciudad = '${ciudadFilter}')
+      OR
+      ( CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
+  )
+  AND Factura IS NOT NULL
+  AND fecha >= '${mininumDateAllowed}'
+  AND albaran != '' 
+GROUP BY 
+  PedidoVenta,
+  NombreCliente,
+  CuentaCliente;
+    `;
 };
 exports.query_get_pedidoventas = query_get_pedidoventas;
 //-----------------------------------------------------------------------------------------------------//
@@ -53,27 +46,30 @@ exports.query_get_pedidoventas = query_get_pedidoventas;
 const query_get_facts_of_a_pedidoVenta = (pedido) => {
     return `
    SELECT
-   CASE
-       WHEN ( Factura != '') AND AlbaranCount = 1 THEN Factura
-       WHEN (Factura IS NULL or factura = '') AND AlbaranCount = 1 THEN Albaran
-       WHEN ( Factura != '') AND AlbaranCount > 1 THEN CONCAT(Factura, ' ', Albaran)
-	     WHEN ( Factura = '') AND AlbaranCount > 1 THEN Albaran
-   END AS Factura
-FROM (
-   SELECT distinct
-   Factura,
-   Albaran,
-   COUNT(*) OVER (PARTITION BY Albaran) AS AlbaranCount
-   FROM
-       IMGetAllPackedBoxesInSB
-   WHERE
-       Pais = '${paisFilter}'
-       AND Ciudad = '${ciudadFilter}'
-       AND fecha >= '${mininumDateAllowed}'
-       AND pedidoventa = '${pedido}'
-   --and factura = '00207341'
- group by Factura, albaran
-) AS Subquery; `;
+      CASE
+          WHEN ( Factura != '') AND AlbaranCount = 1 THEN Factura
+          WHEN ( Factura IS NULL or factura = '') AND AlbaranCount = 1 THEN Albaran
+          WHEN ( Factura != '') AND AlbaranCount > 1 THEN CONCAT(Factura, ' ', Albaran)
+          WHEN ( Factura = '') AND AlbaranCount > 1 THEN Albaran
+      END AS Factura
+    FROM (
+      SELECT distinct
+      Factura,
+      Albaran,
+      COUNT(*) OVER (PARTITION BY Albaran) AS AlbaranCount
+      FROM
+          IMGetAllPackedBoxesInSB
+      WHERE
+      (
+        (Pais = '${paisFilter}' AND ciudad = '${ciudadFilter}')
+        OR
+        ( CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
+      )    
+      AND pedidoventa = '${pedido}'
+      AND fecha >= '${mininumDateAllowed}'
+      AND albaran != '' 
+    group by Factura, albaran
+    ) AS Subquery;`;
 };
 exports.query_get_facts_of_a_pedidoVenta = query_get_facts_of_a_pedidoVenta;
 //-----------------------------------------------------------------------------------------------------//
@@ -89,9 +85,9 @@ const query_get_albarans_of_a_factura = (factura) => {
      FROM IMGetAllPackedBoxesInSB 
      WHERE 
          fecha >= '${mininumDateAllowed}' 
-         AND Pais= '${paisFilter}' 
-         AND ciudad = '${ciudadFilter}' 
-         AND Factura = '${factura}';`;
+         AND Pais= '${paisFilter}'
+         AND Factura = '${factura}'
+         AND albaran != '' ;`;
 };
 exports.query_get_albarans_of_a_factura = query_get_albarans_of_a_factura;
 //-----------------------------------------------------------------------------------------------------//
@@ -100,20 +96,24 @@ exports.query_get_albarans_of_a_factura = query_get_albarans_of_a_factura;
 const query_get_albaran_of_albaran_inserted_as_factura = (albaran, pedido_venta) => {
     return `
   SELECT DISTINCT
-         Albaran,
-         Pais,
-         Departamento,
-         ciudad,
-         calle,
-         ubicacion
-     FROM IMGetAllPackedBoxesInSB 
-     WHERE 
-         fecha >= '${mininumDateAllowed}' 
-         AND Pais= '${paisFilter}' 
-         AND ciudad = '${ciudadFilter}' 
-         AND Albaran = '${albaran}'
-         AND PedidoVenta = '${pedido_venta}'
-         AND (factura is null or factura ='');`;
+        Albaran,
+        Pais,
+        Departamento,
+        ciudad,
+        calle,
+        ubicacion
+    FROM IMGetAllPackedBoxesInSB 
+    WHERE 
+        (
+            (Pais = '${paisFilter}' AND ciudad = '${ciudadFilter}')
+            OR
+            (CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
+        )    
+    AND fecha >= '${mininumDateAllowed}' 
+    AND Albaran = '${albaran}'
+    AND PedidoVenta = '${pedido_venta}'
+    AND (factura IS NULL OR factura = '');
+`;
 };
 exports.query_get_albaran_of_albaran_inserted_as_factura = query_get_albaran_of_albaran_inserted_as_factura;
 //-----------------------------------------------------------------------------------------------------//
@@ -127,19 +127,17 @@ const query_get_boxes_of_an_albaran = (albaran) => {
     Caja,
     NumeroCaja,
     cantidad
-FROM
-    IMGetAllPackedBoxesInSB 
-WHERE 
-    Pais = '${paisFilter}'
-    AND ciudad = '${ciudadFilter}'
-    AND fecha >= '${mininumDateAllowed}'
-    AND Albaran = '${albaran}'
-GROUP BY
-    ListaEmpaque,
-    Caja,
-    NumeroCaja,
-	  cantidad;   
-  `;
+  FROM
+      IMGetAllPackedBoxesInSB 
+  WHERE 
+      Pais = '${paisFilter}'
+      AND fecha >= '${mininumDateAllowed}'
+      AND Albaran = '${albaran}'
+  GROUP BY
+      ListaEmpaque,
+      Caja,
+      NumeroCaja,
+      cantidad;`;
 };
 exports.query_get_boxes_of_an_albaran = query_get_boxes_of_an_albaran;
 //-----------------------------------------------------------------------------------------------------//

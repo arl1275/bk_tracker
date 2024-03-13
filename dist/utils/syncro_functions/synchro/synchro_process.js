@@ -23,10 +23,10 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
             for (let i = 0; i < pedidoventas_.length; i++) {
                 const pedido = pedidoventas_[i];
                 const exist_pedido = yield (0, syncro_functions_1.val_insert_pedidoventas_nuevas)(pedido.PedidoVenta);
-                // VALIDATES IF THE PEDIDO VENTA ALREADY EXIST
                 if (exist_pedido === false) {
                     const id_pedido = yield (0, syncro_functions_1.insert_pedidoVenta)(pedido);
-                    console.log('   PEDIDO VENTA INSERTADO: ', pedido.PedidoVenta);
+                    console.log('___________________________________________________________________________________');
+                    console.log('// PedidoVenta : ', pedido.PedidoVenta);
                     if (id_pedido) {
                         //------------------------------------------------------------------------------------------------------------//
                         //                       THIS PART OBTAIN THE SPECIFIC FACTURAS OF THE PEDIDOS DE VENTA
@@ -34,22 +34,21 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                         const facturas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_facts_of_a_pedidoVenta)(pedido.PedidoVenta));
                         for (let j = 0; j < facturas_.length; j++) {
                             const fact = facturas_[j];
-                            if (fact) { // fact.Factura.startWith('AL')
+                            if (fact) {
                                 const exist_factura = yield (0, syncro_functions_1.val_insert_facturas_nuevas)(fact.Factura, pedido.PedidoVenta); // values if the factura already exist in LOCAL_DB
                                 if (exist_factura === false) {
                                     const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact, id_pedido); // insert the factura and return the id
                                     if (id_factura) {
-                                        console.log('ID DE FACTURA ====> ', id_factura);
                                         //----------------------------------------------------------------------------------------------------//
                                         //                  THIS IS TO HANDLE THE ALBARANES THAT DOES NOT HAVE FACTURA                        //
                                         //----------------------------------------------------------------------------------------------------//
                                         let albaran_;
                                         if (fact.Factura.startsWith('AL')) { // if an albaran was inserted as factura, the get the albaran of that albaran
-                                            console.log('SE INSERTO COMO ALBARAN : ', fact.Factura);
+                                            console.log('//  INSERTO COMO ALBARAN : ', fact.Factura);
                                             albaran_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_albaran_of_albaran_inserted_as_factura)(fact.Factura, pedido.PedidoVenta));
                                         }
                                         else {
-                                            console.log('       FACTURA INGRESADA : ', fact.Factura);
+                                            console.log('//   FACTURA : ', fact.Factura);
                                             albaran_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_albarans_of_a_factura)(fact.Factura)); // gets all the albaranes of one factura
                                         }
                                         //----------------------------------------------------------------------------------------------------//
@@ -57,15 +56,15 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                                             const _albaran = albaran_[k];
                                             const id_albaran = yield (0, syncro_functions_1.insert_albaran_)(_albaran, id_factura); // insert albaran and return id
                                             //------------------------------------------------------------------------------------------------------------//
-                                            //                       THIS PART OBTAIN THE SPECIFIC CAJAS OF THE FACTURA
+                                            //                       THIS PART OBTAIN THE SPECIFIC CAJAS OF THE FACTURA                                   //
                                             //------------------------------------------------------------------------------------------------------------//
                                             if (id_albaran) {
-                                                console.log('           ALBARAN INGRESADO : ', _albaran.Albaran);
+                                                console.log('//      ALBARAN : ', _albaran.Albaran);
                                                 const cajas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_boxes_of_an_albaran)(_albaran.Albaran)); // get all the cajas of one albaran
                                                 for (let l = 0; l < cajas_.length; l++) {
                                                     const _caja = cajas_[l];
                                                     yield (0, syncro_functions_1.insert_boxes_)(_caja, id_albaran);
-                                                    console.log('               CAJA INGRESADA : ', _caja.Caja);
+                                                    console.log('//         CAJA : ', _caja.Caja);
                                                 }
                                             }
                                         }
@@ -73,13 +72,13 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                                 }
                             }
                             else {
-                                console.log('       ERROR : FACTURA TIENEN CAMPO VACIO');
+                                console.log('// ERROR : FACTURA TIENEN CAMPO VACIO');
                             }
                         }
                     }
                 }
                 else {
-                    console.log('PEDIDO DE VENTA YA EXISTE');
+                    console.log('// PEDIDO DE VENTA YA EXISTE : ', pedido.PedidoVenta);
                 }
             }
         }
@@ -88,7 +87,7 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
         }
     }
     catch (err) {
-        console.log('NO SE PUDO INSERTAR PEDIDOS DE VENTA : ', err);
+        console.log('ERROR DURANTE LA SINCRONIZACIÓN : ', err);
     }
 });
 exports.NORMAL_insert_process_of_synchro = NORMAL_insert_process_of_synchro;
