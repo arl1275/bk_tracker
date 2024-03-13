@@ -34,14 +34,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.syncroData_AX = void 0;
 const synchro_process_1 = require("./synchro_process");
+const albaran_synchro_1 = require("../special_synchro/albaran_synchro");
 const cron = __importStar(require("node-cron"));
 function syncroData_AX() {
     return __awaiter(this, void 0, void 0, function* () {
-        const cronExpression = '* * * * *'; // program to execute every 30 min
+        const cronExpression = '*/5 * * * *'; // program to execute every 30 min
         cron.schedule(cronExpression, () => __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log('KRON TRIGGERED');
                 yield (0, synchro_process_1.NORMAL_insert_process_of_synchro)();
+                yield (0, albaran_synchro_1.UpdateFacturasChanges)();
             }
             catch (error) {
                 console.error('Error during syncroData_AX:', error);

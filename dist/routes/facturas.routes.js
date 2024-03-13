@@ -23,4 +23,7 @@ routerFacturas.get('/adminFact', facturas_controller_1.getAdminFacts_controller)
 // para sincronizar cajas en la app
 routerFacturas.get('/app/getCajasOneFact', facturas_controller_1.getCajasFAct_controller);
 routerFacturas.get('/toNullState', facturas_controller_1.toNullState_controller);
+//------------------------------------------------- THIS IS A ADMINISTRATOR ROUTE -------------------------------------------------//
+//routerFacturas.post('/admin/forceSyncroFact', forceFactura_controller)         // this route is to force the incronization of one factura
+//---------------------------------------------------------------------------------------------------------------------------------//
 exports.default = routerFacturas;

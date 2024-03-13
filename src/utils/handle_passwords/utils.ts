@@ -30,11 +30,12 @@ function agregarCeroALaIzquierda(numero: number): string {
     return numero < 10 ? `0${numero}` : `${numero}`;
   }
   
-export function obtenerFechaActual(): string {                      // this function is to get the today date, to sync funtions
+export function obtenerFechaActual(){                      // this function is to get the today date, to sync funtions
     const fechaActual = new Date();
     const año = fechaActual.getFullYear();
     const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
     const dia = agregarCeroALaIzquierda(fechaActual.getDate());
+    console.log(`data actualizada en : ${año}-${mes}-${dia}`)
 
     return `${año}-${mes}-${dia}`;
 }
@@ -50,3 +51,6 @@ export function obtenerFechaConAtraso( props : number) {
     return `${año}-${mes}-${dia}`;
 }
 
+export function Force_Sincro (Encabezado : [], cajas : []){
+
+}

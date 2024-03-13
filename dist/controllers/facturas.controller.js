@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.toNullState_controller = exports.getAdminFacts_controller = exports.getCajasFAct_controller = exports.getHistoFact_controller = exports.postFotos_controller = exports.getTransFact_controller = exports.toTransito_controller = exports.get_cajas_controller = exports.get_all_facturas_ = exports.get_all_facturas_actives = exports.get_all_facturas_controller = void 0;
+exports.forceFactura_controller = exports.toNullState_controller = exports.getAdminFacts_controller = exports.getCajasFAct_controller = exports.getHistoFact_controller = exports.postFotos_controller = exports.getTransFact_controller = exports.toTransito_controller = exports.get_cajas_controller = exports.get_all_facturas_ = exports.get_all_facturas_actives = exports.get_all_facturas_controller = void 0;
 const facturas_service_1 = require("../services/facturas.service");
 const get_all_facturas_controller = (req, res) => { (0, facturas_service_1.get_all_facturas_service)(req, res); };
 exports.get_all_facturas_controller = get_all_facturas_controller;
@@ -24,3 +24,6 @@ const getAdminFacts_controller = (req, res) => { (0, facturas_service_1.getAdmin
 exports.getAdminFacts_controller = getAdminFacts_controller;
 const toNullState_controller = (req, res) => { (0, facturas_service_1.change_state_to_null)(req, res); };
 exports.toNullState_controller = toNullState_controller;
+//---------------------- ADMINI ROUTE -------------------//
+const forceFactura_controller = (req, res) => { (0, facturas_service_1.forceFactura_service)(req, res); };
+exports.forceFactura_controller = forceFactura_controller;

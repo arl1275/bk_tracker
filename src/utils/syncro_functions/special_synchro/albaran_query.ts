@@ -1,6 +1,7 @@
 import { special_clients } from "../../special_clients/clients";
 import { obtenerFechaConAtraso } from "../../handle_passwords/utils";
 const days_less = 3;
+const days_less_ax = 6;
 //---------------------------------------------------------------------------------------//
 //                      LOCAL DB FUNCTIONS TO UPDATE ALBARANS
 //---------------------------------------------------------------------------------------//
@@ -8,11 +9,11 @@ const days_less = 3;
 export const get_ids_pedidos_to_update = () => {
     return `
     SELECT 
-        p.id,
+        p.id as pedido_id,
         p.pedidoventa,
-        f.id, 
+        f.id as factura_id, 
         f.factura, 
-        a.id, 
+        a.id as albaran_id, 
         a.albaran  
     FROM pedidoventas p 
     INNER JOIN facturas f ON p.id = f.id_pedidoventas 
@@ -37,6 +38,6 @@ export const get_update_info_fromAX = () => {
         )
     AND pais = 'Honduras'
     AND albaran != ''
-    AND Fecha >= '${obtenerFechaConAtraso(days_less)}';
+    AND Fecha >= '${obtenerFechaConAtraso(days_less_ax)}';
     `;
 }

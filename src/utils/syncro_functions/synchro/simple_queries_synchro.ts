@@ -1,17 +1,21 @@
 //---------------------------------------------------------------------------------//
 // THIS FILE IS TO EXPORT QUERIES THAT ARE USED IN OTHERS FILES TO SYNCRO AX DATA  //
 //---------------------------------------------------------------------------------//
-import { obtenerFechaActual } from "../../handle_passwords/utils";
+
 
 
 //---------------------------------------------------------//
 //                  DEFAULT DATA FILTERS                   //
 //---------------------------------------------------------//
 
+import { obtenerFechaActual } from "../../handle_passwords/utils";
+import { special_clients } from "../../special_clients/clients";
+
+
 const paisFilter = 'Honduras';                             // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                     // valor para setear las ubicaciones
-const mininumDateAllowed = '2024-03-01'//obtenerFechaActual();           // valor para captar las facturas mas antiguas
-import { special_clients } from "../../special_clients/clients";
+const mininumDateAllowed =  obtenerFechaActual();           // valor para captar las facturas mas antiguas
+
 //---------------------------------------------------------//
 
 //-----------------------------------------------------------------------------------------------------//
@@ -157,6 +161,42 @@ export const get_boxes_one_fact = () => {
       INNER JOIN cajas c ON a.id = c.id_albaranes
       WHERE f.id = $1;`
 }
+
+//-----------------------------------------------------------------------------------------------------//
+// this query is to force the sincro of one factura
+//-----------------------------------------------------------------------------------------------------//
+
+export const ForceSincroFact_factura = ( pedido : string, factura : string) => {
+  return`
+  SELECT DISTINCT 
+  pedidoventa, 
+  factura, 
+  albaran,
+  Pais,
+  Departamento,
+  ciudad,
+  calle,
+  ubicacion 
+  WHERE pedidoventa = '${pedido}'
+  AND factura = ${factura};`
+}
+
+export const ForceSincroFact_albaran = ( pedido : string , albaran : string) => {
+  return`
+  SELECT DISTINCT 
+    pedidoventa, 
+    factura, 
+    albaran,
+    Pais,
+    Departamento,
+    ciudad,
+    calle,
+    ubicacion 
+  WHERE 
+    pedidoventa = '${pedido}'
+    AND albaran = '${albaran}';`
+}
+
 
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //

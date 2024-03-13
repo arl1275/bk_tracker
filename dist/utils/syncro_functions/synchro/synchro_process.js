@@ -25,8 +25,12 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                 const exist_pedido = yield (0, syncro_functions_1.val_insert_pedidoventas_nuevas)(pedido.PedidoVenta);
                 if (exist_pedido === false) {
                     const id_pedido = yield (0, syncro_functions_1.insert_pedidoVenta)(pedido);
-                    console.log('___________________________________________________________________________________');
-                    console.log('// PedidoVenta : ', pedido.PedidoVenta);
+                    console.log(`
+||------------------------------------------------------------------------------------------------------------||
+||    PEDIDO-VENTA : ${pedido.PedidoVenta}                                                                    
+||    CLIENTE : ${pedido.NombreCliente}                                                                       
+||    CUENTA : ${pedido.CuentaCliente}                                                                        
+||------------------------------------------------------------------------------------------------------------||`);
                     if (id_pedido) {
                         //------------------------------------------------------------------------------------------------------------//
                         //                       THIS PART OBTAIN THE SPECIFIC FACTURAS OF THE PEDIDOS DE VENTA
@@ -44,11 +48,11 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                                         //----------------------------------------------------------------------------------------------------//
                                         let albaran_;
                                         if (fact.Factura.startsWith('AL')) { // if an albaran was inserted as factura, the get the albaran of that albaran
-                                            console.log('//  INSERTO COMO ALBARAN : ', fact.Factura);
+                                            console.log(`||         INSERTO COMO ALBARAN : ${fact.Factura}`);
                                             albaran_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_albaran_of_albaran_inserted_as_factura)(fact.Factura, pedido.PedidoVenta));
                                         }
                                         else {
-                                            console.log('//   FACTURA : ', fact.Factura);
+                                            console.log(`||         FACTURA : ${fact.Factura}`);
                                             albaran_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_albarans_of_a_factura)(fact.Factura)); // gets all the albaranes of one factura
                                         }
                                         //----------------------------------------------------------------------------------------------------//
@@ -59,12 +63,12 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                                             //                       THIS PART OBTAIN THE SPECIFIC CAJAS OF THE FACTURA                                   //
                                             //------------------------------------------------------------------------------------------------------------//
                                             if (id_albaran) {
-                                                console.log('//      ALBARAN : ', _albaran.Albaran);
+                                                console.log(`||                 ALBARAN : ${_albaran.Albaran}   DESTINO : ${_albaran.ciudad}`);
                                                 const cajas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_boxes_of_an_albaran)(_albaran.Albaran)); // get all the cajas of one albaran
                                                 for (let l = 0; l < cajas_.length; l++) {
                                                     const _caja = cajas_[l];
                                                     yield (0, syncro_functions_1.insert_boxes_)(_caja, id_albaran);
-                                                    console.log('//         CAJA : ', _caja.Caja);
+                                                    console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                                 }
                                             }
                                         }
@@ -75,6 +79,7 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                                 console.log('// ERROR : FACTURA TIENEN CAMPO VACIO');
                             }
                         }
+                        console.log('||------------------------------------------------------------------------------------------------------------||');
                     }
                 }
                 else {

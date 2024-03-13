@@ -10,7 +10,8 @@ import {
     getHistoFact_service,
     getCajasOneFact_service,
     getAdminFacts_service,
-    change_state_to_null
+    change_state_to_null,
+    forceFactura_service
 } from "../services/facturas.service";
 
 
@@ -35,4 +36,8 @@ export const getCajasFAct_controller = (req: Request, res: Response) => { getCaj
 export const getAdminFacts_controller = (req: Request, res: Response) => { getAdminFacts_service(req, res)};
 
 export const toNullState_controller = ( req : Request, res : Response ) => { change_state_to_null(req, res)}
+
+//---------------------- ADMINI ROUTE -------------------//
+
+export const forceFactura_controller = ( req : Request, res : Response ) => { forceFactura_service( req, res )}
 

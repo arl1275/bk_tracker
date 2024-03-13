@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
+exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
-const mail_body_syncro_1 = require("../utils/reports/mail.body_syncro");
+const ax_config_1 = require("../utils/db/ax_config");
+const simple_queries_synchro_1 = require("../utils/syncro_functions/synchro/simple_queries_synchro");
+const syncro_functions_1 = require("../utils/syncro_functions/synchro/syncro_functions");
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
 //----------------------------------------------------
@@ -324,7 +326,7 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         console.log('data to send file:', fact_list_to_mail);
         console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZARON');
-        yield (0, mail_body_syncro_1.sendEmail_Entregados)(fact_list_to_mail);
+        //await sendEmail_Entregados(fact_list_to_mail);
         res.status(200).json({ message: 'SE GENERO LA SINCRONIZACION' });
     }
     catch (err) {
@@ -447,3 +449,42 @@ let change_state_to_null = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.change_state_to_null = change_state_to_null;
+//---------------------------- THIS IS AN ADMIN FUNCTION SERVICE ------------------------------------//
+let forceFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { pedido, factura, albaran } = req.query;
+        const pedido_ = pedido ? pedido.toString() : '';
+        const facturaString = factura ? factura.toString() : '';
+        const albaranString = albaran ? albaran.toString() : '';
+        if (pedido != '') {
+            if (factura == '') {
+                const data_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.ForceSincroFact_albaran)(pedido_, albaranString)); // Could not get an array over 1 rows
+                let x = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_boxes_of_an_albaran)(albaranString)); // will get boxes, more than one row (only applys facts of today)
+                const data = {
+                    PedidoVenta: data_.pedidoventa,
+                    NombreCliente: data_.NombreCliente,
+                    CuentaCliente: data_.CuentaCliente
+                };
+                const facturao = data_.factura;
+                const id_pv = yield (0, syncro_functions_1.insert_pedidoVenta)(data);
+                if (id_pv) {
+                }
+            }
+            else if (factura != '' && albaran != '') {
+                const data_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.ForceSincroFact_factura)(pedido_, facturaString));
+                const caj = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_boxes_of_an_albaran)(facturaString));
+            }
+            else {
+                res.status(500).json({ message: 'No se puede procesar, ingrese solo un albaran y una factura.' });
+            }
+        }
+        else {
+            res.status(500).json({ message: 'No se puede procesar, ingrese pedido.' });
+        }
+    }
+    catch (err) {
+        console.log(' ERROR AL FORZAR SINCRONIZACION :', err);
+        res.status(500).json({ message: ' NO SE PUDO SINCRONIZAR LA FACTURA MANUALMENTE' });
+    }
+});
+exports.forceFactura_service = forceFactura_service;

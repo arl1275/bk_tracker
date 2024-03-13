@@ -4,17 +4,18 @@ exports.get_update_info_fromAX = exports.get_ids_pedidos_to_update = void 0;
 const clients_1 = require("../../special_clients/clients");
 const utils_1 = require("../../handle_passwords/utils");
 const days_less = 3;
+const days_less_ax = 6;
 //---------------------------------------------------------------------------------------//
 //                      LOCAL DB FUNCTIONS TO UPDATE ALBARANS
 //---------------------------------------------------------------------------------------//
 const get_ids_pedidos_to_update = () => {
     return `
     SELECT 
-        p.id,
+        p.id as pedido_id,
         p.pedidoventa,
-        f.id, 
+        f.id as factura_id, 
         f.factura, 
-        a.id, 
+        a.id as albaran_id, 
         a.albaran  
     FROM pedidoventas p 
     INNER JOIN facturas f ON p.id = f.id_pedidoventas 
@@ -38,7 +39,7 @@ const get_update_info_fromAX = () => {
         )
     AND pais = 'Honduras'
     AND albaran != ''
-    AND Fecha >= '${(0, utils_1.obtenerFechaConAtraso)(days_less)}';
+    AND Fecha >= '${(0, utils_1.obtenerFechaConAtraso)(days_less_ax)}';
     `;
 };
 exports.get_update_info_fromAX = get_update_info_fromAX;

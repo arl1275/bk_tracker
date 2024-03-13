@@ -11,7 +11,8 @@ import {
         getHistoFact_controller,
         getCajasFAct_controller,
         getAdminFacts_controller,
-        toNullState_controller
+        toNullState_controller,
+        forceFactura_controller
 } from "../controllers/facturas.controller";
 
 const routerFacturas = express.Router();
@@ -47,5 +48,12 @@ routerFacturas.get('/adminFact', getAdminFacts_controller);
 routerFacturas.get('/app/getCajasOneFact', getCajasFAct_controller);
 
 routerFacturas.get('/toNullState', toNullState_controller);
+
+
+//------------------------------------------------- THIS IS A ADMINISTRATOR ROUTE -------------------------------------------------//
+
+//routerFacturas.post('/admin/forceSyncroFact', forceFactura_controller)         // this route is to force the incronization of one factura
+
+//---------------------------------------------------------------------------------------------------------------------------------//
 
 export default routerFacturas;

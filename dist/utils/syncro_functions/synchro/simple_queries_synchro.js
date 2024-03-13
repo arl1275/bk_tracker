@@ -1,13 +1,17 @@
 "use strict";
+//---------------------------------------------------------------------------------//
+// THIS FILE IS TO EXPORT QUERIES THAT ARE USED IN OTHERS FILES TO SYNCRO AX DATA  //
+//---------------------------------------------------------------------------------//
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports.insert_pedido_venta = exports.val_if_fact_exist = exports.val_if_pedido_venta = exports.get_boxes_one_fact = exports.query_get_boxes_of_an_albaran = exports.query_get_albaran_of_albaran_inserted_as_factura = exports.query_get_albarans_of_a_factura = exports.query_get_facts_of_a_pedidoVenta = exports.query_get_pedidoventas = void 0;
+exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports.insert_pedido_venta = exports.val_if_fact_exist = exports.val_if_pedido_venta = exports.ForceSincroFact_albaran = exports.ForceSincroFact_factura = exports.get_boxes_one_fact = exports.query_get_boxes_of_an_albaran = exports.query_get_albaran_of_albaran_inserted_as_factura = exports.query_get_albarans_of_a_factura = exports.query_get_facts_of_a_pedidoVenta = exports.query_get_pedidoventas = void 0;
 //---------------------------------------------------------//
 //                  DEFAULT DATA FILTERS                   //
 //---------------------------------------------------------//
+const utils_1 = require("../../handle_passwords/utils");
+const clients_1 = require("../../special_clients/clients");
 const paisFilter = 'Honduras'; // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula'; // valor para setear las ubicaciones
-const mininumDateAllowed = '2024-03-01'; //obtenerFechaActual();           // valor para captar las facturas mas antiguas
-const clients_1 = require("../../special_clients/clients");
+const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(); // valor para captar las facturas mas antiguas
 //---------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
@@ -151,6 +155,40 @@ const get_boxes_one_fact = () => {
       WHERE f.id = $1;`;
 };
 exports.get_boxes_one_fact = get_boxes_one_fact;
+//-----------------------------------------------------------------------------------------------------//
+// this query is to force the sincro of one factura
+//-----------------------------------------------------------------------------------------------------//
+const ForceSincroFact_factura = (pedido, factura) => {
+    return `
+  SELECT DISTINCT 
+  pedidoventa, 
+  factura, 
+  albaran,
+  Pais,
+  Departamento,
+  ciudad,
+  calle,
+  ubicacion 
+  WHERE pedidoventa = '${pedido}'
+  AND factura = ${factura};`;
+};
+exports.ForceSincroFact_factura = ForceSincroFact_factura;
+const ForceSincroFact_albaran = (pedido, albaran) => {
+    return `
+  SELECT DISTINCT 
+    pedidoventa, 
+    factura, 
+    albaran,
+    Pais,
+    Departamento,
+    ciudad,
+    calle,
+    ubicacion 
+  WHERE 
+    pedidoventa = '${pedido}'
+    AND albaran = '${albaran}';`;
+};
+exports.ForceSincroFact_albaran = ForceSincroFact_albaran;
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
 //                      THIS QUERIES ARE FOR THE INSERTION IN THE LOCAL DB                             //

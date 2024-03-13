@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obtenerFechaConAtraso = exports.obtenerFechaActual = exports.ComparedPassWord = exports.EncryptPassword_ = void 0;
+exports.Force_Sincro = exports.obtenerFechaConAtraso = exports.obtenerFechaActual = exports.ComparedPassWord = exports.EncryptPassword_ = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const saltRounds = 10;
 //--------------------------------------------------------------------//
@@ -46,6 +46,7 @@ function obtenerFechaActual() {
     const año = fechaActual.getFullYear();
     const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
     const dia = agregarCeroALaIzquierda(fechaActual.getDate());
+    console.log(`data actualizada en : ${año}-${mes}-${dia}`);
     return `${año}-${mes}-${dia}`;
 }
 exports.obtenerFechaActual = obtenerFechaActual;
@@ -58,3 +59,6 @@ function obtenerFechaConAtraso(props) {
     return `${año}-${mes}-${dia}`;
 }
 exports.obtenerFechaConAtraso = obtenerFechaConAtraso;
+function Force_Sincro(Encabezado, cajas) {
+}
+exports.Force_Sincro = Force_Sincro;
