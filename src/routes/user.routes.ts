@@ -7,7 +7,8 @@ import {
         see_all_users,
         update_user,
         log_controller,
-        log_appController
+        log_appController,
+        authCheck_controller
 } from "../controllers/user.controller";
 
 // //admin routes
@@ -28,6 +29,6 @@ routerUser.get("/auth/user", log_controller);
 
 routerUser.get("/auth/app", log_appController); //usuarios/auth/app
 
-// routerUser.get("/EMER:", Emergency_log);
+routerUser.get("/auth/check", authCheck_controller);
 
 export default routerUser;

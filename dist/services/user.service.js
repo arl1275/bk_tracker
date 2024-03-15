@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -14,8 +37,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.passUser_appService = exports.passUser_service = exports.UpdateUserService = exports.DelUser = exports.CreateUserService = exports.getAllUsuarios = exports.get_all_entregadores_service = void 0;
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const utils_1 = require("../utils/handle_passwords/utils");
+const dotenv = __importStar(require("dotenv"));
+dotenv.config();
 let get_all_entregadores_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         localDB_config_1.default.query('SELECT id, nombre FROM users WHERE id_role = 3;', (err, result) => {
@@ -151,14 +177,18 @@ let passUser_service = (req, res) => __awaiter(void 0, void 0, void 0, function*
                     if (result.rows[0].id_role === 1 || result.rows[0].id_role === 4) {
                         if (typeof _password === 'string') {
                             const valid = yield (0, utils_1.ComparedPassWord)(_password, result.rows[0].hashed_password);
+                            if (!process.env.JWT_SECRET) {
+                                return res.status(500).json({ message: 'JWT_SECRET no está definido en las variables de entorno' });
+                            }
                             if (valid) {
                                 const usurario = {
                                     nombre: result.rows[0].nombre,
                                     cod_empleado: result.rows[0].cod_empleado,
                                     type_: result.rows[0].id_role
                                 };
+                                const token = jsonwebtoken_1.default.sign({ cod_empleado: usurario.cod_empleado }, process.env.JWT_SECRET);
                                 console.log('SE INGRESO VIA FRONT-END KELLER-CHECK');
-                                res.status(200).json({ data: usurario });
+                                res.status(200).json({ token, usurario });
                             }
                             else {
                                 console.log('SE INTENGO INGRESAR AL KELLER');

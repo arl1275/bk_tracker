@@ -1,8 +1,10 @@
 import { Request, Response, query } from "express";
 import connDB from "../utils/db/localDB_config";
-import { usuario } from "../interfaces/ft_interfaces/usuario.interface";
+import jwt from 'jsonwebtoken';
 import format from "pg-format";
 import { EncryptPassword_, ComparedPassWord } from "../utils/handle_passwords/utils";
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export let get_all_entregadores_service = async (req: Request, res: Response) => {
   try {
@@ -120,6 +122,14 @@ export let UpdateUserService = async (req: Request, res: Response) => {
 //                      Check user sing                            //
 //-----------------------------------------------------------------//
 
+export let authCheck_service = async ( req : Request, res : Response) => {
+  try {
+    
+  } catch (err) {
+    console.log(' USUARIO SIN TOCKEN ');
+    res.status(401);
+  }
+}
 
 export let passUser_service = async (req: Request, res: Response) => {
   try {
@@ -137,8 +147,11 @@ export let passUser_service = async (req: Request, res: Response) => {
           if (result.rows[0].id_role === 1 || result.rows[0].id_role ===  4) {
 
             if(typeof _password === 'string'){
-
               const valid = await ComparedPassWord(_password, result.rows[0].hashed_password);
+
+              if (!process.env.JWT_SECRET) {
+                return res.status(500).json({ message: 'JWT_SECRET no está definido en las variables de entorno' });
+              }
 
               if(valid){
                 const usurario = {
@@ -146,27 +159,23 @@ export let passUser_service = async (req: Request, res: Response) => {
                   cod_empleado : result.rows[0].cod_empleado,
                   type_ : result.rows[0].id_role
                 }
+                const token = jwt.sign({ cod_empleado: usurario.cod_empleado }, process.env.JWT_SECRET);
                 console.log('SE INGRESO VIA FRONT-END KELLER-CHECK');
-                res.status(200).json({ data : usurario});
+                res.status(200).json({ token, usurario });
               }else{
                 console.log('SE INTENGO INGRESAR AL KELLER')
                 res.status(500)
               }
-
             }else{
               console.log('LA CONTRASEÑA NO ES UN STRING');
               res.status(500).json({message : 'la contraseña no es un string'});
             }
-                        
-          
           } else {
             res.status(500).json({ message: 'NO ES UN ADMINISTRADOR' });
           }
-
         } else {
           res.status(500).json({ message: 'USUARIO INVALIDO' });
-        }
-        
+        }       
       }
     });
 

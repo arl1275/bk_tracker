@@ -6,7 +6,8 @@ import {
         getAllUsuarios,
         UpdateUserService,
         passUser_service,
-        passUser_appService
+        passUser_appService,
+        authCheck_service
 } from "../services/user.service";
 
 // //routes thay we need
@@ -23,7 +24,7 @@ export const update_user = (req: Request, res: Response) => { UpdateUserService(
 
 export const log_appController = (req : Request, res : Response) => { passUser_appService(req, res)};
 
-// export const update_user_role = (req: Request, res : Response) =>{update_role(req, res)};
+export const authCheck_controller = (req: Request, res : Response) =>{ authCheck_service(req, res)};
 
 // //admin routes
 
