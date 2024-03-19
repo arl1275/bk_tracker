@@ -187,6 +187,8 @@ export const ForceSincroFact_factura = ( pedido : string, factura : string) => {
   ciudad,
   calle,
   ubicacion 
+  FROM
+      IMGetAllPackedBoxesInSB 
   WHERE pedidoventa = '${pedido}'
   AND factura = ${factura};`
 }
@@ -201,7 +203,9 @@ export const ForceSincroFact_albaran = ( pedido : string , albaran : string) => 
     Departamento,
     ciudad,
     calle,
-    ubicacion 
+    ubicacion
+  FROM
+    IMGetAllPackedBoxesInSB 
   WHERE 
     pedidoventa = '${pedido}'
     AND albaran = '${albaran}';`

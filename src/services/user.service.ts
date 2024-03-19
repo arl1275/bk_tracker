@@ -2,9 +2,10 @@ import { Request, Response, query } from "express";
 import connDB from "../utils/db/localDB_config";
 import jwt from 'jsonwebtoken';
 import format from "pg-format";
-import { EncryptPassword_, ComparedPassWord } from "../utils/handle_passwords/utils";
+import { EncryptPassword_, ComparedPassWord, generate_token } from "../utils/handle_passwords/utils";
 import * as dotenv from 'dotenv';
 dotenv.config();
+
 
 export let get_all_entregadores_service = async (req: Request, res: Response) => {
   try {
@@ -124,7 +125,8 @@ export let UpdateUserService = async (req: Request, res: Response) => {
 
 export let authCheck_service = async ( req : Request, res : Response) => {
   try {
-    
+    const {user, cod_empleado} = req.query
+    res.status(200);
   } catch (err) {
     console.log(' USUARIO SIN TOCKEN ');
     res.status(401);
@@ -149,19 +151,16 @@ export let passUser_service = async (req: Request, res: Response) => {
             if(typeof _password === 'string'){
               const valid = await ComparedPassWord(_password, result.rows[0].hashed_password);
 
-              if (!process.env.JWT_SECRET) {
-                return res.status(500).json({ message: 'JWT_SECRET no está definido en las variables de entorno' });
-              }
-
               if(valid){
                 const usurario = {
                   nombre : result.rows[0].nombre,
                   cod_empleado : result.rows[0].cod_empleado,
                   type_ : result.rows[0].id_role
                 }
-                const token = jwt.sign({ cod_empleado: usurario.cod_empleado }, process.env.JWT_SECRET);
+                const token = await generate_token(usurario.nombre);
                 console.log('SE INGRESO VIA FRONT-END KELLER-CHECK');
                 res.status(200).json({ token, usurario });
+
               }else{
                 console.log('SE INTENGO INGRESAR AL KELLER')
                 res.status(500)

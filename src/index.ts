@@ -3,27 +3,18 @@ import { Request, Response, NextFunction} from 'express';
 import bodyParser = require('body-parser');
 import { syncroData_AX } from './utils/syncro_functions/synchro/synchro';
 
-//
-import { sendEmail_transito } from './utils/reports/mail_body';
-//
-
 require("dotenv").config({path: './.env'});
 const cors = require('cors');
-
 
 import routerFacturas from './routes/facturas.routes';
 import routerCamiones from './routes/camion.routes';
 import routerUser from './routes/user.routes';
 import routerDec_env from './routes/declaracion_env.routes';
 
-
 const express = require("express");
 const app = express();
 
 syncroData_AX()
-//
-
-//
 
 app.use(cors());
 app.use(bodyParser.json({limit : '50mb'})); 

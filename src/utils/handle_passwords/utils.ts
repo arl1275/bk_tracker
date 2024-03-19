@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const saltRounds = 10;
 //--------------------------------------------------------------------//
@@ -21,6 +23,21 @@ export const ComparedPassWord = async (LogPassword : string, DBPassword : string
       return false;   
     }
 }
+
+//--------------------------------------------------------------------//
+//                            JWT HANDLERS                            //                
+//--------------------------------------------------------------------//
+
+export const generate_token = async ( pass_ : string ) =>{
+     if (!process.env.JWT_SECRET) {
+         return null
+       }
+
+     const tocken = jwt.sign({ id: pass_ }, process.env.JWT_SECRET, { expiresIn: '1h' });
+     return tocken;
+}
+
+
 
 //--------------------------------------------------------------------//
 //                            DATE GENERATORS                         //                

@@ -10,6 +10,7 @@ import {
         log_appController,
         authCheck_controller
 } from "../controllers/user.controller";
+import { authenticateToken } from '../middleware/user.middleware'
 
 // //admin routes
 
@@ -29,6 +30,6 @@ routerUser.get("/auth/user", log_controller);
 
 routerUser.get("/auth/app", log_appController); //usuarios/auth/app
 
-routerUser.get("/auth/check", authCheck_controller);
+routerUser.get("/auth/check", authenticateToken ,authCheck_controller);
 
 export default routerUser;

@@ -35,14 +35,14 @@ WHERE
       ( CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
   )
   AND Factura IS NOT NULL
-  --AND fecha >= '${mininumDateAllowed}'
+  AND fecha >= '${mininumDateAllowed}'
 
-  --_______________________________________________________________________________________________||--
+  --  _____________________________________________________________________________________________  --
   --||                                                                                             ||--
   --||        THIS IS TO FORCE SINCRONIZACION JUST ADD THE PEDIDOS THAT U WANT TO FORCE SINCRO     ||--
   --||_____________________________________________________________________________________________||--
 
-      AND pedidoventa = 'PV-00310245' OR pedidoventa = 'PV-00310252' 
+  -- AND pedidoventa = 'PV-00310245' OR pedidoventa = 'PV-00310252' 
   
   --||_____________________________________________________________________________________________||-- 
 
@@ -80,7 +80,7 @@ const query_get_facts_of_a_pedidoVenta = (pedido) => {
         ( CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
       )    
       AND pedidoventa = '${pedido}'
-      --AND fecha >= '${mininumDateAllowed}'
+      AND fecha >= '${mininumDateAllowed}'
       AND albaran != '' 
     group by Factura, albaran
     ) AS Subquery;`;
@@ -98,7 +98,7 @@ const query_get_albarans_of_a_factura = (factura) => {
          ubicacion
      FROM IMGetAllPackedBoxesInSB 
      WHERE 
-         --fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
+         fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
          Pais= '${paisFilter}'
          AND Factura = '${factura}'
          AND albaran != '' ;`;
@@ -123,7 +123,7 @@ const query_get_albaran_of_albaran_inserted_as_factura = (albaran, pedido_venta)
             OR
             (CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
         )    
-    --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
+    AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
     AND Albaran = '${albaran}'
     AND PedidoVenta = '${pedido_venta}'
     AND (factura IS NULL OR factura = '');
@@ -145,7 +145,7 @@ const query_get_boxes_of_an_albaran = (albaran) => {
       IMGetAllPackedBoxesInSB 
   WHERE 
       Pais = '${paisFilter}'
-      --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
+      AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
       AND Albaran = '${albaran}'
   GROUP BY
       ListaEmpaque,
@@ -179,6 +179,8 @@ const ForceSincroFact_factura = (pedido, factura) => {
   ciudad,
   calle,
   ubicacion 
+  FROM
+      IMGetAllPackedBoxesInSB 
   WHERE pedidoventa = '${pedido}'
   AND factura = ${factura};`;
 };
@@ -193,7 +195,9 @@ const ForceSincroFact_albaran = (pedido, albaran) => {
     Departamento,
     ciudad,
     calle,
-    ubicacion 
+    ubicacion
+  FROM
+    IMGetAllPackedBoxesInSB 
   WHERE 
     pedidoventa = '${pedido}'
     AND albaran = '${albaran}';`;

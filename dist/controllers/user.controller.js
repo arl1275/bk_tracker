@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.see_all_users = exports.log_appController = exports.update_user = exports.delete_User = exports.create_User = exports.log_controller = exports.get_all_entregadores = void 0;
+exports.see_all_users = exports.authCheck_controller = exports.log_appController = exports.update_user = exports.delete_User = exports.create_User = exports.log_controller = exports.get_all_entregadores = void 0;
 const user_service_1 = require("../services/user.service");
 // //routes thay we need
 const get_all_entregadores = (req, res) => { (0, user_service_1.get_all_entregadores_service)(req, res); }; //loggin access
@@ -15,7 +15,8 @@ const update_user = (req, res) => { (0, user_service_1.UpdateUserService)(req, r
 exports.update_user = update_user;
 const log_appController = (req, res) => { (0, user_service_1.passUser_appService)(req, res); };
 exports.log_appController = log_appController;
-// export const update_user_role = (req: Request, res : Response) =>{update_role(req, res)};
+const authCheck_controller = (req, res) => { (0, user_service_1.authCheck_service)(req, res); };
+exports.authCheck_controller = authCheck_controller;
 // //admin routes
 const see_all_users = (req, res) => { (0, user_service_1.getAllUsuarios)(req, res); };
 exports.see_all_users = see_all_users;

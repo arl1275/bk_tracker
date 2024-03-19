@@ -1,20 +1,42 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { Secret } from 'jsonwebtoken';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization;
+interface TokenPayload {
+  userId: string;
+}
+
+function verifyToken(token: string) {
+  try {
+
+    if (!process.env.JWT_SECRET) {
+      return null
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return decoded;
+  } catch (error) {
+   
+    console.error('Error verifying token:', error);
+    return null;
+  }
+}
+
+export function authenticateToken(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'Acceso no autorizado: token no proporcionado' });
+    return res.sendStatus(401); // Unauthorized
   }
 
-  jwt.verify(token, process.env.JWT_SECRET as Secret, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: 'Acceso no autorizado: token inválido' });
-    }
-    //req.user = decoded; // Almacenar la información del usuario decodificada en el objeto de solicitud para su uso posterior
-    next();
-  });
-};
+  const decodedToken = verifyToken(token);
+  if (!decodedToken) {
+    return res.sendStatus(403); // Forbidden
+  }
 
-export default verifyToken;
+  (req as any).user = decodedToken;
+  next();
+}
+
+

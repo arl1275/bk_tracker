@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const routerUser = (0, express_1.Router)();
 const user_controller_1 = require("../controllers/user.controller");
+const user_middleware_1 = require("../middleware/user.middleware");
 // //admin routes
 routerUser.get("/entregadores", user_controller_1.get_all_entregadores); //get all users
 // //user routes
@@ -12,5 +13,5 @@ routerUser.delete("/deleteuser:", user_controller_1.delete_User);
 routerUser.put("/update_user", user_controller_1.update_user); // /usuarios/update_user
 routerUser.get("/auth/user", user_controller_1.log_controller);
 routerUser.get("/auth/app", user_controller_1.log_appController); //usuarios/auth/app
-// routerUser.get("/EMER:", Emergency_log);
+routerUser.get("/auth/check", user_middleware_1.authenticateToken, user_controller_1.authCheck_controller);
 exports.default = routerUser;

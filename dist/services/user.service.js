@@ -35,9 +35,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.passUser_appService = exports.passUser_service = exports.UpdateUserService = exports.DelUser = exports.CreateUserService = exports.getAllUsuarios = exports.get_all_entregadores_service = void 0;
+exports.passUser_appService = exports.passUser_service = exports.authCheck_service = exports.UpdateUserService = exports.DelUser = exports.CreateUserService = exports.getAllUsuarios = exports.get_all_entregadores_service = void 0;
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const utils_1 = require("../utils/handle_passwords/utils");
 const dotenv = __importStar(require("dotenv"));
@@ -163,6 +162,17 @@ exports.UpdateUserService = UpdateUserService;
 //-----------------------------------------------------------------//
 //                      Check user sing                            //
 //-----------------------------------------------------------------//
+let authCheck_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { user, cod_empleado } = req.query;
+        res.status(200);
+    }
+    catch (err) {
+        console.log(' USUARIO SIN TOCKEN ');
+        res.status(401);
+    }
+});
+exports.authCheck_service = authCheck_service;
 let passUser_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user, _password } = req.query;
@@ -177,16 +187,13 @@ let passUser_service = (req, res) => __awaiter(void 0, void 0, void 0, function*
                     if (result.rows[0].id_role === 1 || result.rows[0].id_role === 4) {
                         if (typeof _password === 'string') {
                             const valid = yield (0, utils_1.ComparedPassWord)(_password, result.rows[0].hashed_password);
-                            if (!process.env.JWT_SECRET) {
-                                return res.status(500).json({ message: 'JWT_SECRET no está definido en las variables de entorno' });
-                            }
                             if (valid) {
                                 const usurario = {
                                     nombre: result.rows[0].nombre,
                                     cod_empleado: result.rows[0].cod_empleado,
                                     type_: result.rows[0].id_role
                                 };
-                                const token = jsonwebtoken_1.default.sign({ cod_empleado: usurario.cod_empleado }, process.env.JWT_SECRET);
+                                const token = yield (0, utils_1.generate_token)(usurario.nombre);
                                 console.log('SE INGRESO VIA FRONT-END KELLER-CHECK');
                                 res.status(200).json({ token, usurario });
                             }
