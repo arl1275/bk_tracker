@@ -28,7 +28,7 @@ const mininumDateAllowed =  '2024-03-01'//obtenerFechaActual();          // valo
 //-----------------------------------------------------------------------------------------------------//
 // this query is to get all the pedidos de venta 
 //-----------------------------------------------------------------------------------------------------//
-export const query_get_pedidoventas = () =>{
+export const query_get_pedidoventas_F = ( pedidoventa : string) =>{
   return `
   SELECT 
   PedidoVenta,
@@ -42,14 +42,12 @@ WHERE
       ( CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
   )
   AND Factura IS NOT NULL
-  AND fecha >= '${mininumDateAllowed}'
-
   --  _____________________________________________________________________________________________  --
   --||                                                                                             ||--
   --||        THIS IS TO FORCE SINCRONIZACION JUST ADD THE PEDIDOS THAT U WANT TO FORCE SINCRO     ||--
   --||_____________________________________________________________________________________________||--
 
-  AND pedidoventa = 'PV-00310785' 
+  AND pedidoventa = '${pedidoventa}' 
   
   --||_____________________________________________________________________________________________||-- 
 
@@ -64,7 +62,7 @@ GROUP BY
 //-----------------------------------------------------------------------------------------------------//
 // this query is to get all facturas of one pedido de venta
 //-----------------------------------------------------------------------------------------------------//
-export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
+export const query_get_facts_of_a_pedidoVenta_F = (pedido : string ) =>{
    return `
    SELECT
       CASE
@@ -87,14 +85,28 @@ export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
         ( CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
       )    
       AND pedidoventa = '${pedido}'
-      --AND fecha >= '${mininumDateAllowed}'
       AND albaran != '' 
     group by Factura, albaran
     ) AS Subquery;`;
   }
 
+
 //-----------------------------------------------------------------------------------------------------//
-export const query_get_albarans_of_a_factura = (factura: string) => {
+// this query is to get all facturas of one pedido de venta
+//-----------------------------------------------------------------------------------------------------//
+export const query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F = (pedido : string, factura : string) =>{
+    return `
+    SELECT DISTINCT
+        Factura
+       FROM
+           IMGetAllPackedBoxesInSB
+       WHERE
+       pedidoventa = '${pedido}'
+       AND factura = '${factura}'`;
+   }
+
+//-----------------------------------------------------------------------------------------------------//
+export const query_get_albarans_of_a_factura_F = (factura: string) => {
   return `
       SELECT DISTINCT
          Albaran,
@@ -106,7 +118,7 @@ export const query_get_albarans_of_a_factura = (factura: string) => {
      FROM IMGetAllPackedBoxesInSB 
      WHERE 
          --fecha >= '${mininumDateAllowed}' 
-          Pais= '${paisFilter}'
+         Pais= '${paisFilter}'
          AND Factura = '${factura}'
          AND albaran != '' ;`;
 }
@@ -114,7 +126,7 @@ export const query_get_albarans_of_a_factura = (factura: string) => {
 //-----------------------------------------------------------------------------------------------------//
 // this query is to get all the albaran of one albaran that is beein inserted as factura
 //-----------------------------------------------------------------------------------------------------//
-export const query_get_albaran_of_albaran_inserted_as_factura = ( albaran : string, pedido_venta : string) => {
+export const query_get_albaran_of_albaran_inserted_as_factura_F = ( albaran : string, pedido_venta : string) => {
   return `
   SELECT DISTINCT
         Albaran,
@@ -130,17 +142,15 @@ export const query_get_albaran_of_albaran_inserted_as_factura = ( albaran : stri
             OR
             (CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
         )    
-    --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
     AND Albaran = '${albaran}'
-    AND PedidoVenta = '${pedido_venta}'
-    AND (factura IS NULL OR factura = '');
+    AND PedidoVenta = '${pedido_venta}';
 `;
 }
 
 //-----------------------------------------------------------------------------------------------------//
 // this query is to get all the albaranes of one factura
 //-----------------------------------------------------------------------------------------------------//
-export const query_get_boxes_of_an_albaran = (albaran: string) => {
+export const query_get_boxes_of_an_albaran_F = (albaran: string, pedido : string) => {
   return `
   SELECT
 	distinct
@@ -154,6 +164,7 @@ export const query_get_boxes_of_an_albaran = (albaran: string) => {
       Pais = '${paisFilter}'
       --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
       AND Albaran = '${albaran}'
+      AND pedidoventa = '${pedido}'
   GROUP BY
       ListaEmpaque,
       Caja,

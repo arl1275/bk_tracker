@@ -10,7 +10,11 @@ export const UpdateFacturasChanges = async () => {
         let dataLocal: any = [];
         let data_changes: any = [];
 
-        dataAX = await executeQuery(get_update_info_fromAX()); // || pedidoventa | factura | albaran ||
+        // this function brings all the facturas from AX that applies into the terns of the syncron, whit the next format
+        // || pedidoventa | factura | albaran ||
+        dataAX = await executeQuery(get_update_info_fromAX());
+
+        // this funciton will bring the facturas from our local DB that are into our 
         dataLocal = connDB.query(get_ids_pedidos_to_update()); // || pedido_id | p.pedidoventa | factura_id | f.factura | albaran_id | a.albaran || 
 
         for (let i = 0; i < dataLocal.length; i++) {

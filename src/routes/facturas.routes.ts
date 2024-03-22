@@ -52,7 +52,9 @@ routerFacturas.get('/toNullState', toNullState_controller);
 
 //------------------------------------------------- THIS IS A ADMINISTRATOR ROUTE -------------------------------------------------//
 
-//routerFacturas.post('/admin/forceSyncroFact', forceFactura_controller)         // this route is to force the incronization of one factura
+routerFacturas.post('/admin/forceSyncroFact', forceFactura_controller)         // this route is to force the incronization of one factura
+
+//routerFacturas.get('/admin/force', forceFactura_controller);
 
 //---------------------------------------------------------------------------------------------------------------------------------//
 

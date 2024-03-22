@@ -6,12 +6,8 @@ import { uploadFileToCloudinary } from "../utils/db/cloudinary_config";
 import { QueryResult } from "pg";
 import { sendEmail_transito } from "../utils/reports/mail_body";
 import { sendEmail_Entregados } from "../utils/reports/mail.body_syncro";
-import { executeQuery } from "../utils/db/ax_config";
-import { ForceSincroFact_albaran, 
-        ForceSincroFact_factura, 
-        get_boxes_one_fact, 
-        query_get_boxes_of_an_albaran } from "../utils/syncro_functions/synchro/simple_queries_synchro";
-import { insert_pedidoVenta } from "../utils/syncro_functions/synchro/syncro_functions";
+import { ForceSynchro } from "../utils/syncro_functions/force_synchro/force_syncro";
+
 
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
@@ -458,40 +454,15 @@ export let change_state_to_null = async (req: Request, res: Response) => {
 
 export let forceFactura_service = async (req: Request, res: Response) => {
     try {
-        const { pedido, factura, albaran } = req.query;
-        const pedido_ = pedido ? pedido.toString() : '';
-        const facturaString = factura ? factura.toString() : '';
-        const albaranString = albaran ? albaran.toString() : '';
+        const {pedidoventa, factura, albaran } = req.body;
 
-        if (pedido != '') {
-            if (factura == '') {
-                const data_ : any= await executeQuery(ForceSincroFact_albaran(pedido_, albaranString));    // Could not get an array over 1 rows
-                let x  : caja[] = await executeQuery(query_get_boxes_of_an_albaran(albaranString));     // will get boxes, more than one row (only applys facts of today)
-
-                const data : pedidoventa = {
-                    PedidoVenta : data_.pedidoventa,
-                    NombreCliente: data_.NombreCliente,
-                    CuentaCliente: data_.CuentaCliente
-                }
-
-                const facturao : factura = data_.factura; 
-
-                const id_pv = await insert_pedidoVenta(data);
-                if(id_pv){
-                
-                }
-
-
-            } else if (factura != '' && albaran != '') {
-                const data_ = await executeQuery(ForceSincroFact_factura(pedido_, facturaString));
-                const caj : caja[] = await executeQuery(query_get_boxes_of_an_albaran(facturaString))
-
-            } else {
-                res.status(500).json({ message: 'No se puede procesar, ingrese solo un albaran y una factura.' })
-            }
-        } else {
-            res.status(500).json({ message: 'No se puede procesar, ingrese pedido.' })
+        if(typeof pedidoventa === 'string' && typeof factura === 'string' && typeof albaran === 'string'){
+            await ForceSynchro( pedidoventa, factura, albaran);
+            res.status(200).json({ message : 'data sin saver si se ingreso'});
+        }else{
+            res.status(500).json({ message : '|| NO SE EJECUTO LAS FUNCIONES'});
         }
+        
     } catch (err) {
         console.log(' ERROR AL FORZAR SINCRONIZACION :', err);
         res.status(500).json({ message: ' NO SE PUDO SINCRONIZAR LA FACTURA MANUALMENTE' });

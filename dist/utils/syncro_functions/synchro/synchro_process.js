@@ -18,12 +18,15 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
         //------------------------------------------------------------------------------------------------------------//
         //                              THIS PART OBTAIN THE PEDIDOS FROM AX
         //------------------------------------------------------------------------------------------------------------//
+        // Obtienen todos los pedidos de venta de este día (hoy)
         const pedidoventas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_pedidoventas)());
         if (pedidoventas_.length > 0) {
             for (let i = 0; i < pedidoventas_.length; i++) {
                 const pedido = pedidoventas_[i];
+                // verifica si el pedido ya existe
                 const exist_pedido = yield (0, syncro_functions_1.val_insert_pedidoventas_nuevas)(pedido.PedidoVenta);
                 if (exist_pedido === false) {
+                    // si no existe el pedido de venta  ingresará
                     const id_pedido = yield (0, syncro_functions_1.insert_pedidoVenta)(pedido);
                     console.log(`
 ||------------------------------------------------------------------------------------------------------------||
@@ -35,8 +38,10 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                         //------------------------------------------------------------------------------------------------------------//
                         //                       THIS PART OBTAIN THE SPECIFIC FACTURAS OF THE PEDIDOS DE VENTA
                         //------------------------------------------------------------------------------------------------------------//
+                        // Obtiene todas las facturas de una sola declaracion de envio
                         const facturas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_facts_of_a_pedidoVenta)(pedido.PedidoVenta));
                         for (let j = 0; j < facturas_.length; j++) {
+                            // guarda una sola factura en la variable facts
                             const fact = facturas_[j];
                             if (fact) {
                                 const exist_factura = yield (0, syncro_functions_1.val_insert_facturas_nuevas)(fact.Factura, pedido.PedidoVenta); // values if the factura already exist in LOCAL_DB
@@ -83,7 +88,7 @@ const NORMAL_insert_process_of_synchro = () => __awaiter(void 0, void 0, void 0,
                     }
                 }
                 else {
-                    console.log('// PEDIDO DE VENTA YA EXISTE : ', pedido.PedidoVenta);
+                    console.log('||     PEDIDO DE VENTA YA EXISTE : ', pedido.PedidoVenta);
                 }
             }
         }

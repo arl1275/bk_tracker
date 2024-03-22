@@ -1,5 +1,5 @@
 import { NORMAL_insert_process_of_synchro } from "./synchro_process";
-import { UpdateFacturasChanges } from "../special_synchro/albaran_synchro";
+import { UpdateFacturasChanges } from "../special_synchro/special_synchro";
 import * as cron from 'node-cron';
 
 export async function syncroData_AX() {
