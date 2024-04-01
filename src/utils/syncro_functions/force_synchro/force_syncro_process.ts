@@ -19,17 +19,9 @@ import {
     insert_albaran_,
     insert_boxes_
 } from '../synchro/syncro_functions';
+import { string } from 'pg-format';
 
 export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, factura : string, albaran : string) => {
-
-    let info_force = {
-        pedido : '',
-        cliente : '',
-        factura : '',
-        albaran : '',
-        ruta : '',
-        cajas : 0
-    }
 
     try {
         //------------------------------------------------------------------------------------------------------------//
@@ -45,7 +37,6 @@ export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, fac
                 const pedido: pedidoventa = pedidoventas_[i];
 
                 if (pedido) {
-                    info_force.cliente = pedido.NombreCliente;
                     const id_pedido = await insert_pedidoVenta(pedido);
                     console.log(`
 ||------------------------------------------------------------------------------------------------------------||
@@ -68,7 +59,7 @@ export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, fac
                                 const id_factura = await insert_factura_(fact[0], id_pedido); 
                                 if(id_factura){
                                     console.log(`||         FACTURA : ${fact[0].Factura}`);
-                                    info_force.factura = fact[0].Factura;
+                                   
                                     const albarans_ : albaran[] =  await executeQuery(query_get_albarans_of_a_factura_F(fact[0].Factura));
                                     for (let k = 0; k < albarans_.length; k++) {
                                         const _albaran = albarans_[k];
@@ -169,11 +160,15 @@ export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, fac
                     console.log('||     PEDIDO DE VENTA NO RECONOCIDO : ', pedidoventas_);
                 }
             }
+
+            console.log('||------------------------------------------------------------------------------------------------------------||')
         } else {
             console.log('||  PEDIDO DE VENTA TIENE MAS DE UNA COINCIDENCIA O NO EXISTE EN AX');
+            return false
         }
     } catch (err) {
         console.log('||     ERROR DURANTE LA SINCRONIZACIÓN FORZADA : ', err);
+        return false;
     }
 
 }
