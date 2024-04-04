@@ -19,7 +19,7 @@ import {
     insert_albaran_,
     insert_boxes_
 } from '../synchro/syncro_functions';
-import { string } from 'pg-format';
+
 
 export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, factura : string, albaran : string) => {
 

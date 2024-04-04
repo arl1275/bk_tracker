@@ -24,3 +24,20 @@ export interface caja {
     NumeroCaja : string,
     cantidad : number
 }
+
+//-------------------------- SINCRO INTERFACES --------------------------//
+
+export interface detAlbaran {
+    _albaran_ : albaran,
+    _cajas_ : caja[]
+}
+
+export interface detFact {
+    _factura_ : factura,
+    detalleFact : detAlbaran[]
+}
+
+export interface sincroObject {
+    pedido : pedidoventa,
+    data : detFact[]
+}

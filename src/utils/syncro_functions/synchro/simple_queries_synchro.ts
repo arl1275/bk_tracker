@@ -14,7 +14,7 @@ import { special_clients } from "../../special_clients/clients";
 
 const paisFilter = 'Honduras';                             // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                     // valor para setear las ubicaciones
-const mininumDateAllowed =  '2024-03-01'//obtenerFechaActual();          // valor para captar las facturas mas antiguas
+const mininumDateAllowed =  obtenerFechaActual(0);          // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -49,7 +49,7 @@ WHERE
   --||        THIS IS TO FORCE SINCRONIZACION JUST ADD THE PEDIDOS THAT U WANT TO FORCE SINCRO     ||--
   --||_____________________________________________________________________________________________||--
 
-  AND pedidoventa = 'PV-00310785' 
+  --AND pedidoventa = 'PV-00310785' 
   
   --||_____________________________________________________________________________________________||-- 
 
@@ -94,7 +94,7 @@ export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
   }
 
 //-----------------------------------------------------------------------------------------------------//
-export const query_get_albarans_of_a_factura = (factura: string) => {
+export const query_get_albarans_of_a_factura = (factura: string, pedido : string) => {
   return `
       SELECT DISTINCT
          Albaran,
@@ -106,8 +106,9 @@ export const query_get_albarans_of_a_factura = (factura: string) => {
      FROM IMGetAllPackedBoxesInSB 
      WHERE 
          --fecha >= '${mininumDateAllowed}' 
-          Pais= '${paisFilter}'
+         Pais= '${paisFilter}'
          AND Factura = '${factura}'
+         AND PedidoVenta = '${pedido}'
          AND albaran != '' ;`;
 }
 
@@ -152,7 +153,7 @@ export const query_get_boxes_of_an_albaran = (albaran: string) => {
       IMGetAllPackedBoxesInSB 
   WHERE 
       Pais = '${paisFilter}'
-      --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
+      AND fecha >= '${mininumDateAllowed}'
       AND Albaran = '${albaran}'
   GROUP BY
       ListaEmpaque,
@@ -219,15 +220,56 @@ export const ForceSincroFact_albaran = ( pedido : string , albaran : string) => 
 //-----------------------------------------------------------------------------------------------------//
 
 export const val_if_pedido_venta = () => {
-  return `SELECT EXISTS (SELECT 1 FROM pedidoventas WHERE pedidoventa = $1);`
+  return `SELECT 
+  CASE 
+      WHEN EXISTS (SELECT 1 FROM pedidoventas WHERE pedidoventa = $1) 
+      THEN (SELECT MAX(id) FROM pedidoventas WHERE pedidoventa = $1) 
+      ELSE NULL 
+  END AS pedidoventa_id;
+`
 }
 
 export const val_if_fact_exist = () =>{
-  return `SELECT EXISTS (
-    SELECT 1 FROM pedidoventas p 
-    INNER JOIN facturas f on p.id = f.id_pedidoventas
-    WHERE f.factura = $1 and p.pedidoventa = $2);`;
+  return `SELECT 
+  CASE 
+      WHEN EXISTS (
+          SELECT 1 
+          FROM facturas f
+          WHERE f.factura = $1
+      ) 
+      THEN (
+          SELECT MAX(f.id)
+          FROM facturas f 
+          INNER JOIN pedidoventas p ON p.id = f.id_pedidoventas
+          WHERE f.factura = $1 AND p.pedidoventa = $2
+      ) 
+      ELSE NULL 
+  END AS factura_id;
+
+`;
 }
+
+export const val_if_albaran = () => {
+  return `SELECT 
+  CASE 
+      WHEN EXISTS (SELECT 1 FROM albaranes a WHERE albaran = $1 AND a.id_facturas = $2) 
+      THEN ( SELECT MAX(id) FROM albaranes a WHERE albaran = $1 AND a.id_facturas = $2) 
+      ELSE NULL 
+  END AS albaran_id;
+`
+}
+
+export const val_if_caja = () => {
+  return `SELECT 
+  CASE 
+      WHEN EXISTS (SELECT 1 FROM cajas c WHERE caja = $1 and c.id_albaran = $2) 
+      THEN (SELECT id FROM cajas c WHERE caja = $1  and c.id_albaran = $2) 
+      ELSE NULL 
+  END AS caja_id;
+`
+}
+
+//-----------------------------------------------------------------------------------------------------//
 
 export const insert_pedido_venta = () => {
   return `INSERT INTO 

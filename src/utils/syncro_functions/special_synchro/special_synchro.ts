@@ -45,7 +45,7 @@ export const UpdateFacturasChanges = async () => {
         } else {
             console.log(`
         ||----------------------------------------------------------------------------------------------------||
-        ||                NO SE REALIZARON ACTUALIZACIONES DE FACTURAS : ${obtenerFechaActual()}              ||
+        ||                NO SE REALIZARON ACTUALIZACIONES DE FACTURAS : ${obtenerFechaActual(0)}              ||
         ||----------------------------------------------------------------------------------------------------||
         `)
         }

@@ -14,14 +14,6 @@ const ax_config_1 = require("../../db/ax_config");
 const force_syncro_queries_1 = require("./force_syncro_queries");
 const syncro_functions_1 = require("../synchro/syncro_functions");
 const FORCE_insert_process_of_synchro = (pedidoVenta, factura, albaran) => __awaiter(void 0, void 0, void 0, function* () {
-    let info_force = {
-        pedido: '',
-        cliente: '',
-        factura: '',
-        albaran: '',
-        ruta: '',
-        cajas: 0
-    };
     try {
         //------------------------------------------------------------------------------------------------------------//
         //                              THIS PART OBTAIN THE PEDIDOS FROM AX
@@ -32,7 +24,6 @@ const FORCE_insert_process_of_synchro = (pedidoVenta, factura, albaran) => __awa
             for (let i = 0; i < pedidoventas_.length; i++) {
                 const pedido = pedidoventas_[i];
                 if (pedido) {
-                    info_force.cliente = pedido.NombreCliente;
                     const id_pedido = yield (0, syncro_functions_1.insert_pedidoVenta)(pedido);
                     console.log(`
 ||------------------------------------------------------------------------------------------------------------||
@@ -54,7 +45,6 @@ const FORCE_insert_process_of_synchro = (pedidoVenta, factura, albaran) => __awa
                                 const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact[0], id_pedido);
                                 if (id_factura) {
                                     console.log(`||         FACTURA : ${fact[0].Factura}`);
-                                    info_force.factura = fact[0].Factura;
                                     const albarans_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_albarans_of_a_factura_F)(fact[0].Factura));
                                     for (let k = 0; k < albarans_.length; k++) {
                                         const _albaran = albarans_[k];
@@ -148,13 +138,16 @@ const FORCE_insert_process_of_synchro = (pedidoVenta, factura, albaran) => __awa
                     console.log('||     PEDIDO DE VENTA NO RECONOCIDO : ', pedidoventas_);
                 }
             }
+            console.log('||------------------------------------------------------------------------------------------------------------||');
         }
         else {
             console.log('||  PEDIDO DE VENTA TIENE MAS DE UNA COINCIDENCIA O NO EXISTE EN AX');
+            return false;
         }
     }
     catch (err) {
         console.log('||     ERROR DURANTE LA SINCRONIZACIÓN FORZADA : ', err);
+        return false;
     }
 });
 exports.FORCE_insert_process_of_synchro = FORCE_insert_process_of_synchro;

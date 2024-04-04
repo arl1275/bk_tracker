@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Force_Sincro = exports.obtenerFechaConAtraso = exports.obtenerFechaActual = exports.generate_token = exports.ComparedPassWord = exports.EncryptPassword_ = void 0;
+exports.obtenerFechaConAtraso = exports.obtenerFechaActual = exports.generate_token = exports.ComparedPassWord = exports.EncryptPassword_ = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv = __importStar(require("dotenv"));
@@ -78,12 +78,13 @@ exports.generate_token = generate_token;
 function agregarCeroALaIzquierda(numero) {
     return numero < 10 ? `0${numero}` : `${numero}`;
 }
-function obtenerFechaActual() {
+function obtenerFechaActual(MenosDias) {
     const fechaActual = new Date();
-    const año = fechaActual.getFullYear();
-    const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
-    const dia = agregarCeroALaIzquierda(fechaActual.getDate());
-    console.log(`data actualizada en : ${año}-${mes}-${dia}`);
+    const fechaRestada = new Date(fechaActual.getTime() - MenosDias * 24 * 60 * 60 * 1000); // Resta días en milisegundos
+    const año = fechaRestada.getFullYear();
+    const mes = agregarCeroALaIzquierda(fechaRestada.getMonth() + 1);
+    const dia = agregarCeroALaIzquierda(fechaRestada.getDate());
+    console.log(`Fecha restada ${MenosDias} días: ${año}-${mes}-${dia}`);
     return `${año}-${mes}-${dia}`;
 }
 exports.obtenerFechaActual = obtenerFechaActual;
@@ -96,6 +97,3 @@ function obtenerFechaConAtraso(props) {
     return `${año}-${mes}-${dia}`;
 }
 exports.obtenerFechaConAtraso = obtenerFechaConAtraso;
-function Force_Sincro(Encabezado, cajas) {
-}
-exports.Force_Sincro = Force_Sincro;

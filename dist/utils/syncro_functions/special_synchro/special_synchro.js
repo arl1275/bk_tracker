@@ -51,7 +51,7 @@ const UpdateFacturasChanges = () => __awaiter(void 0, void 0, void 0, function* 
         else {
             console.log(`
         ||----------------------------------------------------------------------------------------------------||
-        ||                NO SE REALIZARON ACTUALIZACIONES DE FACTURAS : ${(0, utils_1.obtenerFechaActual)()}              ||
+        ||                NO SE REALIZARON ACTUALIZACIONES DE FACTURAS : ${(0, utils_1.obtenerFechaActual)(0)}              ||
         ||----------------------------------------------------------------------------------------------------||
         `);
         }

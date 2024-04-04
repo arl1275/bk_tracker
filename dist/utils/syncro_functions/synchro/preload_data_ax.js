@@ -19,6 +19,9 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
         let pdventas_ = []; // this is to save the details of all pedidos de venta
         pdventas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_pedidoventas)());
         if (pdventas_.length > 0) {
+            console.log('||--------------------------------------------------------------------------------------------------------------------||');
+            console.log('||                                                 GENERANDO LA PRECARGA                                              ||');
+            console.log('||--------------------------------------------------------------------------------------------------------------------||');
             for (let i = 0; i < pdventas_.length; i++) {
                 let pedido = pdventas_[i]; // this is to save one pedidodeVenta to be process
                 let facturas_ = []; // this is to save all the facturas of the pedidoVentas that is going to process
@@ -65,7 +68,6 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                 const Detalle_pedido = { pedido: pedido, data: detalleFactura };
                 preloadData.push(Detalle_pedido);
             }
-            console.log(' data : ', preloadData);
             return preloadData;
         }
         else {

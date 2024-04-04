@@ -42,20 +42,23 @@ export const generate_token = async ( pass_ : string ) =>{
 //--------------------------------------------------------------------//
 //                            DATE GENERATORS                         //                
 //--------------------------------------------------------------------//
-
 function agregarCeroALaIzquierda(numero: number): string {
-    return numero < 10 ? `0${numero}` : `${numero}`;
-  }
-  
-export function obtenerFechaActual(){                      // this function is to get the today date, to sync funtions
-    const fechaActual = new Date();
-    const año = fechaActual.getFullYear();
-    const mes = agregarCeroALaIzquierda(fechaActual.getMonth() + 1);
-    const dia = agregarCeroALaIzquierda(fechaActual.getDate());
-    console.log(`data actualizada en : ${año}-${mes}-${dia}`)
-
-    return `${año}-${mes}-${dia}`;
+  return numero < 10 ? `0${numero}` : `${numero}`;
 }
+
+export function obtenerFechaActual(MenosDias: number): string {
+  const fechaActual = new Date();
+  const fechaRestada = new Date(fechaActual.getTime() - MenosDias * 24 * 60 * 60 * 1000); // Resta días en milisegundos
+
+  const año = fechaRestada.getFullYear();
+  const mes = agregarCeroALaIzquierda(fechaRestada.getMonth() + 1);
+  const dia = agregarCeroALaIzquierda(fechaRestada.getDate());
+
+  console.log(`Fecha restada ${MenosDias} días: ${año}-${mes}-${dia}`);
+
+  return `${año}-${mes}-${dia}`;
+}
+
 
 export function obtenerFechaConAtraso( props : number) {
     const fechaActual = new Date();
@@ -68,6 +71,4 @@ export function obtenerFechaConAtraso( props : number) {
     return `${año}-${mes}-${dia}`;
 }
 
-export function Force_Sincro (Encabezado : [], cajas : []){
 
-}
