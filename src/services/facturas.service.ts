@@ -4,7 +4,7 @@ import format from "pg-format";
 import { caja, factura, pedidoventa } from "../interfaces/db_interfeces/Axproveider";
 import { uploadFileToCloudinary } from "../utils/db/cloudinary_config";
 import { QueryResult } from "pg";
-import { sendEmail_transito } from "../utils/reports/mail_body";
+import { sendEmail_transito } from "../utils/reports/mail_body_transit";
 import { sendEmail_Entregados } from "../utils/reports/mail.body_syncro";
 import { ForceSynchro } from "../utils/syncro_functions/force_synchro/force_syncro";
 

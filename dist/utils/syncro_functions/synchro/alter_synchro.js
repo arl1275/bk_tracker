@@ -20,6 +20,15 @@ const syncro_functions_1 = require("./syncro_functions");
 const alter_queries_synchro_1 = require("./alter_queries_synchro");
 function UpdateOrNone_Pedido(pedido_) {
     return __awaiter(this, void 0, void 0, function* () {
+        //----------------------------------------------------------------------------------------------------------------------------------//
+        //  THIS FUNCITON IS TO SEEK FOR UPDATES IN THE PEDIDOS
+        //  FIRST VALIDATES THE FACTURAS IF A FACTURA ALREADY EXIST, THEN IT'LL GO RIGHT TO THE ALBARAN, THEN CAJAS AND FINISH
+        //  BUT IF THE FACTURA NOT EXIST::
+        //         1._ FIRST VALIDATE IF THE FACTURA HAS ITS ALBARAN INSERTED IN THE DB, THAT MEANS THAT FACTURA ALREADY EXIST
+        //             BUT IT EXIST AS ALBARAN NOT AS A FACTURA, THEN UPDATE THE NAME OF THE FACTURA
+        //         2._ IF THE ALBARAN OF THE NEW FACTURA DOES NOT EXIST IN THE LOCAL DB, THAT MEANS IS A NEW FACTURA, THEN MADE A NORMAL 
+        //             FACTURA INSERTION.
+        //----------------------------------------------------------------------------------------------------------------------------------//
         try {
             const idPDV = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_pedido_venta)(), [pedido_.pedido.PedidoVenta]);
             if (idPDV.rows.length > 0) {
@@ -30,13 +39,13 @@ function UpdateOrNone_Pedido(pedido_) {
                         const existFact = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_fact_exist)(), [detalleFacturas._factura_.Factura, pedido_.pedido.PedidoVenta]);
                         const existFact_id = existFact.rows[0].factura_id;
                         if (typeof existFact_id === 'number') {
-                            console.log(`||     SIN MODIFICACIONES EN FACTURA : ${detalleFacturas._factura_.Factura} `);
+                            //console.log(`||     SIN MODIFICACIONES EN FACTURA : ${detalleFacturas._factura_.Factura} `)
                             for (let j = 0; detalleFacturas.detalleFact.length > j; j++) {
                                 const detalleAlbaran = detalleFacturas.detalleFact[j];
                                 const existAlb = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_albaran)(), [detalleAlbaran._albaran_.Albaran, existFact_id]);
                                 const existAlb_id = existAlb.rows[0].albaran_id;
                                 if (typeof existAlb_id === 'number') {
-                                    console.log(`||     SIN MODIFICACIONES EN ALBARAN : ${detalleAlbaran._albaran_.Albaran} `);
+                                    //console.log(`||     SIN MODIFICACIONES EN ALBARAN : ${detalleAlbaran._albaran_.Albaran} `);
                                     let count_cajas_agregadas = 0;
                                     for (let k = 0; detalleAlbaran._cajas_.length > k; k++) {
                                         const caja_ = detalleAlbaran._cajas_[k];
@@ -47,9 +56,6 @@ function UpdateOrNone_Pedido(pedido_) {
                                             count_cajas_agregadas += 1;
                                         }
                                     }
-                                    if (count_cajas_agregadas === 0) {
-                                        console.log('||     NO SE AGREGARON CAJAS EXTRA A ESTE ALBARAN');
-                                    }
                                 }
                                 else {
                                     if (existFact_id)
@@ -59,7 +65,35 @@ function UpdateOrNone_Pedido(pedido_) {
                         }
                         else if (existFact_id === null) {
                             if (typeof pedidoventa_id === 'number') {
-                                yield (0, alter_queries_synchro_1.quickFacturaInsert)(pedidoventa_id, pedido_.pedido, detalleFacturas);
+                                //---------------------------------------------------------------------------------------------------------------//
+                                // HERE IS WHERE WE NEED TO MAKE THE CHANGE,
+                                // IF THE NEW FACTURA HAS THE SAME ALBARAN AND SAME LISTA-EMPAQUE, CHANGE THE ALBARAN FOR THE FACTURA
+                                // THI IS IN THE FACTURAS TABLE, NOT IN THE ALBARAN TABLE
+                                //---------------------------------------------------------------------------------------------------------------//
+                                try {
+                                    const facturasHead = yield localDB_config_1.default.query((0, simple_queries_synchro_1.get_head_albaranesAsFact)());
+                                    const facturasAsAlb = facturasHead.rows;
+                                    if (facturasAsAlb.length > 0) {
+                                        for (let x = 0; facturasAsAlb.length > x; x++) { // facturasAsAlb.length
+                                            for (let y = 0; detalleFacturas.detalleFact.length > y; y++) {
+                                                if (facturasAsAlb[x].albaran === detalleFacturas.detalleFact[y]._albaran_.Albaran &&
+                                                    facturasAsAlb[x].lista_empaque === detalleFacturas.detalleFact[y]._cajas_[0].ListaEmpaque &&
+                                                    facturasAsAlb[x].factura !== detalleFacturas._factura_.Factura) {
+                                                    // let id_factura = await connDB.query(val_if_fact_exist(), [detalleFacturas.detalleFact[y]._albaran_.Albaran, pedido_.pedido.PedidoVenta]);
+                                                    //console.log('ID DE LA FACTURA :: ', facturasAsAlb[x].id_factura, detalleFacturas._factura_.Factura, detalleFacturas.detalleFact[0]._albaran_.Albaran, facturasAsAlb[x].albaran)
+                                                    yield localDB_config_1.default.query((0, simple_queries_synchro_1.change_factura_name)(), [detalleFacturas._factura_.Factura, facturasAsAlb[x].id_factura]);
+                                                    console.log(`|| ACTULIZANDO NOMBRE DE FACTURA DE ::: ${facturasAsAlb[x].factura} === A ===> ${detalleFacturas._factura_.Factura}  `);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        yield (0, alter_queries_synchro_1.quickFacturaInsert)(pedidoventa_id, pedido_.pedido, detalleFacturas);
+                                    }
+                                }
+                                catch (error) {
+                                    console.log('ERRO AL ACTUALIZAR FACTURA :: ', error);
+                                }
                             }
                             else
                                 console.log('|| ERROR EN EL ID DE FACTURA : ', existFact_id);
@@ -84,6 +118,10 @@ function UpdateOrNone_Pedido(pedido_) {
 }
 function validinert(pedido) {
     return __awaiter(this, void 0, void 0, function* () {
+        //-----------------------------------------------------------------------------------------------------------//
+        // THIS FUNCTION IS TO VERIFY IS A PEDIDO ALREADY EXIST, IF EXIST THEN SEEK FOR UPDATES
+        // IN CASE NO EXIST IT MAKES ALL FULL INSERTION
+        //-----------------------------------------------------------------------------------------------------------//
         try {
             if (pedido) {
                 const pedidoExist = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_pedido_venta)(), [pedido.pedido.PedidoVenta]);
@@ -160,9 +198,9 @@ function syncroData_AX_() {
             const data = yield (0, preload_data_ax_1.Preloaded_pedido_AX)();
             if (data !== false) {
                 console.log(`
-||------------------------------------------------------------------||
-||                 SE OBTUVO EL PRECARGADO (SIN ERRORES)            ||
-||------------------------------------------------------------------||`);
+||--------------------------------------------------------------------------------------------------------------------||
+||                                  **** SE OBTUVO EL PRECARGADO (SIN ERRORES) ****                                   ||
+||--------------------------------------------------------------------------------------------------------------------||`);
                 if (data.length > 0) {
                     for (let i = 0; data.length > i; i++) {
                         yield validinert(data[i]);

@@ -1,3 +1,6 @@
+//-----------------------------------------------//
+//  THIS REFERS TO OUR POSTGRES DB
+
 import { Pool } from "pg";
 import * as dotenv from 'dotenv'
 dotenv.config()

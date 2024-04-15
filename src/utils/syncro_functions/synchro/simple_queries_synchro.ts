@@ -14,7 +14,7 @@ import { special_clients } from "../../special_clients/clients";
 
 const paisFilter = 'Honduras';                             // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                     // valor para setear las ubicaciones
-const mininumDateAllowed =  obtenerFechaActual(40);        // valor para captar las facturas mas antiguas
+const mininumDateAllowed =  obtenerFechaActual(5);        // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -87,7 +87,7 @@ export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
         ( CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
       )    
       AND pedidoventa = '${pedido}'
-      --AND fecha >= '${mininumDateAllowed}'
+      AND fecha >= '${mininumDateAllowed}'
       AND albaran != '' 
     group by Factura, albaran
     ) AS Subquery;`;
@@ -105,8 +105,8 @@ export const query_get_albarans_of_a_factura = (factura: string, pedido : string
          ubicacion
      FROM IMGetAllPackedBoxesInSB 
      WHERE 
-         --fecha >= '${mininumDateAllowed}' 
-         Pais= '${paisFilter}'
+         fecha >= '${mininumDateAllowed}' 
+         AND Pais= '${paisFilter}'
          AND Factura = '${factura}'
          AND PedidoVenta = '${pedido}'
          AND albaran != '' ;`;
@@ -131,7 +131,7 @@ export const query_get_albaran_of_albaran_inserted_as_factura = ( albaran : stri
             OR
             (CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
         )    
-    --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
+    AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
     AND Albaran = '${albaran}'
     AND PedidoVenta = '${pedido_venta}'
     AND (factura IS NULL OR factura = '');
@@ -269,7 +269,25 @@ export const val_if_caja = () => {
 `
 }
 
+export const get_head_albaranesAsFact = () => {
+  return`
+  SELECT 
+    p.id as id_pedido,
+    p.pedidoventa,
+    f.id as id_factura, 
+    f.factura, 
+    a.id as id_albaran, 
+    a.albaran,
+    c.lista_empaque 
+  FROM pedidoventas p 
+  INNER JOIN facturas f ON p.id = f.id_pedidoventas 
+  INNER JOIN albaranes a ON f.id = a.id_facturas
+  INNER JOIN cajas c on a.id = c.id_albaran 
+  WHERE f.factura LIKE 'AL-%'`
+}
+
 //-----------------------------------------------------------------------------------------------------//
+//                         LOCAL DB QUERIES TO VALIDATE IF SOMETHIN EXIST                              //
 
 export const insert_pedido_venta = () => {
   return `INSERT INTO 
@@ -293,4 +311,8 @@ export const insert_boxes = () => {
   return `INSERT INTO 
   cajas (created_at, lista_empaque, caja, numerocaja, cantidad, id_albaran) 
   VALUES (CURRENT_TIMESTAMP, $1, $2, $3, $4, $5);`;
+}
+
+export const change_factura_name = () => {
+  return `UPDATE facturas SET factura = $1 WHERE id = $2;`
 }

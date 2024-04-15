@@ -3,7 +3,7 @@
 // THIS FILE IS TO EXPORT QUERIES THAT ARE USED IN OTHERS FILES TO SYNCRO AX DATA  //
 //---------------------------------------------------------------------------------//
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports.insert_pedido_venta = exports.val_if_caja = exports.val_if_albaran = exports.val_if_fact_exist = exports.val_if_pedido_venta = exports.ForceSincroFact_albaran = exports.ForceSincroFact_factura = exports.get_boxes_one_fact = exports.query_get_boxes_of_an_albaran = exports.query_get_albaran_of_albaran_inserted_as_factura = exports.query_get_albarans_of_a_factura = exports.query_get_facts_of_a_pedidoVenta = exports.query_get_pedidoventas = void 0;
+exports.change_factura_name = exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports.insert_pedido_venta = exports.get_head_albaranesAsFact = exports.val_if_caja = exports.val_if_albaran = exports.val_if_fact_exist = exports.val_if_pedido_venta = exports.ForceSincroFact_albaran = exports.ForceSincroFact_factura = exports.get_boxes_one_fact = exports.query_get_boxes_of_an_albaran = exports.query_get_albaran_of_albaran_inserted_as_factura = exports.query_get_albarans_of_a_factura = exports.query_get_facts_of_a_pedidoVenta = exports.query_get_pedidoventas = void 0;
 //---------------------------------------------------------//
 //                  DEFAULT DATA FILTERS                   //
 //---------------------------------------------------------//
@@ -11,7 +11,7 @@ const utils_1 = require("../../handle_passwords/utils");
 const clients_1 = require("../../special_clients/clients");
 const paisFilter = 'Honduras'; // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula'; // valor para setear las ubicaciones
-const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(40); // valor para captar las facturas mas antiguas
+const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(5); // valor para captar las facturas mas antiguas
 //---------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
@@ -80,7 +80,7 @@ const query_get_facts_of_a_pedidoVenta = (pedido) => {
         ( CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
       )    
       AND pedidoventa = '${pedido}'
-      --AND fecha >= '${mininumDateAllowed}'
+      AND fecha >= '${mininumDateAllowed}'
       AND albaran != '' 
     group by Factura, albaran
     ) AS Subquery;`;
@@ -98,8 +98,8 @@ const query_get_albarans_of_a_factura = (factura, pedido) => {
          ubicacion
      FROM IMGetAllPackedBoxesInSB 
      WHERE 
-         --fecha >= '${mininumDateAllowed}' 
-         Pais= '${paisFilter}'
+         fecha >= '${mininumDateAllowed}' 
+         AND Pais= '${paisFilter}'
          AND Factura = '${factura}'
          AND PedidoVenta = '${pedido}'
          AND albaran != '' ;`;
@@ -124,7 +124,7 @@ const query_get_albaran_of_albaran_inserted_as_factura = (albaran, pedido_venta)
             OR
             (CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
         )    
-    --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
+    AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
     AND Albaran = '${albaran}'
     AND PedidoVenta = '${pedido_venta}'
     AND (factura IS NULL OR factura = '');
@@ -259,7 +259,25 @@ const val_if_caja = () => {
 `;
 };
 exports.val_if_caja = val_if_caja;
+const get_head_albaranesAsFact = () => {
+    return `
+  SELECT 
+    p.id as id_pedido,
+    p.pedidoventa,
+    f.id as id_factura, 
+    f.factura, 
+    a.id as id_albaran, 
+    a.albaran,
+    c.lista_empaque 
+  FROM pedidoventas p 
+  INNER JOIN facturas f ON p.id = f.id_pedidoventas 
+  INNER JOIN albaranes a ON f.id = a.id_facturas
+  INNER JOIN cajas c on a.id = c.id_albaran 
+  WHERE f.factura LIKE 'AL-%'`;
+};
+exports.get_head_albaranesAsFact = get_head_albaranesAsFact;
 //-----------------------------------------------------------------------------------------------------//
+//                         LOCAL DB QUERIES TO VALIDATE IF SOMETHIN EXIST                              //
 const insert_pedido_venta = () => {
     return `INSERT INTO 
   pedidoventas (created_at, pedidoventa, clientenombre, clientecuenta) 
@@ -284,3 +302,7 @@ const insert_boxes = () => {
   VALUES (CURRENT_TIMESTAMP, $1, $2, $3, $4, $5);`;
 };
 exports.insert_boxes = insert_boxes;
+const change_factura_name = () => {
+    return `UPDATE facturas SET factura = $1 WHERE id = $2;`;
+};
+exports.change_factura_name = change_factura_name;

@@ -17,9 +17,9 @@ import {
     query_get_albaran_of_albaran_inserted_as_factura_F,
     query_get_albarans_of_a_factura_F,
     query_get_boxes_of_an_albaran_F,
-    query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F,
-    query_get_facts_of_a_pedidoVenta_F,
-    query_get_pedidoventas_F
+    query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F
+    //query_get_facts_of_a_pedidoVenta_F,
+    //query_get_pedidoventas_F
 } from '../force_synchro/force_syncro_queries'
 import {
     insert_pedidoVenta,
