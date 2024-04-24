@@ -83,7 +83,7 @@ function generateTableHTML(data) {
       <tbody>
   `;
     data.forEach(row => {
-        const facturaData = row[0]; // Acceder al primer elemento del arreglo dentro de cada objeto
+        const facturaData = row; // Acceder al primer elemento del arreglo dentro de cada objeto
         tableHTML += `
   <tr>
     <td>${facturaData.pedidoventa}</td>

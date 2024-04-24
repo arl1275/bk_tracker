@@ -20,7 +20,7 @@ import {
 
 export const Preloaded_pedido_AX = async () => {
     try {
-        let preloadData: sincroObject[] = [];                              // this is to save all the details of all pedidos de venta
+        let preloadData: sincroObject[] = [];                               // this is to save all the details of all pedidos de venta
         let pdventas_: pedidoventa[] = [];                                  // this is to save the details of all pedidos de venta
         pdventas_ = await executeQuery(query_get_pedidoventas());
 
@@ -32,9 +32,9 @@ export const Preloaded_pedido_AX = async () => {
 
             for (let i = 0; i < pdventas_.length; i++) {
 
-                let pedido: pedidoventa = pdventas_[i];                     // this is to save one pedidodeVenta to be process
-                let facturas_: factura[] = [];                              // this is to save all the facturas of the pedidoVentas that is going to process
-                let detalleFactura: detFact[] = [];                        // this is to save the details of the facturas of one pedidoVentas
+                let pedido: pedidoventa = pdventas_[i];                         // this is to save one pedidodeVenta to be process
+                let facturas_: factura[] = [];                                  // this is to save all the facturas of the pedidoVentas that is going to process
+                let detalleFactura: detFact[] = [];                             // this is to save the details of the facturas of one pedidoVentas
 
 
                 facturas_ = await executeQuery(query_get_facts_of_a_pedidoVenta(pedido.PedidoVenta));
@@ -42,9 +42,9 @@ export const Preloaded_pedido_AX = async () => {
                  if (facturas_.length > 0) {
 
                      for (let j = 0; j < facturas_.length; j++) {
-                         let albaranes_: albaran[] = [];                     // this is to save all albaranes of one factura to be process
-                         let detalleAlbaran: detAlbaran[] = []              // this is to save the detail of one albaran
-                         const fact = facturas_[j];                          // this is to save one factura to be process
+                         let albaranes_: albaran[] = [];                        // this is to save all albaranes of one factura to be process
+                         let detalleAlbaran: detAlbaran[] = []                  // this is to save the detail of one albaran
+                         const fact = facturas_[j];                             // this is to save one factura to be process
 
                          if (fact.Factura.startsWith('AL')) {
                              let alb_: albaran[] = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura(fact.Factura, pedido.PedidoVenta));

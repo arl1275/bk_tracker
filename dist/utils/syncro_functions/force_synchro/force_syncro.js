@@ -11,13 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ForceSynchro = void 0;
 const force_syncro_process_1 = require("./force_syncro_process");
-function ForceSynchro(pedido, factura, albaran) {
+function ForceSynchro(caja, tipo) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield (0, force_syncro_process_1.FORCE_insert_process_of_synchro)(pedido, factura, albaran);
+            let result = yield (0, force_syncro_process_1.FORCE_insert_process_of_synchro)(caja, tipo);
+            return result;
         }
         catch (err) {
             console.log('|| ERROR AL FORZAR SINCRONIZADO : ', err);
+            return [false, { message: 'Ocurrio un error al sincronizar' }];
         }
     });
 }

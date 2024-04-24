@@ -21,9 +21,7 @@ const generate_dec_env = () => {
     `;
 };
 exports.generate_dec_env = generate_dec_env;
-const data_to_repots_of_syncro_facts = (props) => {
-    return `
-    select 
+exports.data_to_repots_of_syncro_facts = `select 
         distinct 
         p.pedidoventa,
         f.factura,
@@ -43,7 +41,7 @@ const data_to_repots_of_syncro_facts = (props) => {
         left join entregas e on f.id_entregas = e.id 
         left join status s on e.id_estados = s.id 
     where s.id = 2
-        AND f.factura = '${props}'
+        AND f.id = $1
     group by p.pedidoventa,
         f.factura,
         p.clientenombre,
@@ -51,10 +49,7 @@ const data_to_repots_of_syncro_facts = (props) => {
         a.ciudad,
         c.lista_empaque,
         de.declaracionenvio,
-        s.state_name;
-    `;
-};
-exports.data_to_repots_of_syncro_facts = data_to_repots_of_syncro_facts;
+        s.state_name;`;
 const data_to_repots_of_syncro_facts_entregadas = (props) => {
     return `
     select 

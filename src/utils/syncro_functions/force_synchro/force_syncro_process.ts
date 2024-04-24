@@ -19,9 +19,10 @@ import {
     insert_albaran_,
     insert_boxes_
 } from '../synchro/syncro_functions';
+import connDB from '../../db/localDB_config';
 
 
-export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, factura : string, albaran : string) => {
+export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number) => {
 
     try {
         //------------------------------------------------------------------------------------------------------------//
@@ -29,10 +30,12 @@ export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, fac
         //------------------------------------------------------------------------------------------------------------//
 
         // Obtienen todos los pedidos de venta de este día (hoy)
-        const pedidoventas_: pedidoventa[] = await executeQuery(query_get_pedidoventas_F(pedidoVenta));       
+
+        const pedido_brute: any = await executeQuery(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE Caja = '${caja}';`);
+        
+        const pedidoventas_: pedidoventa[] = await executeQuery(query_get_pedidoventas_F(pedido_brute[0].pedidoventa));
 
         if (pedidoventas_.length = 1) {
-
             for (let i = 0; i < pedidoventas_.length; i++) {
                 const pedido: pedidoventa = pedidoventas_[i];
 
@@ -52,70 +55,87 @@ export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, fac
                         //------------------------------------------------------------------------------------------------------------//
 
                         // THIS PART INSERT ONLY ONE FACTURA
-                        if( factura != '' && albaran === ''){
-                            console.log('||         INGRESO A INSERCION POR FACTURA : ', factura);
-                            let fact : factura[] = await executeQuery(query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F(pedido.PedidoVenta, factura));
-                            if(fact){
-                                const id_factura = await insert_factura_(fact[0], id_pedido); 
-                                if(id_factura){
-                                    console.log(`||         FACTURA : ${fact[0].Factura}`);
-                                   
-                                    const albarans_ : albaran[] =  await executeQuery(query_get_albarans_of_a_factura_F(fact[0].Factura));
-                                    for (let k = 0; k < albarans_.length; k++) {
-                                        const _albaran = albarans_[k];
-                                        const id_albaran = await insert_albaran_(_albaran, id_factura);                                     
+                        if (tipo == 1) {
+                            console.log('||         INGRESO A INSERCION POR FACTURA : ', pedido_brute[0].factura === '' ? pedido_brute[0].albaran : pedido_brute[0].factura);
+
+                            if (pedido_brute[0].factura === '' && pedido_brute[0].albaran != '') {
+                                const AlbAsFact: any = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura_F(pedido_brute[0].albaran, pedido.PedidoVenta));
+
+                                if (AlbAsFact.length > 0) {
+                                    const factu = AlbAsFact[0]?.Albaran
+                                    console.log(' DATA DE LA FACTURA :: ', factu)
+                                    const id_factura = await insert_factura_(factu, id_pedido);
+
+                                    if (id_factura) {
+                                        const _albaran: albaran = AlbAsFact[0];
+                                        const id_albaran = await insert_albaran_(_albaran, id_factura);
                                         if (id_albaran) {
-                                            console.log(`||                 ALBARAN : ${_albaran.Albaran}   DESTINO : ${_albaran.ciudad}`);
                                             const cajas_: caja[] = await executeQuery(query_get_boxes_of_an_albaran_F(_albaran.Albaran, pedido.PedidoVenta));    // get all the cajas of one albaran
+                                            
                                             for (let l = 0; l < cajas_.length; l++) {
                                                 const _caja = cajas_[l];
                                                 await insert_boxes_(_caja, id_albaran);
                                                 console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                             }
+                                            console.log('||     FORZADO SINCRONIZADO FINALIZADO SIN PROBLEMAS');
+                                            return [true, { message : `SINCRONIZADO SIN PROBLEMAS COMO ALBARAN : ${pedido_brute[0].albaran}`}]
+                                        } else {
+                                            console.log('||     NO SE PUDO INGRESAR EL ALBARAN ');
+                                            return [false, { message: 'NO SE PUDO INGRESAR EL ALBARAN' }];
                                         }
+                                    } else {
+                                        console.log('||     NO SE PUDO INSERTAR LA FCTURA COMO ALBARAN');
+                                        return [false, { message: 'NO SE PUDO INGRESAR LA FACTURA COMO ALBARAN' }];
                                     }
 
+                                } else {
+                                    console.log('||     NO SE PUDO OBTENER EL ALBARAN INSERTED AS FACTURA');
+                                    return [false, { message: 'NO SE PUDO OBTENER EL ALBARAN COMO FACTURA' }];
                                 }
-                            }else{
-                                console.log('|| FACTURA NO EXISTE EN AX');
-                            }
 
-                        }
-                        // THIS PART IF TO INSERT ONLY ONE ALBARAN
-                        else if ( albaran != '' && factura === ''){
-                            const albaran_ : albaran[] = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura_F(albaran, pedido.PedidoVenta));
-                            
-                            if(albaran_.length > 0 ){
-                                const fact : factura = { Factura : albaran_[0].Albaran}
-                                const id_fact = await insert_factura_( fact , id_pedido );
+                            } else {
+                                let fact: factura[] = await executeQuery(query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F(pedido.PedidoVenta, pedido_brute[0].factura));
+                                if (fact) {
+                                    const id_factura = await insert_factura_(fact[0], id_pedido);
+                                    if (id_factura) {
+                                        console.log(`||         FACTURA : ${fact[0].Factura}`);
 
-                                if(id_fact){
-                                    console.log('||         INGRESO A INSERCION POR ALBARAN : ', fact);
-                                    const id_albaran = await insert_albaran_(albaran_[0], id_fact);
-                                    if (id_albaran) {
-                                        console.log(`||                 ALBARAN : ${albaran_[0].Albaran}   DESTINO : ${albaran_[0].ciudad}`);
-                                        const cajas_: caja[] = await executeQuery(query_get_boxes_of_an_albaran_F(albaran_[0].Albaran, pedido.PedidoVenta));    // get all the cajas of one albaran
-
-                                        for (let l = 0; l < cajas_.length; l++) {
-                                            const _caja = cajas_[l];
-                                            await insert_boxes_(_caja, id_albaran);
-                                            console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
+                                        const albarans_: albaran[] = await executeQuery(query_get_albarans_of_a_factura_F(fact[0].Factura));
+                                        for (let k = 0; k < albarans_.length; k++) {
+                                            const _albaran = albarans_[k];
+                                            const id_albaran = await insert_albaran_(_albaran, id_factura);
+                                            if (id_albaran) {
+                                                console.log(`||                 ALBARAN : ${_albaran.Albaran}   DESTINO : ${_albaran.ciudad}`);
+                                                const cajas_: caja[] = await executeQuery(query_get_boxes_of_an_albaran_F(_albaran.Albaran, pedido.PedidoVenta));    // get all the cajas of one albaran
+                                                for (let l = 0; l < cajas_.length; l++) {
+                                                    const _caja = cajas_[l];
+                                                    await insert_boxes_(_caja, id_albaran);
+                                                    console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
+                                                }
+                                                return [true, { message : `SE SINCRONIZO LA FACTURA : ${pedido_brute[0].factura}`}]
+                                            }
                                         }
-                                    }
-                                }else{
-                                    console.log('||         NO SE PUDO INGRESAR EL ALBARAN')
-                                }
-                            }
 
+                                    }
+                                } else {
+                                    console.log('|| FACTURA NO EXISTE EN AX');
+                                    return [false, { message: 'FACTURA NO EXISTE EN AX' }]
+                                }
+
+                            }
                         }
                         // THIS PART IS TO SYNCRO ALL THE PEDIDOVENTA
-                        else if( factura == '' && albaran === ''){
-                            console.log('||         INGRESO A INSERCION DE PEDIDO COMPLETO : ', pedidoVenta);
+                        else if (tipo == 0) {
+                            console.log('||         INGRESO A INSERCION DE PEDIDO COMPLETO : ', pedido.PedidoVenta);
                             const facturas_: factura[] = await executeQuery(query_get_facts_of_a_pedidoVenta_F(pedido.PedidoVenta));
-                            for (let j = 0; j < facturas_.length; j++) {
-                                
-                                const fact = facturas_[j];
-                                if (fact) {
+                            //console.log('DATA DE FACTURAS : ', facturas_);
+
+                            if(facturas_ ){
+
+                                for (let j = 0; facturas_.length > j; j++) {
+                                    const fact : factura = facturas_[j];
+
+                                    if (fact) {
                                         const id_factura = await insert_factura_(fact, id_pedido);                                                  // insert the factura and return the id
     
                                         if (id_factura) {
@@ -144,31 +164,54 @@ export const FORCE_insert_process_of_synchro = async ( pedidoVenta : string, fac
                                                         await insert_boxes_(_caja, id_albaran);
                                                         console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                                     }
+
+                                                    if( j === facturas_.length - 1 ){
+                                                        return [true, { message : 'SE SINCRONIZO TODO EL PEDIDO.'}];
+                                                    }
+                                                    
                                                 }
                                             }
+                                        }else{
+                                            console.log('|| ERROR FACTURA MAL INSERTADA');
+                                            return [false, { message : 'Factura mal insertada'}];
                                         }
-                                    
-                                } else {
-                                    console.log('// ERROR : FACTURA TIENEN CAMPO VACIO');
+    
+                                    } else {
+                                        console.log('||  ERROR : FACTURA TIENEN CAMPO VACIO');
+                                        return [false, {message : 'FACTURA VACIA'}];
+                                    }
                                 }
+
+                            }else{
+                                console.log('||     SIN FACTURAS ENCONTRADAS');
+                                return [false, { message : 'NO SE ENCONTRO FACTURAS DE DICHO PEDIDO'}]
                             }
+                            
                             console.log('||------------------------------------------------------------------------------------------------------------||')
+                        } else {
+                            console.log('||     ESTO NO DEBE PASAR EN EL FORZADO DE SINCRONIZACION');
+                            return [false, { message: 'ESTE ES UN ERROR IMPOSIBLE' }];
                         }
-                        
+
+                    } else {
+                        console.log('|| NO SE INSERTO ID');
+                        return [false, { message: 'NO SE INSERTO EL PEDIDO CORRECTAMENTE' }];
                     }
+
                 } else {
                     console.log('||     PEDIDO DE VENTA NO RECONOCIDO : ', pedidoventas_);
+                    return [false, { message: 'PEDIDO DE VENTA NO RECONOCIDO' }];
                 }
             }
 
             console.log('||------------------------------------------------------------------------------------------------------------||')
         } else {
             console.log('||  PEDIDO DE VENTA TIENE MAS DE UNA COINCIDENCIA O NO EXISTE EN AX');
-            return false
+            return [false, { message: 'PEDIDO DE VENTA TIENEN MAS DE UNA COINCIDENCIA EN AX' }];
         }
     } catch (err) {
         console.log('||     ERROR DURANTE LA SINCRONIZACIÓN FORZADA : ', err);
-        return false;
+        return [false, { message: 'ERROR DURANTE LA SINCRONIZACION FORZADA' }];
     }
 
 }

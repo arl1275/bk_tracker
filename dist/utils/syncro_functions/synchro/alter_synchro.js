@@ -140,7 +140,8 @@ function validinert(pedido) {
                             const idPDV = yield (0, syncro_functions_1.insert_pedidoVenta)(pedido.pedido);
                             if (idPDV) {
                                 // PRINT OF THE CONSOLE
-                                console.log(`||--------------------------------------------------------------------------------------------------------------------||
+                                console.log(`
+||--------------------------------------------------------------------------------------------------------------------||
 ||  PEDIDO : ${pedido.pedido.PedidoVenta} 
 ||  CLIENTE : ${pedido.pedido.NombreCliente}
 ||  CUENTA : ${pedido.pedido.CuentaCliente}

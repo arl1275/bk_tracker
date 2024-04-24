@@ -18,9 +18,8 @@ export const generate_dec_env = () => {
     `
 }
 
-export const data_to_repots_of_syncro_facts = ( props : string) => {
-    return `
-    select 
+export const data_to_repots_of_syncro_facts = 
+    `select 
         distinct 
         p.pedidoventa,
         f.factura,
@@ -40,7 +39,7 @@ export const data_to_repots_of_syncro_facts = ( props : string) => {
         left join entregas e on f.id_entregas = e.id 
         left join status s on e.id_estados = s.id 
     where s.id = 2
-        AND f.factura = '${ props }'
+        AND f.id = $1
     group by p.pedidoventa,
         f.factura,
         p.clientenombre,
@@ -48,9 +47,7 @@ export const data_to_repots_of_syncro_facts = ( props : string) => {
         a.ciudad,
         c.lista_empaque,
         de.declaracionenvio,
-        s.state_name;
-    `
-}
+        s.state_name;`;
 
 export const data_to_repots_of_syncro_facts_entregadas = ( props : string) => {
     return `

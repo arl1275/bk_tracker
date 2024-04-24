@@ -1,10 +1,12 @@
 import { FORCE_insert_process_of_synchro } from "./force_syncro_process";
 
-export async function ForceSynchro( pedido : string, factura: string, albaran : string){
+export async function ForceSynchro( caja : string, tipo : number){
     try {
-        await FORCE_insert_process_of_synchro(pedido, factura, albaran);
+        let result : any = await FORCE_insert_process_of_synchro(caja, tipo);
+        return result
     } catch (err) {
-        console.log('|| ERROR AL FORZAR SINCRONIZADO : ', err)
+        console.log('|| ERROR AL FORZAR SINCRONIZADO : ', err);
+        return [false, { message : 'Ocurrio un error al sincronizar'}];
     }
     
 }

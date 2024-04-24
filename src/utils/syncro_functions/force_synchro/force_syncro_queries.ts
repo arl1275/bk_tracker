@@ -14,7 +14,7 @@ import { special_clients } from "../../special_clients/clients";
 
 const paisFilter = 'Honduras';                             // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                     // valor para setear las ubicaciones
-const mininumDateAllowed =  '2024-03-01'//obtenerFechaActual();          // valor para captar las facturas mas antiguas
+const mininumDateAllowed =  '2024-01-01'//obtenerFechaActual();          // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 

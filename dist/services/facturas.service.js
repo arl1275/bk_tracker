@@ -16,6 +16,7 @@ exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFa
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
+const mail_body_transit_1 = require("../utils/reports/mail_body_transit");
 const force_syncro_1 = require("../utils/syncro_functions/force_synchro/force_syncro");
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
@@ -145,23 +146,29 @@ let change_transito_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
     try {
         let data_to_mail = []; // Array para guardar las referencias de las facturas
         const data = req.body;
-        console.log('DATA DESDE LA APP:', data);
         const query = 'SELECT * FROM change_state_to_entransito($1);'; // La variable $1 es la referencia de la factura
-        for (let i = 0; i < data.length; i++) {
-            const factura_ = data[i];
-            try {
-                const result = yield localDB_config_1.default.query(query, [factura_]);
-                console.log('SE ENVIO A TRANSITO:', factura_);
-                data_to_mail.push(factura_);
-            }
-            catch (err) {
-                console.log('NO SE PUDO ENVIAR A TRANSITO:', err);
-                res.status(500).json({ message: 'ERROR AL ENVIAR A TRANSITO' });
-                return; // Termina la ejecución de la función si hay un error
+        if (data.length > 0) {
+            for (let i = 0; data.length > i; i++) {
+                const factura_ = data[i];
+                try {
+                    console.log('SE ENVIO A TRANSITO:', factura_.id);
+                    //await connDB.query(query, [factura_.id]);
+                    console.log('tipo de id ::: ', typeof factura_.id);
+                    data_to_mail.push(factura_.id);
+                }
+                catch (err) {
+                    console.log('NO SE PUDO ENVIAR A TRANSITO:', err);
+                    res.status(500).json({ message: 'ERROR AL ENVIAR A TRANSITO' });
+                    return; // Termina la ejecución de la función si hay un error
+                }
             }
         }
+        else {
+            res.status(500).json({ message: 'ERROR AL ENVIAR A TRANSITO PORQUE NO LLEGO LA DATA PARA EMAIL' });
+            return;
+        }
         console.log('DESDE LA RUTA:', data_to_mail);
-        //await sendEmail_transito(data_to_mail);
+        yield (0, mail_body_transit_1.sendEmail_transito)(data_to_mail);
         res.status(200).json({ message: 'SE ENVIARON LAS FACTURAS A TRANSITO' });
     }
     catch (err) {
@@ -450,13 +457,26 @@ exports.change_state_to_null = change_state_to_null;
 //---------------------------- THIS IS AN ADMIN FUNCTION SERVICE ------------------------------------//
 let forceFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { pedidoventa, factura, albaran } = req.body;
-        if (typeof pedidoventa === 'string' && typeof factura === 'string' && typeof albaran === 'string') {
-            yield (0, force_syncro_1.ForceSynchro)(pedidoventa, factura, albaran);
-            res.status(200).json({ message: 'data sin saver si se ingreso' });
+        const { caja, tipo } = req.query;
+        console.log('resultado ', caja, tipo);
+        if (typeof caja === 'string' && typeof tipo === 'string') {
+            const tipo_ = parseInt(tipo);
+            const result = yield (0, force_syncro_1.ForceSynchro)(caja, tipo_);
+            if (Array.isArray(result) && result.length === 2) {
+                const [success, data] = result;
+                if (success === true) {
+                    res.status(200).json({ message: data.message });
+                }
+                else {
+                    res.status(500).json({ message: data.message });
+                }
+            }
+            else {
+                res.status(500).json({ message: 'Respuesta inesperada de ForceSynchro' });
+            }
         }
         else {
-            res.status(500).json({ message: '|| NO SE EJECUTO LAS FUNCIONES' });
+            res.status(500).json({ message: 'NO SE EJECUTO LAS FUNCIONES' });
         }
     }
     catch (err) {
