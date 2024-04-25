@@ -199,7 +199,6 @@ const getDecEnv_appEncabezadoService = (req, res) => __awaiter(void 0, void 0, v
                 res.status(500).json({ message: 'error al procesar' });
             }
             else {
-                console.log('SE OBTUBO EL ENCABEZADO DE DECLARACION DE ENVIO');
                 res.status(200).json({ data: response.rows });
             }
         });

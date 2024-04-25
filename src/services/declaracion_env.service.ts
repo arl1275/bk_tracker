@@ -186,7 +186,6 @@ export const getDecEnv_appEncabezadoService = async (req : Request, res : Respon
                 console.log('ERROR AL OBTENER EL ENCABEZADO : ', err);
                 res.status(500).json({ message : 'error al procesar'})
             }else{
-                console.log('SE OBTUBO EL ENCABEZADO DE DECLARACION DE ENVIO');
                 res.status(200).json({ data : response.rows })
             }
         })

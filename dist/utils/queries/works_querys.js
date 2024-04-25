@@ -50,7 +50,7 @@ exports.data_to_repots_of_syncro_facts = `select
         c.lista_empaque,
         de.declaracionenvio,
         s.state_name;`;
-const data_to_repots_of_syncro_facts_entregadas = (props) => {
+const data_to_repots_of_syncro_facts_entregadas = () => {
     return `
     select 
         distinct 
@@ -74,7 +74,7 @@ const data_to_repots_of_syncro_facts_entregadas = (props) => {
         left join entregas e on f.id_entregas = e.id 
         left join status s on e.id_estados = s.id 
     where s.id = 3
-        AND f.factura = '${props}'
+        AND f.id = $1
     group by p.pedidoventa,
         f.factura,
         p.clientenombre,

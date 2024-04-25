@@ -82,7 +82,7 @@ function generateTableHTML(data) {
     data.forEach(row => {
         if (row && row.length > 0) {
             const facturaData = row[0]; // Acceder al primer elemento del arreglo dentro de cada objeto
-            console.log('Datos de la fila:', facturaData); // Depurar datos de la fila
+            //console.log('Datos de la fila:', facturaData); // Depurar datos de la fila
             tableHTML += `
         <tr>
           <td>${facturaData.pedidoventa}</td>
@@ -135,7 +135,7 @@ function sendEmail_transito(list_fact) {
                 html: tableHTML
             };
             const info = yield transporter.sendMail(mailOptions);
-            console.log('Correo electrónico enviado:', info.messageId);
+            //console.log('Correo electrónico enviado:', info.messageId);
         }
         catch (error) {
             console.error('Error al enviar el correo electrónico:', error);

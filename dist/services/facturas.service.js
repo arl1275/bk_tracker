@@ -17,6 +17,7 @@ const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
 const mail_body_transit_1 = require("../utils/reports/mail_body_transit");
+const mail_body_syncro_1 = require("../utils/reports/mail.body_syncro");
 const force_syncro_1 = require("../utils/syncro_functions/force_synchro/force_syncro");
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
@@ -149,12 +150,12 @@ let change_transito_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
         const query = 'SELECT * FROM change_state_to_entransito($1);'; // La variable $1 es la referencia de la factura
         if (data.length > 0) {
             for (let i = 0; data.length > i; i++) {
-                const factura_ = data[i];
+                const factura_ = parseInt(data[i]);
                 try {
-                    console.log('SE ENVIO A TRANSITO:', factura_.id);
-                    //await connDB.query(query, [factura_.id]);
-                    console.log('tipo de id ::: ', typeof factura_.id);
-                    data_to_mail.push(factura_.id);
+                    console.log('SE ENVIO A TRANSITO:', factura_);
+                    yield localDB_config_1.default.query(query, [factura_]);
+                    console.log('tipo de id ::: ', typeof factura_);
+                    data_to_mail.push(factura_);
                 }
                 catch (err) {
                     console.log('NO SE PUDO ENVIAR A TRANSITO:', err);
@@ -254,47 +255,6 @@ let get_facturas_en_transito = (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.get_facturas_en_transito = get_facturas_en_transito;
-// en uso
-// export let subir_fotos = async ( req: Request, res: Response ) => {
-//     try {
-//         const data = req.body;
-//         const query = 'SELECT * FROM sincro_fact( $1, $2, $3, $4, $5);'; 
-//         let fact_list_to_mail : string[] = [];                                                                  // this save the facturas to send an email.
-//         let error;
-//         //console.log('data from APK :: ', data)
-//         for (let i = 0; i < data.length; i++) {
-//             const element = data[i];
-//             const firma_ = await uploadFileToCloudinary(element.nameSing, 'bodega_despacho', element.factura);
-//             const foto_ = await uploadFileToCloudinary(element.namePic, 'bodega_despacho', element.factura + '_foto');
-//             if(firma_ != null && foto_ != null){
-//                 connDB.query(query, [element.factura, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
-//                     if(err){
-//                         error = false;
-//                         console.log('ERROR AL CREAR FOTOS : ', err);
-//                     }else{
-//                         fact_list_to_mail.push(element.factura);
-//                         error = true;
-//                     }
-//                 });
-//             }else{
-//                 console.log('NO SE GENERARON LAS FOTOS');
-//                 res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
-//             }
-//         }
-//         if(error == false){
-//             console.log('NO SE PUDO GENERAR LA SINCRONIZACION');
-//             res.status(500).json({ message : 'NO SE PUDO GENERAR LAS FOTOS'});
-//         }else{
-//             console.log('data to send file ::: ', fact_list_to_mail)
-//             console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZO');
-//             sendEmail_Entregados(fact_list_to_mail);
-//             res.status(200).json({ message : 'SE GENERO LA SINCRONIZACION'});
-//         }
-//     } catch (err) {
-//         console.log('ERROR AL OBTENER RUTA DE SYNCRONIZACION : ', err);
-//         res.status(500).json({ message : 'NO SE PUEDE OBTENER RUTA DE SYNCRONIZACION DE FACTURAS' });
-//     }
-// }
 let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.body;
@@ -313,7 +273,7 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                                 reject(err);
                             }
                             else {
-                                fact_list_to_mail.push(element.factura);
+                                fact_list_to_mail.push(parseInt(element.factura_id));
                                 resolve();
                             }
                         });
@@ -331,7 +291,7 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         console.log('data to send file:', fact_list_to_mail);
         console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZARON');
-        //await sendEmail_Entregados(fact_list_to_mail);
+        yield (0, mail_body_syncro_1.sendEmail_Entregados)(fact_list_to_mail);
         res.status(200).json({ message: 'SE GENERO LA SINCRONIZACION' });
     }
     catch (err) {

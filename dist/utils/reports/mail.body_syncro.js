@@ -48,7 +48,7 @@ function return_data_toReports_Sincro_facts(data_) {
             const data = []; // save the list of facturas to send
             for (let i = 0; i < data_.length; i++) {
                 const element = data_[i]; // save elemente
-                const queryResult = yield localDB_config_1.default.query((0, works_querys_1.data_to_repots_of_syncro_facts_entregadas)(element));
+                const queryResult = yield localDB_config_1.default.query((0, works_querys_1.data_to_repots_of_syncro_facts_entregadas)(), [element]);
                 data.push(queryResult.rows);
             }
             console.log('FUNCTION : return_data_toReports_Sincro_facts::: return ::: ', data);
@@ -83,21 +83,21 @@ function generateTableHTML(data) {
       <tbody>
   `;
     data.forEach(row => {
-        const facturaData = row; // Acceder al primer elemento del arreglo dentro de cada objeto
+        const facturaData = row[0]; // Acceder al primer elemento del arreglo dentro de cada objeto
         tableHTML += `
   <tr>
-    <td>${facturaData.pedidoventa}</td>
-    <td>${facturaData.factura}</td>
-    <td>${facturaData.clientenombre}</td>
-    <td>${facturaData.albaran}</td>
-    <td>${facturaData.ciudad}</td>
-    <td>${facturaData.lista_empaque}</td>
-    <td>${facturaData.declaracionenvio}</td>
-    <td>${facturaData.cant_cajas}</td>
-    <td>${facturaData.cant_total}</td>
-    <td>${facturaData.state_name}</td>
-    <td><a href="${facturaData.link_firma}">VER FIRMA</a></td>
-    <td><a href="${facturaData.link_foto}">VER FOTO</a></td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.pedidoventa}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.factura}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.clientenombre}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.albaran}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.ciudad}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.lista_empaque}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.declaracionenvio}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.cant_cajas}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.cant_total}</td>
+    <td>${facturaData === null || facturaData === void 0 ? void 0 : facturaData.state_name}</td>
+    <td><a href="${facturaData === null || facturaData === void 0 ? void 0 : facturaData.link_firma}">VER FIRMA</a></td>
+    <td><a href="${facturaData === null || facturaData === void 0 ? void 0 : facturaData.link_foto}">VER FOTO</a></td>
   </tr>
 `;
     });

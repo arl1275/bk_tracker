@@ -55,8 +55,8 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
                     const existFact = await connDB.query(val_if_fact_exist(), [detalleFacturas._factura_.Factura, pedido_.pedido.PedidoVenta]);
                     const existFact_id: number | null = existFact.rows[0].factura_id;
 
-                    if (typeof existFact_id === 'number') {
-                        //console.log(`||     SIN MODIFICACIONES EN FACTURA : ${detalleFacturas._factura_.Factura} `)
+                    if (typeof existFact_id === 'number') {     // if there is coincidence that means the preload and locadb data has no diferences
+
                         for (let j = 0; detalleFacturas.detalleFact.length > j; j++) {
 
                             const detalleAlbaran: detAlbaran = detalleFacturas.detalleFact[j];
@@ -83,7 +83,7 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
                             }
                         }
 
-                    } else if (existFact_id === null) {
+                    } else if (existFact_id === null) { // in case is null, it means the factura does not exist of just has another name
                         if (typeof pedidoventa_id === 'number') {
                             //---------------------------------------------------------------------------------------------------------------//
                             // HERE IS WHERE WE NEED TO MAKE THE CHANGE,
@@ -163,10 +163,6 @@ async function validinert(pedido: sincroObject) {
                 if (typeof pedidoventa_id === 'number') {
 
                     // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
-
-                    console.log('||--------------------------------------------------------------------------------------------------------------------||');
-                    console.log(`||                         ACTUALIZANDO PEDIDO : ${pedido.pedido.PedidoVenta}`);
-                    console.log('||--------------------------------------------------------------------------------------------------------------------||');
 
                     await UpdateOrNone_Pedido(pedido)
 

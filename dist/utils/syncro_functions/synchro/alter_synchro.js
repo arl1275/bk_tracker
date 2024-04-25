@@ -38,8 +38,7 @@ function UpdateOrNone_Pedido(pedido_) {
                         const detalleFacturas = pedido_.data[i];
                         const existFact = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_fact_exist)(), [detalleFacturas._factura_.Factura, pedido_.pedido.PedidoVenta]);
                         const existFact_id = existFact.rows[0].factura_id;
-                        if (typeof existFact_id === 'number') {
-                            //console.log(`||     SIN MODIFICACIONES EN FACTURA : ${detalleFacturas._factura_.Factura} `)
+                        if (typeof existFact_id === 'number') { // if there is coincidence that means the preload and locadb data has no diferences
                             for (let j = 0; detalleFacturas.detalleFact.length > j; j++) {
                                 const detalleAlbaran = detalleFacturas.detalleFact[j];
                                 const existAlb = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_albaran)(), [detalleAlbaran._albaran_.Albaran, existFact_id]);
@@ -63,7 +62,7 @@ function UpdateOrNone_Pedido(pedido_) {
                                 }
                             }
                         }
-                        else if (existFact_id === null) {
+                        else if (existFact_id === null) { // in case is null, it means the factura does not exist of just has another name
                             if (typeof pedidoventa_id === 'number') {
                                 //---------------------------------------------------------------------------------------------------------------//
                                 // HERE IS WHERE WE NEED TO MAKE THE CHANGE,
@@ -129,9 +128,6 @@ function validinert(pedido) {
                     const pedidoventa_id = pedidoExist.rows[0].pedidoventa_id;
                     if (typeof pedidoventa_id === 'number') {
                         // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
-                        console.log('||--------------------------------------------------------------------------------------------------------------------||');
-                        console.log(`||                         ACTUALIZANDO PEDIDO : ${pedido.pedido.PedidoVenta}`);
-                        console.log('||--------------------------------------------------------------------------------------------------------------------||');
                         yield UpdateOrNone_Pedido(pedido);
                     }
                     else if (pedidoventa_id === null) {

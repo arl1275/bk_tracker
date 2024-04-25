@@ -4,13 +4,13 @@ import { data_to_repots_of_syncro_facts_entregadas } from '../queries/works_quer
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-async function return_data_toReports_Sincro_facts( data_ : string[]) {
+async function return_data_toReports_Sincro_facts( data_ : number[]) {
     try {
       console.log('FUNCTION : return_data_toReports_Sincro_facts::: ', data_)
       const data : any[] = [];                 // save the list of facturas to send
       for (let i = 0; i < data_.length; i++) { 
-        const element : string = data_[i];         // save elemente
-        const queryResult = await connDB.query(data_to_repots_of_syncro_facts_entregadas(element));
+        const element : number = data_[i];         // save elemente
+        const queryResult = await connDB.query(data_to_repots_of_syncro_facts_entregadas(), [element]);
         data.push(queryResult.rows);
       }
       console.log('FUNCTION : return_data_toReports_Sincro_facts::: return ::: ', data)
@@ -46,21 +46,21 @@ function generateTableHTML(data: any[]): string {
   `;
 
   data.forEach(row => {
-    const facturaData = row; // Acceder al primer elemento del arreglo dentro de cada objeto
+    const facturaData = row[0]; // Acceder al primer elemento del arreglo dentro de cada objeto
     tableHTML += `
   <tr>
-    <td>${facturaData.pedidoventa}</td>
-    <td>${facturaData.factura}</td>
-    <td>${facturaData.clientenombre}</td>
-    <td>${facturaData.albaran}</td>
-    <td>${facturaData.ciudad}</td>
-    <td>${facturaData.lista_empaque}</td>
-    <td>${facturaData.declaracionenvio}</td>
-    <td>${facturaData.cant_cajas}</td>
-    <td>${facturaData.cant_total}</td>
-    <td>${facturaData.state_name}</td>
-    <td><a href="${facturaData.link_firma}">VER FIRMA</a></td>
-    <td><a href="${facturaData.link_foto}">VER FOTO</a></td>
+    <td>${facturaData?.pedidoventa}</td>
+    <td>${facturaData?.factura}</td>
+    <td>${facturaData?.clientenombre}</td>
+    <td>${facturaData?.albaran}</td>
+    <td>${facturaData?.ciudad}</td>
+    <td>${facturaData?.lista_empaque}</td>
+    <td>${facturaData?.declaracionenvio}</td>
+    <td>${facturaData?.cant_cajas}</td>
+    <td>${facturaData?.cant_total}</td>
+    <td>${facturaData?.state_name}</td>
+    <td><a href="${facturaData?.link_firma}">VER FIRMA</a></td>
+    <td><a href="${facturaData?.link_foto}">VER FOTO</a></td>
   </tr>
 `;
 });
@@ -73,7 +73,7 @@ function generateTableHTML(data: any[]): string {
     return tableHTML;
 }
 
-export async function sendEmail_Entregados( list_fact : string []) {
+export async function sendEmail_Entregados( list_fact : number []) {
     try {
 
         let tableHTML;
