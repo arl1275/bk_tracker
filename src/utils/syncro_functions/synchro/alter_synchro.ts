@@ -1,5 +1,6 @@
 import { Preloaded_pedido_AX } from "./preload_data_ax";
 import connDB from "../../db/localDB_config";
+import { executeQuery } from "../../db/ax_config";
 import { QueryResult } from 'pg';
 import {
     caja,
@@ -12,8 +13,6 @@ import {
     val_if_albaran,
     val_if_fact_exist,
     val_if_caja,
-    change_factura_name,
-    get_head_albaranesAsFact
 } from './simple_queries_synchro';
 import {
     insert_pedidoVenta,
@@ -23,8 +22,8 @@ import {
 } from './syncro_functions';
 import {
     quickAlbaranInsert,
-    quickFacturaInsert,
-    quickBoxesInsert
+    quickBoxesInsert,
+    Full_Names_Update
 } from "./alter_queries_synchro";
 
 
@@ -39,7 +38,7 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
     //             FACTURA INSERTION.
     //----------------------------------------------------------------------------------------------------------------------------------//
     try {
-        type PedidoExistResult = QueryResult<{pedidoventa_id: number | null;}>;
+        type PedidoExistResult = QueryResult<{ pedidoventa_id: number | null; }>;
 
         const idPDV: PedidoExistResult = await connDB.query(val_if_pedido_venta(), [pedido_.pedido.PedidoVenta]);
 
@@ -91,31 +90,7 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
                             // THI IS IN THE FACTURAS TABLE, NOT IN THE ALBARAN TABLE
                             //---------------------------------------------------------------------------------------------------------------//
                             try {
-                                const facturasHead: any = await connDB.query(get_head_albaranesAsFact());
-                                const facturasAsAlb: any = facturasHead.rows
-                                if (facturasAsAlb.length > 0) {
-
-                                    for (let x = 0; facturasAsAlb.length > x; x++) { // facturasAsAlb.length
-
-                                        for (let y = 0; detalleFacturas.detalleFact.length > y; y++) {
-
-                                            if (facturasAsAlb[x].albaran === detalleFacturas.detalleFact[y]._albaran_.Albaran &&
-                                                facturasAsAlb[x].lista_empaque === detalleFacturas.detalleFact[y]._cajas_[0].ListaEmpaque &&
-                                                facturasAsAlb[x].factura !== detalleFacturas._factura_.Factura
-                                            ) {
-                                                // let id_factura = await connDB.query(val_if_fact_exist(), [detalleFacturas.detalleFact[y]._albaran_.Albaran, pedido_.pedido.PedidoVenta]);
-                                                //console.log('ID DE LA FACTURA :: ', facturasAsAlb[x].id_factura, detalleFacturas._factura_.Factura, detalleFacturas.detalleFact[0]._albaran_.Albaran, facturasAsAlb[x].albaran)
-                                                await connDB.query(change_factura_name(), [detalleFacturas._factura_.Factura, facturasAsAlb[x].id_factura]);
-                                                console.log(`|| ACTULIZANDO NOMBRE DE FACTURA DE ::: ${facturasAsAlb[x].factura} === A ===> ${detalleFacturas._factura_.Factura}  `)
-                                            }
-                                        }
-
-                                    }
-
-                                } else {
-                                    await quickFacturaInsert(pedidoventa_id, pedido_.pedido, detalleFacturas);
-                                }
-
+                                await Full_Names_Update();                                
                             } catch (error) {
                                 console.log('ERRO AL ACTUALIZAR FACTURA :: ', error);
                             }
@@ -242,9 +217,9 @@ export async function syncroData_AX_() {
 ||                                  **** SE OBTUVO EL PRECARGADO (SIN ERRORES) ****                                   ||
 ||--------------------------------------------------------------------------------------------------------------------||`);
             if (data.length > 0) {
-                for (let i = 0; data.length > i; i++) {
-                    await validinert(data[i]);
-                }
+                 for (let i = 0; data.length > i; i++) {
+                     await validinert(data[i]);
+                 }
             }
         } else {
             console.log('||         ERROR AL OBTENER EL PRECARGADAO')

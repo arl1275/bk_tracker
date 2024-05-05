@@ -8,13 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Preloaded_pedido_AX = void 0;
 const ax_config_1 = require("../../db/ax_config");
+const localDB_config_1 = __importDefault(require("../../db/localDB_config"));
 const simple_queries_synchro_1 = require("./simple_queries_synchro");
-//      THIS FUNCTION RETURNS A PRELOADED OBJECT TO SINCRO PROCESS
+//||--------------------------------------------------------------------------------------------------------------------||
+//||                          THIS FUNCTION RETURNS A PRELOADED OBJECT TO SINCRO PROCESS
+//||--------------------------------------------------------------------------------------------------------------------||
+//||            THIS FUNCTION HAS AS WELL, THE FUNCTION TO UPDATE DE DECLARACIONS OF ENVIO                              ||
+//||--------------------------------------------------------------------------------------------------------------------||
 const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // this part if to update the declaraciones de envio
+        const query_update_decenv = 'SELECT * FROM automatic_close_decenv();';
+        yield localDB_config_1.default.query(query_update_decenv);
         let preloadData = []; // this is to save all the details of all pedidos de venta
         let pdventas_ = []; // this is to save the details of all pedidos de venta
         pdventas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_pedidoventas)());
@@ -32,6 +43,7 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                         let albaranes_ = []; // this is to save all albaranes of one factura to be process
                         let detalleAlbaran = []; // this is to save the detail of one albaran
                         const fact = facturas_[j]; // this is to save one factura to be process
+                        //console.log(`||    FACTURA : ${fact.Factura}`)
                         if (fact.Factura.startsWith('AL')) {
                             let alb_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_albaran_of_albaran_inserted_as_factura)(fact.Factura, pedido.PedidoVenta));
                             albaranes_.push(alb_[0]);
@@ -46,12 +58,18 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                         if (albaranes_.length > 0) {
                             for (let k = 0; k < albaranes_.length; k++) {
                                 let x = albaranes_[k];
+                                //console.log(`||      ALBARANES : ${x.Albaran}`)
                                 const caja_s = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_boxes_of_an_albaran)(x.Albaran));
                                 if (caja_s.length > 0) {
                                     let detail_oneAlb = { _albaran_: albaranes_[k], _cajas_: caja_s };
                                     detalleAlbaran.push(detail_oneAlb);
                                 }
+                                else {
+                                    console.log(`||     NO HAY CAJAS DE ESTE ALBARAN : ${x.Albaran}`);
+                                    return false;
+                                }
                             }
+                            //console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
                         }
                         else {
                             console.log('||     NO HAY ALBARANES PRECARGADOS');

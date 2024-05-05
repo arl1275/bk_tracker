@@ -14,7 +14,7 @@ import { special_clients } from "../../special_clients/clients";
 
 const paisFilter = 'Honduras';                             // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                     // valor para setear las ubicaciones
-const mininumDateAllowed =  obtenerFechaActual(5);        // valor para captar las facturas mas antiguas
+const mininumDateAllowed =  '2024-02-28';//obtenerFechaActual(5);        // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -49,7 +49,7 @@ WHERE
   --||        THIS IS TO FORCE SINCRONIZACION JUST ADD THE PEDIDOS THAT U WANT TO FORCE SINCRO     ||--
   --||_____________________________________________________________________________________________||--
 
-  --AND pedidoventa = 'PV-00310785' 
+-- AND pedidoventa = '+' 
   
   --||_____________________________________________________________________________________________||-- 
 
@@ -65,32 +65,35 @@ GROUP BY
 // this query is to get all facturas of one pedido de venta
 //-----------------------------------------------------------------------------------------------------//
 export const query_get_facts_of_a_pedidoVenta = (pedido : string) =>{
-   return `
-   SELECT
-      CASE
-          WHEN ( Factura != '') AND AlbaranCount = 1 THEN Factura
-          WHEN ( Factura IS NULL or factura = '') AND AlbaranCount = 1 THEN Albaran
-          WHEN ( Factura != '') AND AlbaranCount > 1 THEN CONCAT(Factura, ' ', Albaran)
-          WHEN ( Factura = '') AND AlbaranCount > 1 THEN Albaran
-      END AS Factura
-    FROM (
-      SELECT distinct
+  return `SELECT
+  CASE
+      WHEN (Factura != '') AND AlbaranCount = 1 THEN Factura
+      WHEN (Factura IS NULL or Factura = '') AND AlbaranCount = 1 THEN Albaran
+      WHEN (Factura != '') AND AlbaranCount > 1 THEN CONCAT(Factura, ', ', Albaran)
+      WHEN (Factura = '') AND AlbaranCount > 1 THEN Albaran
+  END AS Factura
+FROM (
+  SELECT
       Factura,
       Albaran,
-      COUNT(*) OVER (PARTITION BY Albaran) AS AlbaranCount
-      FROM
-          IMGetAllPackedBoxesInSB
+      COUNT(*) AS AlbaranCount
+  FROM (
+      SELECT DISTINCT
+          Factura,
+          Albaran
+      FROM IMGetAllPackedBoxesInSB
       WHERE
-      (
-        (Pais = '${paisFilter}' AND ciudad = '${ciudadFilter}')
-        OR
-        ( CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
-      )    
-      AND pedidoventa = '${pedido}'
-      AND fecha >= '${mininumDateAllowed}'
-      AND albaran != '' 
-    group by Factura, albaran
-    ) AS Subquery;`;
+            (
+              (Pais = '${paisFilter}' AND ciudad = '${ciudadFilter}')
+              OR
+              ( CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
+            )
+            AND pedidoventa = '${pedido}'
+            AND fecha >= '${mininumDateAllowed}'
+            AND albaran != '' 
+  ) AS Subquery
+  GROUP BY Factura, Albaran
+) AS FinalResults;`
   }
 
 //-----------------------------------------------------------------------------------------------------//
@@ -269,9 +272,12 @@ export const val_if_caja = () => {
 `
 }
 
+//------------------------------------------------------------------------------------------------//
+// this is to update names of the facturas
+// :: this querty is to bring all unupdated facturas of the DB
 export const get_head_albaranesAsFact = () => {
   return`
-  SELECT 
+  SELECT distinct
     p.id as id_pedido,
     p.pedidoventa,
     f.id as id_factura, 
@@ -283,7 +289,24 @@ export const get_head_albaranesAsFact = () => {
   INNER JOIN facturas f ON p.id = f.id_pedidoventas 
   INNER JOIN albaranes a ON f.id = a.id_facturas
   INNER JOIN cajas c on a.id = c.id_albaran 
-  WHERE f.factura LIKE 'AL-%'`
+  WHERE f.factura LIKE 'AL-%' OR f.factura = '' OR f.factura IS NULL;`
+}
+
+// :: this query is to bring the names of the facturas fom AX
+
+export const get_Ax_head_albaranesFacturas = ( albaran : string, listaEmpaque : string, pedido : string) => {
+  return `
+  SELECT DISTINCT
+    pedidoventa,
+    factura,
+    albaran,
+    listaempaque
+	FROM IMGetAllPackedBoxesInSB
+	WHERE 
+    albaran = '${albaran}'
+    AND listaempaque = '${listaEmpaque}'
+    AND pedidoventa = '${pedido}'; 
+  `;
 }
 
 //-----------------------------------------------------------------------------------------------------//

@@ -4,6 +4,7 @@
 //-------------------------------------------------------------------------------//
 
 import { executeQuery } from '../../db/ax_config';
+import connDB from '../../db/localDB_config';
 import {
     pedidoventa,
     factura,
@@ -27,6 +28,7 @@ import {
     insert_albaran_,
     insert_boxes_
 } from '../synchro/syncro_functions';
+import { change_factura_name, get_Ax_head_albaranesFacturas, get_head_albaranesAsFact } from './simple_queries_synchro';
 
 export async function quickFacturaInsert(id_pedido: number, pedido_: pedidoventa, facturaDetalle: detFact) {
     try {
@@ -101,9 +103,9 @@ export async function quickFacturaInsert(id_pedido: number, pedido_: pedidoventa
     }
 }
 
-export async function quickAlbaranInsert(id_factura: number, pedido : pedidoventa, detalleAlbaran: detAlbaran) {
+export async function quickAlbaranInsert(id_factura: number, pedido: pedidoventa, detalleAlbaran: detAlbaran) {
     try {
-        const _albaran : albaran = detalleAlbaran._albaran_;
+        const _albaran: albaran = detalleAlbaran._albaran_;
 
         const id_albaran = await insert_albaran_(_albaran, id_factura);
         if (id_albaran) {
@@ -122,13 +124,55 @@ export async function quickAlbaranInsert(id_factura: number, pedido : pedidovent
 
 }
 
-export async function quickBoxesInsert(id_albaran : number, detalleCaja : caja) {
+export async function quickBoxesInsert(id_albaran: number, detalleCaja: caja) {
     try {
-        const inserted = await insert_boxes_( detalleCaja, id_albaran);
-        if(inserted){
+        const inserted = await insert_boxes_(detalleCaja, id_albaran);
+        if (inserted) {
             console.log(`||                 CAJA AGREGADA :  ${detalleCaja.Caja}   CANTIDAD : ${detalleCaja.cantidad}    RUTA : ${detalleCaja.ListaEmpaque} `);
         }
     } catch (err) {
         console.log('|| ERROR AL AGREGAR UN ALBARAN', err);
+    }
+}
+
+//-------------------------------------------------------------------------------------------------------------------//
+//                      THIS FUNCTION LOOK FOR ANY KIND OF UPDATE IN NAMES OF FACTURAS
+//-------------------------------------------------------------------------------------------------------------------//
+
+export async function Full_Names_Update() {
+    try {
+        const facturasHead: any = await connDB.query(get_head_albaranesAsFact());
+        const FactsToUpdate: any = facturasHead.rows
+        console.log('||--------------------------- EN BUSCA DE ACTUALIZACIONES DE FACTURA-----------------------||')
+        
+        if( FactsToUpdate.length > 0){
+            for(let x = 0; FactsToUpdate.length > x; x++){
+                const Factura = FactsToUpdate[x];
+                const AXhead = await executeQuery(get_Ax_head_albaranesFacturas(Factura.albaran, Factura.lista_empaque, Factura.pedidoventa));
+                
+                if(AXhead.length > 0){
+                    for(let y = 0; AXhead.length > y; y++){
+                        if(AXhead[y].factura != '' || AXhead[y].factura != null ){
+                            
+                            await connDB.query(change_factura_name(), [AXhead[y].factura, Factura.id_factura]);
+                            console.log(`|| SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`)
+                        }else{
+                            return [false, { message : '|| ESTA FACTURA NO TIENE ACTUALIZACIONES'}];
+                        }
+                    }
+                }else{
+                    return [false, {message : '|| ESTO NO DEBERIA PASAR'}];
+                }
+
+            }
+            
+        }else{
+            return [false, { message : '|| SIN FACTURAS PARA ACTUALIZAR'}]
+        }
+
+    } catch (error) {
+        console.log(`|| ERROR AL BUSCAR ACTUALIZACIONES :: ${error}`);
+    }finally{
+        console.log('|| FINALIZACION DE ACTUALIZACIONES')
     }
 }

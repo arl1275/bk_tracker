@@ -12,11 +12,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.quickBoxesInsert = exports.quickAlbaranInsert = exports.quickFacturaInsert = void 0;
+exports.Full_Names_Update = exports.quickBoxesInsert = exports.quickAlbaranInsert = exports.quickFacturaInsert = void 0;
 const ax_config_1 = require("../../db/ax_config");
+const localDB_config_1 = __importDefault(require("../../db/localDB_config"));
 const force_syncro_queries_1 = require("../force_synchro/force_syncro_queries");
 const syncro_functions_1 = require("../synchro/syncro_functions");
+const simple_queries_synchro_1 = require("./simple_queries_synchro");
 function quickFacturaInsert(id_pedido, pedido_, facturaDetalle) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -121,3 +126,45 @@ function quickBoxesInsert(id_albaran, detalleCaja) {
     });
 }
 exports.quickBoxesInsert = quickBoxesInsert;
+//-------------------------------------------------------------------------------------------------------------------//
+//                      THIS FUNCTION LOOK FOR ANY KIND OF UPDATE IN NAMES OF FACTURAS
+//-------------------------------------------------------------------------------------------------------------------//
+function Full_Names_Update() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const facturasHead = yield localDB_config_1.default.query((0, simple_queries_synchro_1.get_head_albaranesAsFact)());
+            const FactsToUpdate = facturasHead.rows;
+            console.log('||--------------------------- EN BUSCA DE ACTUALIZACIONES DE FACTURA-----------------------||');
+            if (FactsToUpdate.length > 0) {
+                for (let x = 0; FactsToUpdate.length > x; x++) {
+                    const Factura = FactsToUpdate[x];
+                    const AXhead = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.get_Ax_head_albaranesFacturas)(Factura.albaran, Factura.lista_empaque, Factura.pedidoventa));
+                    if (AXhead.length > 0) {
+                        for (let y = 0; AXhead.length > y; y++) {
+                            if (AXhead[y].factura != '' || AXhead[y].factura != null) {
+                                yield localDB_config_1.default.query((0, simple_queries_synchro_1.change_factura_name)(), [AXhead[y].factura, Factura.id_factura]);
+                                console.log(`|| SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`);
+                            }
+                            else {
+                                return [false, { message: '|| ESTA FACTURA NO TIENE ACTUALIZACIONES' }];
+                            }
+                        }
+                    }
+                    else {
+                        return [false, { message: '|| ESTO NO DEBERIA PASAR' }];
+                    }
+                }
+            }
+            else {
+                return [false, { message: '|| SIN FACTURAS PARA ACTUALIZAR' }];
+            }
+        }
+        catch (error) {
+            console.log(`|| ERROR AL BUSCAR ACTUALIZACIONES :: ${error}`);
+        }
+        finally {
+            console.log('|| FINALIZACION DE ACTUALIZACIONES');
+        }
+    });
+}
+exports.Full_Names_Update = Full_Names_Update;

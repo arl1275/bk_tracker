@@ -37,7 +37,7 @@ const alter_synchro_1 = require("./alter_synchro");
 const cron = __importStar(require("node-cron"));
 function syncroData_AX() {
     return __awaiter(this, void 0, void 0, function* () {
-        const cronExpression = '*/3 * * * *'; // program to execute every 30 min
+        const cronExpression = '*/5 * * * *'; // program to execute every 30 min
         cron.schedule(cronExpression, () => __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log('KRON TRIGGERED');

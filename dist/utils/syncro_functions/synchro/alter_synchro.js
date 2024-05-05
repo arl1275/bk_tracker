@@ -70,25 +70,7 @@ function UpdateOrNone_Pedido(pedido_) {
                                 // THI IS IN THE FACTURAS TABLE, NOT IN THE ALBARAN TABLE
                                 //---------------------------------------------------------------------------------------------------------------//
                                 try {
-                                    const facturasHead = yield localDB_config_1.default.query((0, simple_queries_synchro_1.get_head_albaranesAsFact)());
-                                    const facturasAsAlb = facturasHead.rows;
-                                    if (facturasAsAlb.length > 0) {
-                                        for (let x = 0; facturasAsAlb.length > x; x++) { // facturasAsAlb.length
-                                            for (let y = 0; detalleFacturas.detalleFact.length > y; y++) {
-                                                if (facturasAsAlb[x].albaran === detalleFacturas.detalleFact[y]._albaran_.Albaran &&
-                                                    facturasAsAlb[x].lista_empaque === detalleFacturas.detalleFact[y]._cajas_[0].ListaEmpaque &&
-                                                    facturasAsAlb[x].factura !== detalleFacturas._factura_.Factura) {
-                                                    // let id_factura = await connDB.query(val_if_fact_exist(), [detalleFacturas.detalleFact[y]._albaran_.Albaran, pedido_.pedido.PedidoVenta]);
-                                                    //console.log('ID DE LA FACTURA :: ', facturasAsAlb[x].id_factura, detalleFacturas._factura_.Factura, detalleFacturas.detalleFact[0]._albaran_.Albaran, facturasAsAlb[x].albaran)
-                                                    yield localDB_config_1.default.query((0, simple_queries_synchro_1.change_factura_name)(), [detalleFacturas._factura_.Factura, facturasAsAlb[x].id_factura]);
-                                                    console.log(`|| ACTULIZANDO NOMBRE DE FACTURA DE ::: ${facturasAsAlb[x].factura} === A ===> ${detalleFacturas._factura_.Factura}  `);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        yield (0, alter_queries_synchro_1.quickFacturaInsert)(pedidoventa_id, pedido_.pedido, detalleFacturas);
-                                    }
+                                    yield (0, alter_queries_synchro_1.Full_Names_Update)();
                                 }
                                 catch (error) {
                                     console.log('ERRO AL ACTUALIZAR FACTURA :: ', error);

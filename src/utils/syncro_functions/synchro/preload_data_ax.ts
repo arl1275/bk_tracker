@@ -1,4 +1,5 @@
 import { executeQuery } from '../../db/ax_config';
+import connDB from '../../db/localDB_config';
 import {
     pedidoventa,
     factura,
@@ -15,11 +16,19 @@ import {
     query_get_facts_of_a_pedidoVenta,
     query_get_albaran_of_albaran_inserted_as_factura,
 } from './simple_queries_synchro';
-
-//      THIS FUNCTION RETURNS A PRELOADED OBJECT TO SINCRO PROCESS
+//||--------------------------------------------------------------------------------------------------------------------||
+//||                          THIS FUNCTION RETURNS A PRELOADED OBJECT TO SINCRO PROCESS
+//||--------------------------------------------------------------------------------------------------------------------||
+//||            THIS FUNCTION HAS AS WELL, THE FUNCTION TO UPDATE DE DECLARACIONS OF ENVIO                              ||
+//||--------------------------------------------------------------------------------------------------------------------||
 
 export const Preloaded_pedido_AX = async () => {
     try {
+        // this part if to update the declaraciones de envio
+        const query_update_decenv = 'SELECT * FROM automatic_close_decenv();';
+        await connDB.query(query_update_decenv);
+
+
         let preloadData: sincroObject[] = [];                               // this is to save all the details of all pedidos de venta
         let pdventas_: pedidoventa[] = [];                                  // this is to save the details of all pedidos de venta
         pdventas_ = await executeQuery(query_get_pedidoventas());
@@ -35,7 +44,7 @@ export const Preloaded_pedido_AX = async () => {
                 let pedido: pedidoventa = pdventas_[i];                         // this is to save one pedidodeVenta to be process
                 let facturas_: factura[] = [];                                  // this is to save all the facturas of the pedidoVentas that is going to process
                 let detalleFactura: detFact[] = [];                             // this is to save the details of the facturas of one pedidoVentas
-
+                
 
                 facturas_ = await executeQuery(query_get_facts_of_a_pedidoVenta(pedido.PedidoVenta));
                 
@@ -45,6 +54,7 @@ export const Preloaded_pedido_AX = async () => {
                          let albaranes_: albaran[] = [];                        // this is to save all albaranes of one factura to be process
                          let detalleAlbaran: detAlbaran[] = []                  // this is to save the detail of one albaran
                          const fact = facturas_[j];                             // this is to save one factura to be process
+                         //console.log(`||    FACTURA : ${fact.Factura}`)
 
                          if (fact.Factura.startsWith('AL')) {
                              let alb_: albaran[] = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura(fact.Factura, pedido.PedidoVenta));
@@ -61,14 +71,20 @@ export const Preloaded_pedido_AX = async () => {
                       
                         if (albaranes_.length > 0) {
                             for (let k = 0; k < albaranes_.length; k++) {
+
                                 let x: albaran = albaranes_[k];
+                                //console.log(`||      ALBARANES : ${x.Albaran}`)
                                 const caja_s: caja[] = await executeQuery(query_get_boxes_of_an_albaran(x.Albaran));
+
                                 if (caja_s.length > 0) {
                                     let detail_oneAlb: detAlbaran = { _albaran_: albaranes_[k], _cajas_: caja_s };
                                     detalleAlbaran.push(detail_oneAlb);
+                                }else{
+                                    console.log(`||     NO HAY CAJAS DE ESTE ALBARAN : ${x.Albaran}`);
+                                    return false;
                                 }
                             }
-                            
+                            //console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
                         } else {
                             console.log('||     NO HAY ALBARANES PRECARGADOS')
                             return false;
