@@ -150,18 +150,19 @@ export async function Full_Names_Update() {
 
                 const Factura = FactsToUpdate[x];
                 const AXhead = await executeQuery(get_Ax_head_albaranesFacturas(Factura.albaran, Factura.lista_empaque, Factura.pedidoventa));
-                console.log(' ---- LOCAL DB -----')
-                console.log(Factura.albaran);
-                console.log('------AX DATA ------------')
-                console.log(AXhead);
+                // console.log(' ---- LOCAL DB -----')
+                // console.log(Factura.albaran);
+                // console.log('------AX DATA ------------')
+                // console.log(AXhead);
                 
                 if(AXhead.length > 0){
                     for(let y = 0; AXhead.length > y; y++){
 
-                        if(AXhead[y].factura.length > 0 && AXhead[y].factura != null ){
-                            
-                            await connDB.query(change_factura_name(), [AXhead[y].factura, Factura.id_factura]);
-                            console.log(`|| SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`)
+                        if(AXhead[y].factura != null || AXhead[y].factura != '' ){
+                            if(Factura.factura != AXhead[y].factura){
+                                await connDB.query(change_factura_name(), [AXhead[y].factura, Factura.id_factura]);
+                                console.log(`|| SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`)
+                            }
                         }else{
                             return [false, { message : '|| ESTA FACTURA NO TIENE ACTUALIZACIONES'}];
                         }
