@@ -21,7 +21,7 @@ routerFacturas.get('/getFactActives', facturas_controller_1.get_all_facturas_act
 routerFacturas.get('/getHistoFact', facturas_controller_1.getHistoFact_controller);
 routerFacturas.get('/adminFact', facturas_controller_1.getAdminFacts_controller);
 // para sincronizar cajas en la app
-routerFacturas.get('/app/getCajasOneFact', facturas_controller_1.getCajasFAct_controller);
+routerFacturas.post('/app/getCajasOneFact', facturas_controller_1.getCajasFAct_controller); // /facturas/app/getCAjasOneFact
 routerFacturas.get('/toNullState', facturas_controller_1.toNullState_controller);
 //------------------------------------------------- THIS IS A ADMINISTRATOR ROUTE -------------------------------------------------//
 routerFacturas.post('/admin/forceSyncroFact', facturas_controller_1.forceFactura_controller); // this route is to force the incronization of one factura

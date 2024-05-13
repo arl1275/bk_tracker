@@ -139,9 +139,13 @@ function Full_Names_Update() {
                 for (let x = 0; FactsToUpdate.length > x; x++) {
                     const Factura = FactsToUpdate[x];
                     const AXhead = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.get_Ax_head_albaranesFacturas)(Factura.albaran, Factura.lista_empaque, Factura.pedidoventa));
+                    console.log(' ---- LOCAL DB -----');
+                    console.log(Factura.albaran);
+                    console.log('------AX DATA ------------');
+                    console.log(AXhead);
                     if (AXhead.length > 0) {
                         for (let y = 0; AXhead.length > y; y++) {
-                            if (AXhead[y].factura != '' || AXhead[y].factura != null) {
+                            if (AXhead[y].factura.length > 0 && AXhead[y].factura != null) {
                                 yield localDB_config_1.default.query((0, simple_queries_synchro_1.change_factura_name)(), [AXhead[y].factura, Factura.id_factura]);
                                 console.log(`|| SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`);
                             }

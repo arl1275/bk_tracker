@@ -45,7 +45,7 @@ routerFacturas.get('/getHistoFact', getHistoFact_controller);
 routerFacturas.get('/adminFact', getAdminFacts_controller);
 
 // para sincronizar cajas en la app
-routerFacturas.get('/app/getCajasOneFact', getCajasFAct_controller);
+routerFacturas.post('/app/getCajasOneFact', getCajasFAct_controller); // /facturas/app/getCAjasOneFact
 
 routerFacturas.get('/toNullState', toNullState_controller);
 

@@ -320,11 +320,13 @@ export let getCajasOneFact_service = async (req: Request, res: Response) => {
             caja: string;
             cantidad: number;
         }
+        console.log(' data :: ', req.body);
+        const data = req.body; // Accede al cuerpo de la solicitud
 
-        const { data } = req.query;
         let error = false;
         let cajas_arr: CajaProps[] = [];
         const query = 'SELECT * FROM get_cajas_of_fact($1, $2);';
+        console.log('data from APP :: ', data);
 
         if (Array.isArray(data)) {
             await Promise.all(
@@ -351,22 +353,23 @@ export let getCajasOneFact_service = async (req: Request, res: Response) => {
                     }
                 })
             );
+        } else {
+            console.log('El cuerpo de la solicitud no es un arreglo:', data);
+            return res.status(400).json({ message: 'El cuerpo de la solicitud no es un arreglo' });
         }
 
-        if (error === false && cajas_arr.length > 0) {
-            //console.log('data a mandar : ', cajas_arr);
-            console.log('SE OBTUVIERON LAS CAJAS');
+        if (!error && cajas_arr.length > 0) {
+            console.log('Se obtuvieron las cajas correctamente');
             res.status(200).json({ data: cajas_arr });
         } else {
-            res.status(500).json({ message: 'Error obtaining cajas' });
-            console.log('Failed to obtain cajas');
+            console.log('Error al obtener cajas');
+            res.status(500).json({ message: 'Error al obtener cajas' });
         }
     } catch (err) {
-        console.error('Error in getCajasOneFact_service:', err);
-        res.status(500).json({ message: 'Failed to obtain cajas' });
+        console.error('Error en getCajasOneFact_service:', err);
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
 };
-
 // en uso
 export let getAdminFacts_service = async (req: Request, res: Response) => {
     try {
