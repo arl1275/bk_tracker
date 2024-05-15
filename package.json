@@ -23,15 +23,15 @@
     "nodemailer": "^6.9.9",
     "pg": "^8.11.3",
     "pg-format": "^1.0.4",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.3.3"
+    "ts-loader": "^9.5.1"
   },
   "scripts": {
     "clean": "tsc --build --clean",
-    "start": "node ./dist/app.js",
+    "start": "node ./dist/index.js",
     "build": "tsc"
   },
   "devDependencies": {
-    "@types/nodemailer": "^6.4.14"
+    "@types/nodemailer": "^6.4.14",
+    "typescript": "^5.4.5"
   }
 }

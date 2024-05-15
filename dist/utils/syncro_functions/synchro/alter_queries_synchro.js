@@ -134,20 +134,21 @@ function Full_Names_Update() {
         try {
             const facturasHead = yield localDB_config_1.default.query((0, simple_queries_synchro_1.get_head_albaranesAsFact)());
             const FactsToUpdate = facturasHead.rows;
-            console.log('||--------------------------- EN BUSCA DE ACTUALIZACIONES DE FACTURA-----------------------||');
+            //console.log(FactsToUpdate);
             if (FactsToUpdate.length > 0) {
                 for (let x = 0; FactsToUpdate.length > x; x++) {
                     const Factura = FactsToUpdate[x];
                     const AXhead = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.get_Ax_head_albaranesFacturas)(Factura.albaran, Factura.lista_empaque, Factura.pedidoventa));
-                    console.log(' ---- LOCAL DB -----');
-                    console.log(Factura.albaran);
-                    console.log('------AX DATA ------------');
-                    console.log(AXhead);
+                    console.log('|| FACTURA :: ', Factura.factura);
+                    //console.log(Factura.albaran);
+                    //console.log('------AX DATA ------------')
+                    //console.log(AXhead);
                     if (AXhead.length > 0) {
                         for (let y = 0; AXhead.length > y; y++) {
-                            if (AXhead[y].factura.length > 0 && AXhead[y].factura != null) {
+                            console.log('||     DATA ::: LOCAL : ', Factura.factura, '||  AX : ', AXhead[y].factura);
+                            if (Factura.factura != AXhead[y].factura) {
                                 yield localDB_config_1.default.query((0, simple_queries_synchro_1.change_factura_name)(), [AXhead[y].factura, Factura.id_factura]);
-                                console.log(`|| SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`);
+                                console.log(`||     SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`);
                             }
                             else {
                                 return [false, { message: '|| ESTA FACTURA NO TIENE ACTUALIZACIONES' }];
@@ -155,7 +156,10 @@ function Full_Names_Update() {
                         }
                     }
                     else {
-                        return [false, { message: '|| ESTO NO DEBERIA PASAR' }];
+                        console.log('|| FACTURA SIN ACTUALIZACION DE FACTURA');
+                        //console.log(` ACTUALIZACION :: ${Factura.albaran} y ID : ${Factura.id_factura}`)
+                        //await connDB.query(change_factura_name(), [Factura.albaran, Factura.id_factura]);
+                        //return [false, { message: '|| ESTO NO DEBERIA PASAR' }];
                     }
                 }
             }
@@ -167,7 +171,8 @@ function Full_Names_Update() {
             console.log(`|| ERROR AL BUSCAR ACTUALIZACIONES :: ${error}`);
         }
         finally {
-            console.log('|| FINALIZACION DE ACTUALIZACIONES');
+            console.log('||                                              FINALIZACION DE ACTUALIZACIONES                                       ||');
+            console.log('||--------------------------------------------------------------------------------------------------------------------||');
         }
     });
 }

@@ -14,7 +14,7 @@ import { special_clients } from "../../special_clients/clients";
 
 const paisFilter = 'Honduras';                             // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                     // valor para setear las ubicaciones
-const mininumDateAllowed =  '2024-02-28';//obtenerFechaActual(5);        // valor para captar las facturas mas antiguas
+const mininumDateAllowed =  obtenerFechaActual(10);        // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -248,7 +248,6 @@ export const val_if_fact_exist = () =>{
       ) 
       ELSE NULL 
   END AS factura_id;
-
 `;
 }
 
@@ -305,8 +304,8 @@ export const get_Ax_head_albaranesFacturas = ( albaran : string, listaEmpaque : 
 	WHERE 
     albaran = '${albaran}'
     AND listaempaque = '${listaEmpaque}'
-    AND pedidoventa = '${pedido}'; 
-  `;
+    AND pedidoventa = '${pedido}'
+    AND (Factura IS NOT NULL AND Factura != '');`;
 }
 
 //-----------------------------------------------------------------------------------------------------//

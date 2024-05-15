@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bodyParser = require("body-parser");
+const synchro_1 = require("./utils/syncro_functions/synchro/synchro");
 require("dotenv").config({ path: './.env' });
 const cors = require('cors');
 const facturas_routes_1 = __importDefault(require("./routes/facturas.routes"));
@@ -12,7 +13,7 @@ const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const declaracion_env_routes_1 = __importDefault(require("./routes/declaracion_env.routes"));
 const express = require("express");
 const app = express();
-//syncroData_AX()
+(0, synchro_1.syncroData_AX)();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));

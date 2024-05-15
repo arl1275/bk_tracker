@@ -4,10 +4,14 @@
 //---------------------------------------------------------------------------------//
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.change_factura_name = exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports.insert_pedido_venta = exports.get_Ax_head_albaranesFacturas = exports.get_head_albaranesAsFact = exports.val_if_caja = exports.val_if_albaran = exports.val_if_fact_exist = exports.val_if_pedido_venta = exports.ForceSincroFact_albaran = exports.ForceSincroFact_factura = exports.get_boxes_one_fact = exports.query_get_boxes_of_an_albaran = exports.query_get_albaran_of_albaran_inserted_as_factura = exports.query_get_albarans_of_a_factura = exports.query_get_facts_of_a_pedidoVenta = exports.query_get_pedidoventas = void 0;
+//---------------------------------------------------------//
+//                  DEFAULT DATA FILTERS                   //
+//---------------------------------------------------------//
+const utils_1 = require("../../handle_passwords/utils");
 const clients_1 = require("../../special_clients/clients");
 const paisFilter = 'Honduras'; // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula'; // valor para setear las ubicaciones
-const mininumDateAllowed = '2024-02-28'; //obtenerFechaActual(5);        // valor para captar las facturas mas antiguas
+const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(10); // valor para captar las facturas mas antiguas
 //---------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
@@ -234,7 +238,6 @@ const val_if_fact_exist = () => {
       ) 
       ELSE NULL 
   END AS factura_id;
-
 `;
 };
 exports.val_if_fact_exist = val_if_fact_exist;
@@ -290,8 +293,8 @@ const get_Ax_head_albaranesFacturas = (albaran, listaEmpaque, pedido) => {
 	WHERE 
     albaran = '${albaran}'
     AND listaempaque = '${listaEmpaque}'
-    AND pedidoventa = '${pedido}'; 
-  `;
+    AND pedidoventa = '${pedido}'
+    AND (Factura IS NOT NULL AND Factura != '');`;
 };
 exports.get_Ax_head_albaranesFacturas = get_Ax_head_albaranesFacturas;
 //-----------------------------------------------------------------------------------------------------//

@@ -45,7 +45,7 @@ export const Preloaded_pedido_AX = async () => {
                 let facturas_: factura[] = [];                                  // this is to save all the facturas of the pedidoVentas that is going to process
                 let detalleFactura: detFact[] = [];                             // this is to save the details of the facturas of one pedidoVentas
                 
-
+                //console.log('|| PEDIDO : ', pedido.PedidoVenta, ' :: ', pedido.NombreCliente );
                 facturas_ = await executeQuery(query_get_facts_of_a_pedidoVenta(pedido.PedidoVenta));
                 
                  if (facturas_.length > 0) {
@@ -71,16 +71,16 @@ export const Preloaded_pedido_AX = async () => {
                       
                         if (albaranes_.length > 0) {
                             for (let k = 0; k < albaranes_.length; k++) {
-
                                 let x: albaran = albaranes_[k];
-                                //console.log(`||      ALBARANES : ${x.Albaran}`)
                                 const caja_s: caja[] = await executeQuery(query_get_boxes_of_an_albaran(x.Albaran));
-
-                                if (caja_s.length > 0) {
+                                //console.log(`||      ALBARANES : ${x.Albaran}`)
+                                //console.log('||     DETALLE DE CAJAS ');
+                                if (caja_s.length > 0) {    
+                                    //console.log('|| CAJA :: ', caja_s);
                                     let detail_oneAlb: detAlbaran = { _albaran_: albaranes_[k], _cajas_: caja_s };
                                     detalleAlbaran.push(detail_oneAlb);
                                 }else{
-                                    console.log(`||     NO HAY CAJAS DE ESTE ALBARAN : ${x.Albaran}`);
+                                    //console.log(`||     NO HAY CAJAS DE ESTE ALBARAN : ${x.Albaran}`);
                                     return false;
                                 }
                             }

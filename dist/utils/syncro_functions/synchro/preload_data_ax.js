@@ -37,6 +37,7 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                 let pedido = pdventas_[i]; // this is to save one pedidodeVenta to be process
                 let facturas_ = []; // this is to save all the facturas of the pedidoVentas that is going to process
                 let detalleFactura = []; // this is to save the details of the facturas of one pedidoVentas
+                //console.log('|| PEDIDO : ', pedido.PedidoVenta, ' :: ', pedido.NombreCliente );
                 facturas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_facts_of_a_pedidoVenta)(pedido.PedidoVenta));
                 if (facturas_.length > 0) {
                     for (let j = 0; j < facturas_.length; j++) {
@@ -58,14 +59,16 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                         if (albaranes_.length > 0) {
                             for (let k = 0; k < albaranes_.length; k++) {
                                 let x = albaranes_[k];
-                                //console.log(`||      ALBARANES : ${x.Albaran}`)
                                 const caja_s = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_boxes_of_an_albaran)(x.Albaran));
+                                //console.log(`||      ALBARANES : ${x.Albaran}`)
+                                //console.log('||     DETALLE DE CAJAS ');
                                 if (caja_s.length > 0) {
+                                    //console.log('|| CAJA :: ', caja_s);
                                     let detail_oneAlb = { _albaran_: albaranes_[k], _cajas_: caja_s };
                                     detalleAlbaran.push(detail_oneAlb);
                                 }
                                 else {
-                                    console.log(`||     NO HAY CAJAS DE ESTE ALBARAN : ${x.Albaran}`);
+                                    //console.log(`||     NO HAY CAJAS DE ESTE ALBARAN : ${x.Albaran}`);
                                     return false;
                                 }
                             }

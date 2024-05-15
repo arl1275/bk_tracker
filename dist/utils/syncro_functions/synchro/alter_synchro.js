@@ -30,11 +30,16 @@ function UpdateOrNone_Pedido(pedido_) {
         //             FACTURA INSERTION.
         //----------------------------------------------------------------------------------------------------------------------------------//
         try {
+            // THI PART LOOK FOR THE PEDIDO IN SPECIFIC, CASE IT DOES NOT EXIST WILL RETURN NULL OR NUMBER WHEATHER EXIST
             const idPDV = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_pedido_venta)(), [pedido_.pedido.PedidoVenta]);
             if (idPDV.rows.length > 0) {
                 const pedidoventa_id = idPDV.rows[0].pedidoventa_id;
+                console.log(`
+||--------------------------------------------------------------------------------------------------------------------||
+||    ACTUALIZANDO UN PEDIDO DE VENTA : ${pedido_.pedido.PedidoVenta}`);
                 if (typeof pedidoventa_id === 'number') {
                     for (let i = 0; pedido_.data.length > i; i++) {
+                        // THIS PART WILL LOOK FOR ALL THE FACTURAS OF THAT PEDIDOVENTAS
                         const detalleFacturas = pedido_.data[i];
                         const existFact = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_fact_exist)(), [detalleFacturas._factura_.Factura, pedido_.pedido.PedidoVenta]);
                         const existFact_id = existFact.rows[0].factura_id;
@@ -70,7 +75,7 @@ function UpdateOrNone_Pedido(pedido_) {
                                 // THI IS IN THE FACTURAS TABLE, NOT IN THE ALBARAN TABLE
                                 //---------------------------------------------------------------------------------------------------------------//
                                 try {
-                                    yield (0, alter_queries_synchro_1.Full_Names_Update)();
+                                    //await Full_Names_Update();                                
                                 }
                                 catch (error) {
                                     console.log('ERRO AL ACTUALIZAR FACTURA :: ', error);
@@ -95,6 +100,11 @@ function UpdateOrNone_Pedido(pedido_) {
         ||  EEROR AL MOMENTO DE SINCRONIZAR : ${err}
         ||--------------------------------------------------------------------------||`);
         }
+        finally {
+            console.log(`||--------------------------------------------------------------------------------------------------------------------||`);
+            console.log(`||                                                 SINCRONIZACION FINALIZADA                                          ||`);
+            console.log(`||--------------------------------------------------------------------------------------------------------------------||`);
+        }
     });
 }
 function validinert(pedido) {
@@ -107,7 +117,9 @@ function validinert(pedido) {
             if (pedido) {
                 const pedidoExist = yield localDB_config_1.default.query((0, simple_queries_synchro_1.val_if_pedido_venta)(), [pedido.pedido.PedidoVenta]);
                 if (pedidoExist.rows.length > 0) {
+                    //console.log('||     SE ESTA REVISANDO PEDIDO : ', pedido.pedido.PedidoVenta );
                     const pedidoventa_id = pedidoExist.rows[0].pedidoventa_id;
+                    console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO');
                     if (typeof pedidoventa_id === 'number') {
                         // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
                         yield UpdateOrNone_Pedido(pedido);
@@ -119,6 +131,8 @@ function validinert(pedido) {
                             if (idPDV) {
                                 // PRINT OF THE CONSOLE
                                 console.log(`
+||--------------------------------------------------------------------------------------------------------------------||
+||                                          A NORMAL INSERTION                                                        ||                                 
 ||--------------------------------------------------------------------------------------------------------------------||
 ||  PEDIDO : ${pedido.pedido.PedidoVenta} 
 ||  CLIENTE : ${pedido.pedido.NombreCliente}
@@ -174,7 +188,13 @@ function validinert(pedido) {
 function syncroData_AX_() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            console.log(`
+||--------------------------------------------------------------------------------------------------------------------||
+||                                          **** ACTUALIZANDO NOMBRES ***                                             ||
+||--------------------------------------------------------------------------------------------------------------------||`);
+            yield (0, alter_queries_synchro_1.Full_Names_Update)();
             const data = yield (0, preload_data_ax_1.Preloaded_pedido_AX)();
+            //console.log(data);
             if (data !== false) {
                 console.log(`
 ||--------------------------------------------------------------------------------------------------------------------||
@@ -192,6 +212,10 @@ function syncroData_AX_() {
         }
         catch (err) {
             console.log('||         ERROR AL EJECUTAR LA SINCRONIZACION : ', err);
+        }
+        finally {
+            console.log(`
+**********************************************************************************************************************`);
         }
     });
 }

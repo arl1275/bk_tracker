@@ -39,17 +39,20 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
     //----------------------------------------------------------------------------------------------------------------------------------//
     try {
         type PedidoExistResult = QueryResult<{ pedidoventa_id: number | null; }>;
-
+        // THI PART LOOK FOR THE PEDIDO IN SPECIFIC, CASE IT DOES NOT EXIST WILL RETURN NULL OR NUMBER WHEATHER EXIST
         const idPDV: PedidoExistResult = await connDB.query(val_if_pedido_venta(), [pedido_.pedido.PedidoVenta]);
 
         if (idPDV.rows.length > 0) {
 
             const pedidoventa_id: number | null = idPDV.rows[0].pedidoventa_id;
+            console.log(`
+||--------------------------------------------------------------------------------------------------------------------||
+||    ACTUALIZANDO UN PEDIDO DE VENTA : ${pedido_.pedido.PedidoVenta}`)
 
             if (typeof pedidoventa_id === 'number') {
 
                 for (let i = 0; pedido_.data.length > i; i++) {
-
+                    // THIS PART WILL LOOK FOR ALL THE FACTURAS OF THAT PEDIDOVENTAS
                     const detalleFacturas: detFact = pedido_.data[i];
                     const existFact = await connDB.query(val_if_fact_exist(), [detalleFacturas._factura_.Factura, pedido_.pedido.PedidoVenta]);
                     const existFact_id: number | null = existFact.rows[0].factura_id;
@@ -90,7 +93,7 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
                             // THI IS IN THE FACTURAS TABLE, NOT IN THE ALBARAN TABLE
                             //---------------------------------------------------------------------------------------------------------------//
                             try {
-                                await Full_Names_Update();                                
+                                //await Full_Names_Update();                                
                             } catch (error) {
                                 console.log('ERRO AL ACTUALIZAR FACTURA :: ', error);
                             }
@@ -114,6 +117,10 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
         ||--------------------------------------------------------------------------||
         ||  EEROR AL MOMENTO DE SINCRONIZAR : ${err}
         ||--------------------------------------------------------------------------||`);
+    } finally {
+        console.log(`||--------------------------------------------------------------------------------------------------------------------||`);
+        console.log(`||                                                 SINCRONIZACION FINALIZADA                                          ||`);
+        console.log(`||--------------------------------------------------------------------------------------------------------------------||`);
     }
 }
 
@@ -132,8 +139,9 @@ async function validinert(pedido: sincroObject) {
             const pedidoExist: PedidoExistResult = await connDB.query(val_if_pedido_venta(), [pedido.pedido.PedidoVenta]);
 
             if (pedidoExist.rows.length > 0) {
-
+                //console.log('||     SE ESTA REVISANDO PEDIDO : ', pedido.pedido.PedidoVenta );
                 const pedidoventa_id: number | null = pedidoExist.rows[0].pedidoventa_id;
+                console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO');
 
                 if (typeof pedidoventa_id === 'number') {
 
@@ -148,6 +156,8 @@ async function validinert(pedido: sincroObject) {
                         if (idPDV) {
                             // PRINT OF THE CONSOLE
                             console.log(`
+||--------------------------------------------------------------------------------------------------------------------||
+||                                          A NORMAL INSERTION                                                        ||                                 
 ||--------------------------------------------------------------------------------------------------------------------||
 ||  PEDIDO : ${pedido.pedido.PedidoVenta} 
 ||  CLIENTE : ${pedido.pedido.NombreCliente}
@@ -210,16 +220,22 @@ async function validinert(pedido: sincroObject) {
 
 export async function syncroData_AX_() {
     try {
+        console.log(`
+||--------------------------------------------------------------------------------------------------------------------||
+||                                          **** ACTUALIZANDO NOMBRES ***                                             ||
+||--------------------------------------------------------------------------------------------------------------------||`);
+        await Full_Names_Update();
         const data: false | sincroObject[] = await Preloaded_pedido_AX();
+        //console.log(data);
         if (data !== false) {
             console.log(`
 ||--------------------------------------------------------------------------------------------------------------------||
 ||                                  **** SE OBTUVO EL PRECARGADO (SIN ERRORES) ****                                   ||
 ||--------------------------------------------------------------------------------------------------------------------||`);
             if (data.length > 0) {
-                 for (let i = 0; data.length > i; i++) {
-                     await validinert(data[i]);
-                 }
+                for (let i = 0; data.length > i; i++) {
+                    await validinert(data[i]);
+                }
             }
         } else {
             console.log('||         ERROR AL OBTENER EL PRECARGADAO')
@@ -227,5 +243,8 @@ export async function syncroData_AX_() {
 
     } catch (err) {
         console.log('||         ERROR AL EJECUTAR LA SINCRONIZACION : ', err);
+    } finally {
+        console.log(`
+**********************************************************************************************************************`)
     }
 }
