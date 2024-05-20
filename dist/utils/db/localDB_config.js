@@ -33,7 +33,7 @@ const connDB = new pg_1.Pool({
     host: process.env.DBhost,
     database: process.env.DBdatabase,
     password: process.env.DBpassword,
-    port: 5432, // Default PostgreSQL port
+    port: 8080, // Default PostgreSQL port
 });
 connDB.query('SELECT NOW()', (err, res) => {
     if (err) {

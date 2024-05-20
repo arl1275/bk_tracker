@@ -203,20 +203,30 @@ export let change_sincronizado_service = async (req: Request, res: Response) => 
     }
 }
 
-// EN USO
-export let get_cajas_one_fact = async (req: Request, res: Response) => {
+// ROUTE OBTAINS THE CAJAS IN BOXCHECKER TO GUARDIA
+export let get_cajas_one_fact_Guardia = async (req: Request, res: Response) => {
     try {
         const { factura } = req.query;
-        const query = 'SELECT * FROM get_boxes_oneFact($1);'
-        connDB.query(query, [factura], (err, result) => {
-            if (err) {
-                console.log('NO SE PUEDIERON OBTENER LAS CAJAS : ', err);
-                res.status(500).json({ message: ' NO SE PUDO OBTENER LAs CAJAS' })
-            } else {
-                console.log('SE PUEDIERON OBTENER LAS CAJAS');
-                res.status(200).json({ data: result.rows })
-            }
-        })
+        //console.log(req.query, factura, typeof factura);
+        let id : number;
+        typeof factura === 'string' ? id = parseInt(factura) : id = 0;
+
+        const query = 'SELECT * FROM get_boxes_oneFact_Guardia($1);';
+
+        if(id == 0){
+            console.log('|| ERROR : NO SE PUDO PROCESAR NO ES UN ID');
+            res.status(500).json({ mesagge : 'NO SE PUDO PROCESAR ESTA FACTURA'})
+        }else{
+            connDB.query(query, [id], (err, result) => {
+                if (err) {
+                    console.log('NO SE PUEDIERON OBTENER LAS CAJAS : ', err);
+                    res.status(500).json({ message: ' NO SE PUDO OBTENER LAs CAJAS' })
+                } else {
+                    console.log('SE PUEDIERON OBTENER LAS CAJAS');
+                    res.status(200).json({ data: result.rows })
+                }
+            })
+        }
 
     } catch (err) {
         console.log('NO SE PUDO OBTENER LA RUTA DE CAJAS');
@@ -311,7 +321,7 @@ export let getHistoFact_service = async (req: Request, res: Response) => {
 }
 
 // en uso
-export let getCajasOneFact_service = async (req: Request, res: Response) => {
+export let getCajasOneFact_service_Entregador= async (req: Request, res: Response) => {
     try {
         interface CajaProps {
             id_fact: number;
@@ -320,13 +330,12 @@ export let getCajasOneFact_service = async (req: Request, res: Response) => {
             caja: string;
             cantidad: number;
         }
-        console.log(' data :: ', req.body);
-        const data = req.body; // Accede al cuerpo de la solicitud
-
+        //console.log(' data :: ', req.body);
+        const data = req.body;
         let error = false;
         let cajas_arr: CajaProps[] = [];
         const query = 'SELECT * FROM get_cajas_of_fact($1, $2);';
-        console.log('data from APP :: ', data);
+        //console.log('data from APP :: ', data);
 
         if (Array.isArray(data)) {
             await Promise.all(

@@ -14,7 +14,7 @@ import routerDec_env from './routes/declaracion_env.routes';
 const express = require("express");
 const app = express();
 
-syncroData_AX()
+//syncroData_AX()
 
 app.use(cors());
 app.use(bodyParser.json({limit : '50mb'})); 

@@ -1,5 +1,3 @@
-
-import { Full_Names_Update } from './alter_queries_synchro';
 import { syncroData_AX_ } from './alter_synchro';
 import * as cron from 'node-cron';
 

@@ -10,7 +10,7 @@ routerFacturas.get('/get_all_actives', facturas_controller_1.get_all_facturas_ac
 // get all facturas 
 routerFacturas.get('/getallfacts', facturas_controller_1.get_all_facturas_);
 // get the cajas of one factura
-routerFacturas.get('/getCajas', facturas_controller_1.get_cajas_controller);
+routerFacturas.get('/getCajas_Guardia', facturas_controller_1.get_cajas_controller_Guardia);
 //change factura to transito
 routerFacturas.put('/toTransito', facturas_controller_1.toTransito_controller);
 // to get facturas in transito
@@ -21,7 +21,7 @@ routerFacturas.get('/getFactActives', facturas_controller_1.get_all_facturas_act
 routerFacturas.get('/getHistoFact', facturas_controller_1.getHistoFact_controller);
 routerFacturas.get('/adminFact', facturas_controller_1.getAdminFacts_controller);
 // para sincronizar cajas en la app
-routerFacturas.post('/app/getCajasOneFact', facturas_controller_1.getCajasFAct_controller); // /facturas/app/getCAjasOneFact
+routerFacturas.post('/app/getCajasOneFact_Entregador', facturas_controller_1.getCajasFAct_controller_Entregador); // /facturas/app/getCAjasOneFact  para entregador
 routerFacturas.get('/toNullState', facturas_controller_1.toNullState_controller);
 //------------------------------------------------- THIS IS A ADMINISTRATOR ROUTE -------------------------------------------------//
 routerFacturas.post('/admin/forceSyncroFact', facturas_controller_1.forceFactura_controller); // this route is to force the incronization of one factura

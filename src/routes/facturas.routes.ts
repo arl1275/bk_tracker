@@ -4,12 +4,12 @@ import {
         get_all_facturas_controller,
         get_all_facturas_actives,
         get_all_facturas_,
-        get_cajas_controller,
+        get_cajas_controller_Guardia,
         toTransito_controller,
         getTransFact_controller,
         postFotos_controller,
         getHistoFact_controller,
-        getCajasFAct_controller,
+        getCajasFAct_controller_Entregador,
         getAdminFacts_controller,
         toNullState_controller,
         forceFactura_controller
@@ -27,7 +27,7 @@ routerFacturas.get('/get_all_actives', get_all_facturas_actives);
 routerFacturas.get('/getallfacts', get_all_facturas_);
 
 // get the cajas of one factura
-routerFacturas.get('/getCajas', get_cajas_controller);
+routerFacturas.get('/getCajas_Guardia', get_cajas_controller_Guardia);
 
 //change factura to transito
 routerFacturas.put('/toTransito', toTransito_controller);
@@ -45,7 +45,7 @@ routerFacturas.get('/getHistoFact', getHistoFact_controller);
 routerFacturas.get('/adminFact', getAdminFacts_controller);
 
 // para sincronizar cajas en la app
-routerFacturas.post('/app/getCajasOneFact', getCajasFAct_controller); // /facturas/app/getCAjasOneFact
+routerFacturas.post('/app/getCajasOneFact_Entregador', getCajasFAct_controller_Entregador); // /facturas/app/getCAjasOneFact  para entregador
 
 routerFacturas.get('/toNullState', toNullState_controller);
 

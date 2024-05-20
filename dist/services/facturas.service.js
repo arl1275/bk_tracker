@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
+exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service_Entregador = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact_Guardia = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
@@ -210,28 +210,37 @@ let change_sincronizado_service = (req, res) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.change_sincronizado_service = change_sincronizado_service;
-// EN USO
-let get_cajas_one_fact = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// ROUTE OBTAINS THE CAJAS IN BOXCHECKER TO GUARDIA
+let get_cajas_one_fact_Guardia = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { factura } = req.query;
-        const query = 'SELECT * FROM get_boxes_oneFact($1);';
-        localDB_config_1.default.query(query, [factura], (err, result) => {
-            if (err) {
-                console.log('NO SE PUEDIERON OBTENER LAS CAJAS : ', err);
-                res.status(500).json({ message: ' NO SE PUDO OBTENER LAs CAJAS' });
-            }
-            else {
-                console.log('SE PUEDIERON OBTENER LAS CAJAS');
-                res.status(200).json({ data: result.rows });
-            }
-        });
+        //console.log(req.query, factura, typeof factura);
+        let id;
+        typeof factura === 'string' ? id = parseInt(factura) : id = 0;
+        const query = 'SELECT * FROM get_boxes_oneFact_Guardia($1);';
+        if (id == 0) {
+            console.log('|| ERROR : NO SE PUDO PROCESAR NO ES UN ID');
+            res.status(500).json({ mesagge: 'NO SE PUDO PROCESAR ESTA FACTURA' });
+        }
+        else {
+            localDB_config_1.default.query(query, [id], (err, result) => {
+                if (err) {
+                    console.log('NO SE PUEDIERON OBTENER LAS CAJAS : ', err);
+                    res.status(500).json({ message: ' NO SE PUDO OBTENER LAs CAJAS' });
+                }
+                else {
+                    console.log('SE PUEDIERON OBTENER LAS CAJAS');
+                    res.status(200).json({ data: result.rows });
+                }
+            });
+        }
     }
     catch (err) {
         console.log('NO SE PUDO OBTENER LA RUTA DE CAJAS');
         res.status(500).json({ message: ' NO SE PUDO OBTENER LA RUTA DE CAJAS' });
     }
 });
-exports.get_cajas_one_fact = get_cajas_one_fact;
+exports.get_cajas_one_fact_Guardia = get_cajas_one_fact_Guardia;
 // en uso
 let get_facturas_en_transito = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -322,14 +331,14 @@ let getHistoFact_service = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.getHistoFact_service = getHistoFact_service;
 // en uso
-let getCajasOneFact_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+let getCajasOneFact_service_Entregador = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(' data :: ', req.body);
-        const data = req.body; // Accede al cuerpo de la solicitud
+        //console.log(' data :: ', req.body);
+        const data = req.body;
         let error = false;
         let cajas_arr = [];
         const query = 'SELECT * FROM get_cajas_of_fact($1, $2);';
-        console.log('data from APP :: ', data);
+        //console.log('data from APP :: ', data);
         if (Array.isArray(data)) {
             yield Promise.all(data.map((element) => __awaiter(void 0, void 0, void 0, function* () {
                 let id_ = parseInt(element.id_fact);
@@ -372,7 +381,7 @@ let getCajasOneFact_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
         res.status(500).json({ message: 'Error interno del servidor' });
     }
 });
-exports.getCajasOneFact_service = getCajasOneFact_service;
+exports.getCajasOneFact_service_Entregador = getCajasOneFact_service_Entregador;
 // en uso
 let getAdminFacts_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -11,7 +11,7 @@ const utils_1 = require("../../handle_passwords/utils");
 const clients_1 = require("../../special_clients/clients");
 const paisFilter = 'Honduras'; // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula'; // valor para setear las ubicaciones
-const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(10); // valor para captar las facturas mas antiguas
+const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(3); // valor para captar las facturas mas antiguas
 //---------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
