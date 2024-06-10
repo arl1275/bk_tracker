@@ -26,6 +26,7 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
         // this part if to update the declaraciones de envio
         const query_update_decenv = 'SELECT * FROM automatic_close_decenv();';
         yield localDB_config_1.default.query(query_update_decenv);
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------//
         let preloadData = []; // this is to save all the details of all pedidos de venta
         let pdventas_ = []; // this is to save the details of all pedidos de venta
         pdventas_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_pedidoventas)());

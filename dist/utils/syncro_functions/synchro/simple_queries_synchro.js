@@ -11,7 +11,7 @@ const utils_1 = require("../../handle_passwords/utils");
 const clients_1 = require("../../special_clients/clients");
 const paisFilter = 'Honduras'; // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula'; // valor para setear las ubicaciones
-const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(3); // valor para captar las facturas mas antiguas
+const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(15); // valor para captar las facturas mas antiguas
 //---------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
@@ -60,7 +60,7 @@ exports.query_get_pedidoventas = query_get_pedidoventas;
 const query_get_facts_of_a_pedidoVenta = (pedido) => {
     return `SELECT
   CASE
-      WHEN (Factura != '') AND AlbaranCount = 1 THEN Factura
+      WHEN (Factura != '' ) AND AlbaranCount = 1 THEN Factura
       WHEN (Factura IS NULL or Factura = '') AND AlbaranCount = 1 THEN Albaran
       WHEN (Factura != '') AND AlbaranCount > 1 THEN CONCAT(Factura, ', ', Albaran)
       WHEN (Factura = '') AND AlbaranCount > 1 THEN Albaran

@@ -431,14 +431,14 @@ exports.change_state_to_null = change_state_to_null;
 //---------------------------- THIS IS AN ADMIN FUNCTION SERVICE ------------------------------------//
 let forceFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { caja, tipo } = req.query;
-        console.log('resultado ', caja, tipo);
-        if (typeof caja === 'string' && typeof tipo === 'string') {
-            const tipo_ = parseInt(tipo);
-            const result = yield (0, force_syncro_1.ForceSynchro)(caja, tipo_);
+        const { factura } = req.query;
+        if (typeof factura === 'string') {
+            const fact = factura.toString();
+            console.log('|| FORZANDO :: ', fact);
+            const result = yield (0, force_syncro_1.ForceSynchro)(fact);
             if (Array.isArray(result) && result.length === 2) {
                 const [success, data] = result;
-                if (success === true) {
+                if (success != null) {
                     res.status(200).json({ message: data.message });
                 }
                 else {

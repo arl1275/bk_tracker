@@ -8,19 +8,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FORCE_insert_process_of_synchro = void 0;
 const ax_config_1 = require("../../db/ax_config");
 const force_syncro_queries_1 = require("./force_syncro_queries");
 const syncro_functions_1 = require("../synchro/syncro_functions");
-const FORCE_insert_process_of_synchro = (caja, tipo) => __awaiter(void 0, void 0, void 0, function* () {
+const localDB_config_1 = __importDefault(require("../../db/localDB_config"));
+const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         //------------------------------------------------------------------------------------------------------------//
         //                              THIS PART OBTAIN THE PEDIDOS FROM AX
         //------------------------------------------------------------------------------------------------------------//
+        const tipo = 1;
         // Obtienen todos los pedidos de venta de este día (hoy)
-        const pedido_brute = yield (0, ax_config_1.executeQuery)(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE Caja = '${caja}';`);
+        const result = yield localDB_config_1.default.query('SELECT factura FROM facturas WHERE factura = $1', [factura]);
+        if (result.rows.length > 0) {
+            return [false, { message: 'Esta FACTURA o ALBARAN ya existe en el sistema.' }];
+        }
+        let pedido_brute;
+        if (factura.startsWith('AL-')) {
+            pedido_brute = yield (0, ax_config_1.executeQuery)(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE albaran = '${factura}';`);
+        }
+        else {
+            pedido_brute = yield (0, ax_config_1.executeQuery)(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE factura = '${factura}';`);
+        }
+        //  IF THE FACTURA DOES NOT EXIST, THEN THE SYSTEM MAKES THE OBJECT OF PEDIDO
         const pedidoventas_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_pedidoventas_F)(pedido_brute[0].pedidoventa));
         if (pedidoventas_.length = 1) {
             for (let i = 0; i < pedidoventas_.length; i++) {
@@ -43,6 +59,8 @@ const FORCE_insert_process_of_synchro = (caja, tipo) => __awaiter(void 0, void 0
                         if (tipo == 1) {
                             console.log('||         INGRESO A INSERCION POR FACTURA : ', pedido_brute[0].factura === '' ? pedido_brute[0].albaran : pedido_brute[0].factura);
                             if (pedido_brute[0].factura === '' && pedido_brute[0].albaran != '') {
+                                // THIS PART IS TO SYNCHRO ALBARAN
+                                // this part, is when from front-end comes an albaran
                                 const AlbAsFact = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_albaran_of_albaran_inserted_as_factura_F)(pedido_brute[0].albaran, pedido.PedidoVenta));
                                 if (AlbAsFact.length > 0) {
                                     const factu = (_a = AlbAsFact[0]) === null || _a === void 0 ? void 0 : _a.Albaran;
@@ -77,6 +95,8 @@ const FORCE_insert_process_of_synchro = (caja, tipo) => __awaiter(void 0, void 0
                                 }
                             }
                             else {
+                                // THIS PART OF THE CODE IS TO SYNCRO FACTURA
+                                // this part, syncro when the value from Front-end is a factura.
                                 let fact = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F)(pedido.PedidoVenta, pedido_brute[0].factura));
                                 if (fact) {
                                     const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact[0], id_pedido);
@@ -106,6 +126,8 @@ const FORCE_insert_process_of_synchro = (caja, tipo) => __awaiter(void 0, void 0
                             }
                         }
                         // THIS PART IS TO SYNCRO ALL THE PEDIDOVENTA
+                        // at the moment of this comment (2024-02-16 ; year-month-day), this part of the code is disable
+                        // the developer chose not to delete it, because in the future this could be usefull in a hard moment
                         else if (tipo == 0) {
                             console.log('||         INGRESO A INSERCION DE PEDIDO COMPLETO : ', pedido.PedidoVenta);
                             const facturas_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_facts_of_a_pedidoVenta_F)(pedido.PedidoVenta));
@@ -182,7 +204,7 @@ const FORCE_insert_process_of_synchro = (caja, tipo) => __awaiter(void 0, void 0
         }
         else {
             console.log('||  PEDIDO DE VENTA TIENE MAS DE UNA COINCIDENCIA O NO EXISTE EN AX');
-            return [false, { message: 'PEDIDO DE VENTA TIENEN MAS DE UNA COINCIDENCIA EN AX' }];
+            return [false, { message: 'ESTA FACTURA NO TIENE MAS REFERENCIAS DE PEDIDO EN AX, NO SE PUEDE FORZAR ESTA FACTURA' }];
         }
     }
     catch (err) {

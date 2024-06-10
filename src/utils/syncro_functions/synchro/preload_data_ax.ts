@@ -27,7 +27,7 @@ export const Preloaded_pedido_AX = async () => {
         // this part if to update the declaraciones de envio
         const query_update_decenv = 'SELECT * FROM automatic_close_decenv();';
         await connDB.query(query_update_decenv);
-
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------//
 
         let preloadData: sincroObject[] = [];                               // this is to save all the details of all pedidos de venta
         let pdventas_: pedidoventa[] = [];                                  // this is to save the details of all pedidos de venta

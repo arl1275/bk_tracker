@@ -429,16 +429,15 @@ export let change_state_to_null = async (req: Request, res: Response) => {
 
 export let forceFactura_service = async (req: Request, res: Response) => {
     try {
-        const { caja, tipo } = req.query;
-        console.log('resultado ', caja, tipo);
-        if(typeof caja === 'string' && typeof tipo === 'string' ){
-            const tipo_ : number = parseInt(tipo);
-            const result = await ForceSynchro(caja, tipo_);
-            
+        const { factura } = req.query;
+        if(typeof factura === 'string' ){
+            const fact : string = factura.toString();
+            console.log('|| FORZANDO :: ', fact );
+            const result = await ForceSynchro( fact );
+
             if (Array.isArray(result) && result.length === 2) {
                 const [success, data] = result;
-
-                if (success === true) {
+                if (success != null) {
                     res.status(200).json({ message: data.message });
                 } else {
                     res.status(500).json({ message: data.message });

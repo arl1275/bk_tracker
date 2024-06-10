@@ -1,4 +1,5 @@
 import { executeQuery } from '../../db/ax_config';
+import { val_if_fact_exist } from '../synchro/simple_queries_synchro';
 import {
     pedidoventa,
     factura,
@@ -22,17 +23,30 @@ import {
 import connDB from '../../db/localDB_config';
 
 
-export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number) => {
+export const FORCE_insert_process_of_synchro = async (factura: string) => {
 
     try {
         //------------------------------------------------------------------------------------------------------------//
         //                              THIS PART OBTAIN THE PEDIDOS FROM AX
         //------------------------------------------------------------------------------------------------------------//
-
+        const tipo = 1;
         // Obtienen todos los pedidos de venta de este día (hoy)
+        const result = await connDB.query('SELECT factura FROM facturas WHERE factura = $1', [factura]);
 
-        const pedido_brute: any = await executeQuery(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE Caja = '${caja}';`);
-        
+        if (result.rows.length > 0) { 
+            return [false, { message: 'Esta FACTURA o ALBARAN ya existe en el sistema.' }];
+        }
+
+
+        let pedido_brute: any;
+
+        if (factura.startsWith('AL-')) {
+            pedido_brute = await executeQuery(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE albaran = '${factura}';`);
+        }else{
+            pedido_brute = await executeQuery(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE factura = '${factura}';`);   
+        }
+
+        //  IF THE FACTURA DOES NOT EXIST, THEN THE SYSTEM MAKES THE OBJECT OF PEDIDO
         const pedidoventas_: pedidoventa[] = await executeQuery(query_get_pedidoventas_F(pedido_brute[0].pedidoventa));
 
         if (pedidoventas_.length = 1) {
@@ -59,8 +73,9 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
                             console.log('||         INGRESO A INSERCION POR FACTURA : ', pedido_brute[0].factura === '' ? pedido_brute[0].albaran : pedido_brute[0].factura);
 
                             if (pedido_brute[0].factura === '' && pedido_brute[0].albaran != '') {
+                                // THIS PART IS TO SYNCHRO ALBARAN
+                                // this part, is when from front-end comes an albaran
                                 const AlbAsFact: any = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura_F(pedido_brute[0].albaran, pedido.PedidoVenta));
-
                                 if (AlbAsFact.length > 0) {
                                     const factu = AlbAsFact[0]?.Albaran
                                     console.log(' DATA DE LA FACTURA :: ', factu)
@@ -71,14 +86,14 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
                                         const id_albaran = await insert_albaran_(_albaran, id_factura);
                                         if (id_albaran) {
                                             const cajas_: caja[] = await executeQuery(query_get_boxes_of_an_albaran_F(_albaran.Albaran, pedido.PedidoVenta));    // get all the cajas of one albaran
-                                            
+
                                             for (let l = 0; l < cajas_.length; l++) {
                                                 const _caja = cajas_[l];
                                                 await insert_boxes_(_caja, id_albaran);
                                                 console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                             }
                                             console.log('||     FORZADO SINCRONIZADO FINALIZADO SIN PROBLEMAS');
-                                            return [true, { message : `SINCRONIZADO SIN PROBLEMAS COMO ALBARAN : ${pedido_brute[0].albaran}`}]
+                                            return [true, { message: `SINCRONIZADO SIN PROBLEMAS COMO ALBARAN : ${pedido_brute[0].albaran}` }]
                                         } else {
                                             console.log('||     NO SE PUDO INGRESAR EL ALBARAN ');
                                             return [false, { message: 'NO SE PUDO INGRESAR EL ALBARAN' }];
@@ -94,6 +109,8 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
                                 }
 
                             } else {
+                                // THIS PART OF THE CODE IS TO SYNCRO FACTURA
+                                // this part, syncro when the value from Front-end is a factura.
                                 let fact: factura[] = await executeQuery(query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F(pedido.PedidoVenta, pedido_brute[0].factura));
                                 if (fact) {
                                     const id_factura = await insert_factura_(fact[0], id_pedido);
@@ -112,7 +129,7 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
                                                     await insert_boxes_(_caja, id_albaran);
                                                     console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                                 }
-                                                return [true, { message : `SE SINCRONIZO LA FACTURA : ${pedido_brute[0].factura}`}]
+                                                return [true, { message: `SE SINCRONIZO LA FACTURA : ${pedido_brute[0].factura}` }]
                                             }
                                         }
 
@@ -125,19 +142,21 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
                             }
                         }
                         // THIS PART IS TO SYNCRO ALL THE PEDIDOVENTA
+                        // at the moment of this comment (2024-02-16 ; year-month-day), this part of the code is disable
+                        // the developer chose not to delete it, because in the future this could be usefull in a hard moment
                         else if (tipo == 0) {
                             console.log('||         INGRESO A INSERCION DE PEDIDO COMPLETO : ', pedido.PedidoVenta);
                             const facturas_: factura[] = await executeQuery(query_get_facts_of_a_pedidoVenta_F(pedido.PedidoVenta));
                             //console.log('DATA DE FACTURAS : ', facturas_);
 
-                            if(facturas_ ){
+                            if (facturas_) {
 
                                 for (let j = 0; facturas_.length > j; j++) {
-                                    const fact : factura = facturas_[j];
+                                    const fact: factura = facturas_[j];
 
                                     if (fact) {
                                         const id_factura = await insert_factura_(fact, id_pedido);                                                  // insert the factura and return the id
-    
+
                                         if (id_factura) {
                                             let albaran_: albaran[];
                                             if (fact.Factura.startsWith('AL')) { // if an albaran was inserted as factura, the get the albaran of that albaran
@@ -148,11 +167,11 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
                                                 albaran_ = await executeQuery(query_get_albarans_of_a_factura_F(fact.Factura));                       // gets all the albaranes of one factura
                                             }
                                             //----------------------------------------------------------------------------------------------------//
-    
+
                                             for (let k = 0; k < albaran_.length; k++) {
                                                 const _albaran = albaran_[k];
                                                 const id_albaran = await insert_albaran_(_albaran, id_factura);                                     // insert albaran and return id
-    
+
                                                 //------------------------------------------------------------------------------------------------------------//
                                                 //                       THIS PART OBTAIN THE SPECIFIC CAJAS OF THE FACTURA                                   //
                                                 //------------------------------------------------------------------------------------------------------------//
@@ -165,28 +184,28 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
                                                         console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                                     }
 
-                                                    if( j === facturas_.length - 1 ){
-                                                        return [true, { message : 'SE SINCRONIZO TODO EL PEDIDO.'}];
+                                                    if (j === facturas_.length - 1) {
+                                                        return [true, { message: 'SE SINCRONIZO TODO EL PEDIDO.' }];
                                                     }
-                                                    
+
                                                 }
                                             }
-                                        }else{
+                                        } else {
                                             console.log('|| ERROR FACTURA MAL INSERTADA');
-                                            return [false, { message : 'Factura mal insertada'}];
+                                            return [false, { message: 'Factura mal insertada' }];
                                         }
-    
+
                                     } else {
                                         console.log('||  ERROR : FACTURA TIENEN CAMPO VACIO');
-                                        return [false, {message : 'FACTURA VACIA'}];
+                                        return [false, { message: 'FACTURA VACIA' }];
                                     }
                                 }
 
-                            }else{
+                            } else {
                                 console.log('||     SIN FACTURAS ENCONTRADAS');
-                                return [false, { message : 'NO SE ENCONTRO FACTURAS DE DICHO PEDIDO'}]
+                                return [false, { message: 'NO SE ENCONTRO FACTURAS DE DICHO PEDIDO' }]
                             }
-                            
+
                             console.log('||------------------------------------------------------------------------------------------------------------||')
                         } else {
                             console.log('||     ESTO NO DEBE PASAR EN EL FORZADO DE SINCRONIZACION');
@@ -207,7 +226,7 @@ export const FORCE_insert_process_of_synchro = async (caja: string, tipo: number
             console.log('||------------------------------------------------------------------------------------------------------------||')
         } else {
             console.log('||  PEDIDO DE VENTA TIENE MAS DE UNA COINCIDENCIA O NO EXISTE EN AX');
-            return [false, { message: 'PEDIDO DE VENTA TIENEN MAS DE UNA COINCIDENCIA EN AX' }];
+            return [false, { message: 'ESTA FACTURA NO TIENE MAS REFERENCIAS DE PEDIDO EN AX, NO SE PUEDE FORZAR ESTA FACTURA' }];
         }
     } catch (err) {
         console.log('||     ERROR DURANTE LA SINCRONIZACIÓN FORZADA : ', err);
