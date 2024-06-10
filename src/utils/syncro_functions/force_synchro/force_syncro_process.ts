@@ -48,6 +48,7 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
 
         //  IF THE FACTURA DOES NOT EXIST, THEN THE SYSTEM MAKES THE OBJECT OF PEDIDO
         const pedidoventas_: pedidoventa[] = await executeQuery(query_get_pedidoventas_F(pedido_brute[0].pedidoventa));
+        console.log('valores ingresados en Pedido_Brute :: ', pedido_brute)
 
         if (pedidoventas_.length = 1) {
             for (let i = 0; i < pedidoventas_.length; i++) {
@@ -75,9 +76,10 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
                             if (pedido_brute[0].factura === '' && pedido_brute[0].albaran != '') {
                                 // THIS PART IS TO SYNCHRO ALBARAN
                                 // this part, is when from front-end comes an albaran
+                                console.log('|| data insertada como albaran ::: ', pedido_brute[0].factura, pedido_brute[0].albaran)
                                 const AlbAsFact: any = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura_F(pedido_brute[0].albaran, pedido.PedidoVenta));
                                 if (AlbAsFact.length > 0) {
-                                    const factu = AlbAsFact[0]?.Albaran
+                                    let factu : factura = { Factura :  AlbAsFact[0]?.Albaran }
                                     console.log(' DATA DE LA FACTURA :: ', factu)
                                     const id_factura = await insert_factura_(factu, id_pedido);
 
