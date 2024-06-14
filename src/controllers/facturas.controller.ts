@@ -11,7 +11,9 @@ import {
     getCajasOneFact_service_Entregador,
     getAdminFacts_service,
     change_state_to_null,
-    forceFactura_service
+    forceFactura_service,
+    BlockFacturas_service,
+    unBlockFacturas_service
 } from "../services/facturas.service";
 
 
@@ -40,5 +42,11 @@ export const toNullState_controller = ( req : Request, res : Response ) => { cha
 //---------------------- ADMINI ROUTE -------------------//
 
 export const forceFactura_controller = ( req : Request, res : Response ) => { forceFactura_service( req, res )}
+
+export const blockFacturas_controller = ( req : Request, res : Response) => { BlockFacturas_service(req, res)}
+
+export const unblockFacturas_controller  = ( req : Request, res : Response) => { unBlockFacturas_service(req, res)}
+
+
 
 

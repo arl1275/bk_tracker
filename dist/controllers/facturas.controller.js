@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.forceFactura_controller = exports.toNullState_controller = exports.getAdminFacts_controller = exports.getCajasFAct_controller_Entregador = exports.getHistoFact_controller = exports.postFotos_controller = exports.getTransFact_controller = exports.toTransito_controller = exports.get_cajas_controller_Guardia = exports.get_all_facturas_ = exports.get_all_facturas_actives = exports.get_all_facturas_controller = void 0;
+exports.unblockFacturas_controller = exports.blockFacturas_controller = exports.forceFactura_controller = exports.toNullState_controller = exports.getAdminFacts_controller = exports.getCajasFAct_controller_Entregador = exports.getHistoFact_controller = exports.postFotos_controller = exports.getTransFact_controller = exports.toTransito_controller = exports.get_cajas_controller_Guardia = exports.get_all_facturas_ = exports.get_all_facturas_actives = exports.get_all_facturas_controller = void 0;
 const facturas_service_1 = require("../services/facturas.service");
 const get_all_facturas_controller = (req, res) => { (0, facturas_service_1.get_all_facturas_service)(req, res); };
 exports.get_all_facturas_controller = get_all_facturas_controller;
@@ -27,3 +27,7 @@ exports.toNullState_controller = toNullState_controller;
 //---------------------- ADMINI ROUTE -------------------//
 const forceFactura_controller = (req, res) => { (0, facturas_service_1.forceFactura_service)(req, res); };
 exports.forceFactura_controller = forceFactura_controller;
+const blockFacturas_controller = (req, res) => { (0, facturas_service_1.BlockFacturas_service)(req, res); };
+exports.blockFacturas_controller = blockFacturas_controller;
+const unblockFacturas_controller = (req, res) => { (0, facturas_service_1.unBlockFacturas_service)(req, res); };
+exports.unblockFacturas_controller = unblockFacturas_controller;

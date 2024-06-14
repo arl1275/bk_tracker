@@ -26,5 +26,7 @@ routerFacturas.get('/toNullState', facturas_controller_1.toNullState_controller)
 //------------------------------------------------- THIS IS A ADMINISTRATOR ROUTE -------------------------------------------------//
 routerFacturas.post('/admin/forceSyncroFact', facturas_controller_1.forceFactura_controller); // this route is to force the incronization of one factura
 //routerFacturas.get('/admin/force', forceFactura_controller);
-//---------------------------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------- THIS IS TO BLOCK FACTURAS  -------------------------------------------------//
+routerFacturas.post('/admin/blockFacturas', facturas_controller_1.blockFacturas_controller);
+routerFacturas.post('/admin/unblockFacturas', facturas_controller_1.unblockFacturas_controller);
 exports.default = routerFacturas;

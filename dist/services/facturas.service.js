@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service_Entregador = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact_Guardia = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
+exports.unBlockFacturas_service = exports.BlockFacturas_service = exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service_Entregador = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact_Guardia = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
@@ -459,3 +459,67 @@ let forceFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.forceFactura_service = forceFactura_service;
+let BlockFacturas_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { facturas_id } = req.body;
+        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+            const query = 'SELECT * FROM blockfactura($1)';
+            const validIDs = facturas_id.filter(id => parseInt(id) > 0);
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map((id) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield localDB_config_1.default.query(query, [id]);
+                }));
+                yield Promise.all(promises);
+                res.status(200).json({ message: 'SE BLOQUEARON LAS FACTURAS CORRECTAMENTE' });
+            }
+            catch (err) {
+                console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        }
+        else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    }
+    catch (error) {
+        console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR FACTURAS' });
+    }
+});
+exports.BlockFacturas_service = BlockFacturas_service;
+let unBlockFacturas_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { facturas_id } = req.body;
+        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+            const query = 'SELECT * FROM unblockfactura($1)';
+            const validIDs = facturas_id.filter(id => parseInt(id) > 0);
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map((id) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield localDB_config_1.default.query(query, [id]);
+                }));
+                yield Promise.all(promises);
+                res.status(200).json({ message: 'SE BLOQUEARON LAS FACTURAS CORRECTAMENTE' });
+            }
+            catch (err) {
+                console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        }
+        else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    }
+    catch (error) {
+        console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR FACTURAS' });
+    }
+});
+exports.unBlockFacturas_service = unBlockFacturas_service;

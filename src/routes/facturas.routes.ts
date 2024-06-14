@@ -12,7 +12,9 @@ import {
         getCajasFAct_controller_Entregador,
         getAdminFacts_controller,
         toNullState_controller,
-        forceFactura_controller
+        forceFactura_controller,
+        blockFacturas_controller,
+        unblockFacturas_controller
 } from "../controllers/facturas.controller";
 
 const routerFacturas = express.Router();
@@ -56,6 +58,10 @@ routerFacturas.post('/admin/forceSyncroFact', forceFactura_controller)         /
 
 //routerFacturas.get('/admin/force', forceFactura_controller);
 
-//---------------------------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------- THIS IS TO BLOCK FACTURAS  -------------------------------------------------//
+
+routerFacturas.post('/admin/blockFacturas', blockFacturas_controller);
+
+routerFacturas.post('/admin/unblockFacturas', unblockFacturas_controller)
 
 export default routerFacturas;

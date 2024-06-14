@@ -195,3 +195,72 @@ export const getDecEnv_appEncabezadoService = async (req : Request, res : Respon
         res.status(500).json({ message : 'error al procesar'})
     }
 }
+
+export let BlockDeclaraciones_service = async (req: Request, res: Response) => {
+    try {
+        const { declaraciones_id } = req.body;
+
+        if (Array.isArray(declaraciones_id) && declaraciones_id.length > 0) {
+            const query = 'SELECT * FROM blockdecenvio($1)';
+            const validIDs: number[] = declaraciones_id.filter(id => parseInt(id) > 0);
+
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map(async (id) => {
+                    await connDB.query(query, [id]);
+                });
+
+                await Promise.all(promises);
+
+                res.status(200).json({ message: 'SE BLOQUEARON LAS DECLARACIONES CORRECTAMENTE' });
+            } catch (err) {
+                console.error('|| ERROR AL BLOQUEAR DECLARACIONES :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        } else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    } catch (error) {
+        console.error('|| ERROR AL BLOQUEAR DECLARACIONES :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR DECLARACIONES' });
+    }
+};
+
+
+export let unBlockdeclaraciones_service = async (req: Request, res: Response) => {
+    try {
+        const { declaraciones_id } = req.body;
+
+        if (Array.isArray(declaraciones_id) && declaraciones_id.length > 0) {
+            const query = 'SELECT * FROM unblockdecenvio($1)';
+            const validIDs: number[] = declaraciones_id.filter(id => parseInt(id) > 0);
+
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map(async (id) => {
+                    await connDB.query(query, [id]);
+                });
+
+                await Promise.all(promises);
+
+                res.status(200).json({ message: 'SE BLOQUEARON LAS FACTURAS CORRECTAMENTE' });
+            } catch (err) {
+                console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        } else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    } catch (error) {
+        console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR FACTURAS' });
+    }
+};

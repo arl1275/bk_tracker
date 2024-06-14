@@ -62,11 +62,11 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
                             if (pedido_brute[0].factura === '' && pedido_brute[0].albaran != '') {
                                 // THIS PART IS TO SYNCHRO ALBARAN
                                 // this part, is when from front-end comes an albaran
-                                console.log('|| data insertada como albaran ::: ', pedido_brute[0].factura, pedido_brute[0].albaran);
+                                //console.log('|| data insertada como albaran ::: ', pedido_brute[0].factura, pedido_brute[0].albaran)
                                 const AlbAsFact = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_albaran_of_albaran_inserted_as_factura_F)(pedido_brute[0].albaran, pedido.PedidoVenta));
                                 if (AlbAsFact.length > 0) {
                                     let factu = { Factura: (_a = AlbAsFact[0]) === null || _a === void 0 ? void 0 : _a.Albaran };
-                                    console.log(' DATA DE LA FACTURA :: ', factu);
+                                    //console.log(' DATA DE LA FACTURA :: ', factu)
                                     const id_factura = yield (0, syncro_functions_1.insert_factura_)(factu, id_pedido);
                                     if (id_factura) {
                                         const _albaran = AlbAsFact[0];

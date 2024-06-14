@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDecEnv_appEncabezadoService = exports.putDecEnv_service = exports.getDecEnvios_service = exports.getFacts_one_dec = exports.putDecEnv_serive = exports.getDecEnv_serive = exports.postNewDecEnv_service = void 0;
+exports.unBlockdeclaraciones_service = exports.BlockDeclaraciones_service = exports.getDecEnv_appEncabezadoService = exports.putDecEnv_service = exports.getDecEnvios_service = exports.getFacts_one_dec = exports.putDecEnv_serive = exports.getDecEnv_serive = exports.postNewDecEnv_service = void 0;
 const works_querys_1 = require("../utils/queries/works_querys");
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -209,3 +209,67 @@ const getDecEnv_appEncabezadoService = (req, res) => __awaiter(void 0, void 0, v
     }
 });
 exports.getDecEnv_appEncabezadoService = getDecEnv_appEncabezadoService;
+let BlockDeclaraciones_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { declaraciones_id } = req.body;
+        if (Array.isArray(declaraciones_id) && declaraciones_id.length > 0) {
+            const query = 'SELECT * FROM blockdecenvio($1)';
+            const validIDs = declaraciones_id.filter(id => parseInt(id) > 0);
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map((id) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield localDB_config_1.default.query(query, [id]);
+                }));
+                yield Promise.all(promises);
+                res.status(200).json({ message: 'SE BLOQUEARON LAS DECLARACIONES CORRECTAMENTE' });
+            }
+            catch (err) {
+                console.error('|| ERROR AL BLOQUEAR DECLARACIONES :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        }
+        else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    }
+    catch (error) {
+        console.error('|| ERROR AL BLOQUEAR DECLARACIONES :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR DECLARACIONES' });
+    }
+});
+exports.BlockDeclaraciones_service = BlockDeclaraciones_service;
+let unBlockdeclaraciones_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { declaraciones_id } = req.body;
+        if (Array.isArray(declaraciones_id) && declaraciones_id.length > 0) {
+            const query = 'SELECT * FROM unblockdecenvio($1)';
+            const validIDs = declaraciones_id.filter(id => parseInt(id) > 0);
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map((id) => __awaiter(void 0, void 0, void 0, function* () {
+                    yield localDB_config_1.default.query(query, [id]);
+                }));
+                yield Promise.all(promises);
+                res.status(200).json({ message: 'SE BLOQUEARON LAS FACTURAS CORRECTAMENTE' });
+            }
+            catch (err) {
+                console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        }
+        else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    }
+    catch (error) {
+        console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR FACTURAS' });
+    }
+});
+exports.unBlockdeclaraciones_service = unBlockdeclaraciones_service;

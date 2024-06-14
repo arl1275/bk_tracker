@@ -7,7 +7,9 @@ import {
     getFactsDecEnv,
     putDecEnv_controller,
     getDecEnv_appService,
-    getDecEnv_appEncabezado
+    getDecEnv_appEncabezado,
+    UnblockDecEnv_controller,
+    BlockDecEnv_controller
 } from "../controllers/declaracion_env.controller";
 const routerDec_env = express.Router();
 
@@ -24,5 +26,11 @@ routerDec_env.put('/putDecEnv', putDecEnv_controller);
 routerDec_env.get('/app/getDec_env', getDecEnv_appService);
 
 routerDec_env.get('/app/getEncabezado', getDecEnv_appEncabezado);
+
+//----------------------- this is to block ------------------------//
+
+routerDec_env.post('/admin/blockDec', BlockDecEnv_controller );
+
+routerDec_env.post('/admin/UnblockDecs', UnblockDecEnv_controller);
 
 export default routerDec_env;

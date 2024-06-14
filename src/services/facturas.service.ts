@@ -136,10 +136,10 @@ export let change_transito_service = async (req: Request, res: Response) => {
     try {
         let data_to_mail: number[] = []; // Array para guardar las referencias de las facturas
         const data = req.body;
-        
+
         const query = 'SELECT * FROM change_state_to_entransito($1);'; // La variable $1 es la referencia de la factura
 
-        if(data.length > 0){
+        if (data.length > 0) {
             for (let i = 0; data.length > i; i++) {
                 const factura_ = parseInt(data[i]);
                 try {
@@ -147,18 +147,18 @@ export let change_transito_service = async (req: Request, res: Response) => {
                     await connDB.query(query, [factura_]);
                     console.log('tipo de id ::: ', typeof factura_);
                     data_to_mail.push(factura_);
-                    
+
                 } catch (err) {
                     console.log('NO SE PUDO ENVIAR A TRANSITO:', err);
                     res.status(500).json({ message: 'ERROR AL ENVIAR A TRANSITO' });
                     return; // Termina la ejecución de la función si hay un error
                 }
             }
-        }else{
+        } else {
             res.status(500).json({ message: 'ERROR AL ENVIAR A TRANSITO PORQUE NO LLEGO LA DATA PARA EMAIL' });
             return;
         }
-        
+
 
         console.log('DESDE LA RUTA:', data_to_mail);
         await sendEmail_transito(data_to_mail);
@@ -208,15 +208,15 @@ export let get_cajas_one_fact_Guardia = async (req: Request, res: Response) => {
     try {
         const { factura } = req.query;
         //console.log(req.query, factura, typeof factura);
-        let id : number;
+        let id: number;
         typeof factura === 'string' ? id = parseInt(factura) : id = 0;
 
         const query = 'SELECT * FROM get_boxes_oneFact_Guardia($1);';
 
-        if(id == 0){
+        if (id == 0) {
             console.log('|| ERROR : NO SE PUDO PROCESAR NO ES UN ID');
-            res.status(500).json({ mesagge : 'NO SE PUDO PROCESAR ESTA FACTURA'})
-        }else{
+            res.status(500).json({ mesagge: 'NO SE PUDO PROCESAR ESTA FACTURA' })
+        } else {
             connDB.query(query, [id], (err, result) => {
                 if (err) {
                     console.log('NO SE PUEDIERON OBTENER LAS CAJAS : ', err);
@@ -321,7 +321,7 @@ export let getHistoFact_service = async (req: Request, res: Response) => {
 }
 
 // en uso
-export let getCajasOneFact_service_Entregador= async (req: Request, res: Response) => {
+export let getCajasOneFact_service_Entregador = async (req: Request, res: Response) => {
     try {
         interface CajaProps {
             id_fact: number;
@@ -430,10 +430,10 @@ export let change_state_to_null = async (req: Request, res: Response) => {
 export let forceFactura_service = async (req: Request, res: Response) => {
     try {
         const { factura } = req.query;
-        if(typeof factura === 'string' ){
-            const fact : string = factura.toString();
-            console.log('|| FORZANDO :: ', fact );
-            const result = await ForceSynchro( fact );
+        if (typeof factura === 'string') {
+            const fact: string = factura.toString();
+            console.log('|| FORZANDO :: ', fact);
+            const result = await ForceSynchro(fact);
 
             if (Array.isArray(result) && result.length === 2) {
                 const [success, data] = result;
@@ -445,13 +445,83 @@ export let forceFactura_service = async (req: Request, res: Response) => {
             } else {
                 res.status(500).json({ message: 'Respuesta inesperada de ForceSynchro' });
             }
-            
-        }else{
-            res.status(500).json({ message : 'NO SE EJECUTO LAS FUNCIONES'});
+
+        } else {
+            res.status(500).json({ message: 'NO SE EJECUTO LAS FUNCIONES' });
         }
-        
+
     } catch (err) {
         console.log(' ERROR AL FORZAR SINCRONIZACION :', err);
         res.status(500).json({ message: ' NO SE PUDO SINCRONIZAR LA FACTURA MANUALMENTE' });
     }
 }
+
+
+export let BlockFacturas_service = async (req: Request, res: Response) => {
+    try {
+        const { facturas_id } = req.body;
+
+        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+            const query = 'SELECT * FROM blockfactura($1)';
+            const validIDs: number[] = facturas_id.filter(id => parseInt(id) > 0);
+
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map(async (id) => {
+                    await connDB.query(query, [id]);
+                });
+
+                await Promise.all(promises);
+
+                res.status(200).json({ message: 'SE BLOQUEARON LAS FACTURAS CORRECTAMENTE' });
+            } catch (err) {
+                console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        } else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    } catch (error) {
+        console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR FACTURAS' });
+    }
+};
+
+
+export let unBlockFacturas_service = async (req: Request, res: Response) => {
+    try {
+        const { facturas_id } = req.body;
+
+        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+            const query = 'SELECT * FROM unblockfactura($1)';
+            const validIDs: number[] = facturas_id.filter(id => parseInt(id) > 0);
+
+            if (validIDs.length === 0) {
+                return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
+            }
+
+            // Ejecuta todas las promesas en paralelo
+            try {
+                const promises = validIDs.map(async (id) => {
+                    await connDB.query(query, [id]);
+                });
+
+                await Promise.all(promises);
+
+                res.status(200).json({ message: 'SE BLOQUEARON LAS FACTURAS CORRECTAMENTE' });
+            } catch (err) {
+                console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', err);
+                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+            }
+        } else {
+            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+        }
+    } catch (error) {
+        console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', error);
+        res.status(500).json({ message: 'ERROR AL BLOQUEAR FACTURAS' });
+    }
+};
