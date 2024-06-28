@@ -10,6 +10,7 @@ routerDec_env.get('/FactsDecEnv', declaracion_env_controller_1.getFactsDecEnv);
 routerDec_env.put('/putDecEnv', declaracion_env_controller_1.putDecEnv_controller);
 routerDec_env.get('/app/getDec_env', declaracion_env_controller_1.getDecEnv_appService);
 routerDec_env.get('/app/getEncabezado', declaracion_env_controller_1.getDecEnv_appEncabezado);
+routerDec_env.get('/getfactsdec', declaracion_env_controller_1.getFacts_controller);
 //----------------------- this is to block ------------------------//
 routerDec_env.post('/admin/blockDec', declaracion_env_controller_1.BlockDecEnv_controller);
 routerDec_env.post('/admin/UnblockDecs', declaracion_env_controller_1.UnblockDecEnv_controller);

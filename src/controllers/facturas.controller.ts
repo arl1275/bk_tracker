@@ -13,7 +13,8 @@ import {
     change_state_to_null,
     forceFactura_service,
     BlockFacturas_service,
-    unBlockFacturas_service
+    unBlockFacturas_service,
+    getCajasFactura_service
 } from "../services/facturas.service";
 
 
@@ -37,7 +38,9 @@ export const getCajasFAct_controller_Entregador = (req: Request, res: Response) 
 
 export const getAdminFacts_controller = (req: Request, res: Response) => { getAdminFacts_service(req, res)};
 
-export const toNullState_controller = ( req : Request, res : Response ) => { change_state_to_null(req, res)}
+export const toNullState_controller = ( req : Request, res : Response ) => { change_state_to_null(req, res)};
+
+export const getCajasFactura_controller =  ( req : Request, res : Response ) => { getCajasFactura_service(req, res)};
 
 //---------------------- ADMINI ROUTE -------------------//
 

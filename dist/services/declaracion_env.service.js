@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unBlockdeclaraciones_service = exports.BlockDeclaraciones_service = exports.getDecEnv_appEncabezadoService = exports.putDecEnv_service = exports.getDecEnvios_service = exports.getFacts_one_dec = exports.putDecEnv_serive = exports.getDecEnv_serive = exports.postNewDecEnv_service = void 0;
+exports.unBlockdeclaraciones_service = exports.BlockDeclaraciones_service = exports.getDecEnv_appEncabezadoService = exports.putDecEnv_service = exports.getDecEnvios_service = exports.getFacts_service = exports.getFacts_one_dec = exports.putDecEnv_serive = exports.getDecEnv_serive = exports.postNewDecEnv_service = void 0;
 const works_querys_1 = require("../utils/queries/works_querys");
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -125,7 +125,7 @@ const getFacts_one_dec = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const { dec_envio } = req.query;
         if (typeof dec_envio === 'string') {
             let nuew = parseInt(dec_envio);
-            //console.log('paso : ', nuew);
+            console.log('paso : ', nuew, '  type :: ', typeof dec_envio);
             const query = 'select * from getFacts_one_DecEnv($1);';
             localDB_config_1.default.query(query, [nuew], (err, result) => {
                 if (err) {
@@ -134,10 +134,12 @@ const getFacts_one_dec = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 }
                 else {
                     console.log('SE OBTubieron LAS FACTURAS DE LA DECLARACION DE ENVIO');
-                    //console.log(result.rows);
                     res.status(200).json({ data: result.rows });
                 }
             });
+        }
+        else {
+            res.status(500).json({ message: 'No es una declaracion valida' });
         }
     }
     catch (err) {
@@ -146,6 +148,35 @@ const getFacts_one_dec = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getFacts_one_dec = getFacts_one_dec;
+// en uso
+const getFacts_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { declaracion } = req.query;
+        let declaracion_ = 0;
+        typeof declaracion === 'string' ? declaracion_ = parseInt(declaracion) : null;
+        if (declaracion_ != 0) {
+            const query = 'select * from getfacturasdeunadeclaracion($1);';
+            localDB_config_1.default.query(query, [declaracion_], (err, result) => {
+                if (err) {
+                    console.log('ERROR OBTENIENDO LAS FACTURAS DE LA DECLARACION DE ENVIO : ', err);
+                    res.status(500).json({ message: 'ERROR OBTENIENDO LAS FACTURAS DE LA DECLARACION DE ENVIO' });
+                }
+                else {
+                    console.log('SE OBTubieron LAS FACTURAS DE LA DECLARACION DE ENVIO');
+                    res.status(200).json({ data: result.rows });
+                }
+            });
+        }
+        else {
+            res.status(500).json({ message: 'error para obtener las facturas' });
+        }
+    }
+    catch (err) {
+        console.log('ERROR AL OBTENENER RUTA DE FACTURAS : ', err);
+        res.status(500).json({ message: 'error para obtener las facturas....' });
+    }
+});
+exports.getFacts_service = getFacts_service;
 // en uso
 const getDecEnvios_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

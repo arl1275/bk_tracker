@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unBlockFacturas_service = exports.BlockFacturas_service = exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service_Entregador = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact_Guardia = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
+exports.getCajasFactura_service = exports.unBlockFacturas_service = exports.BlockFacturas_service = exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service_Entregador = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact_Guardia = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
@@ -110,39 +110,6 @@ let change_preparacion_service = (req, res) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.change_preparacion_service = change_preparacion_service;
-//EN USO
-// export let change_transito_service = async ( req: Request, res: Response ) => {
-//     try {
-//         let data_to_mail : string[] = [];                                   // this is to save the facturas references, to generate an Email.
-//         const data = req.body;
-//         console.log('DATA DESDE LA APP :::' , data);
-//         const query = 'SELECT * FROM change_state_to_entransito($1);'; // the $1, is the referencence of the factura
-//         let is_err;
-//          for (let i = 0; i < data.length; i++) {
-//              const factura_ = data[i];
-//             let result = await connDB.query(query, [factura_], (err, result)=>{
-//                   if(err){
-//                       console.log('NO SE PUDO ENVIAR A TRANSITO : ', err);
-//                       is_err = true;
-//                   }else{
-//                       console.log('SE ENVIO A TRANSITO : ', factura_);
-//                       data_to_mail.push(factura_);
-//                       is_err = false
-//                   }
-//               })
-//          }
-//         if(is_err === true){
-//             res.status(500).json({ message : 'ERROR AL ENVIAR A TRANSITO'});
-//         }else{
-//             console.log('DESDE LA RUTA :::', data_to_mail);
-//             await sendEmail_transito(data_to_mail);
-//             res.status(200).json({ message : 'SE ENVIARON LAS FACTURAS A TRANSITO'});
-//         }
-//     } catch (err) {
-//         console.log('ERROR AL ALCANZAR RUTA DE TRANSITO : ', err);
-//         res.status(500).json({ message : 'ERROR AL ALCANZAR RUTA DE TRANSITO'});
-//     }
-// }
 let change_transito_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let data_to_mail = []; // Array para guardar las referencias de las facturas
@@ -523,3 +490,25 @@ let unBlockFacturas_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 });
 exports.unBlockFacturas_service = unBlockFacturas_service;
+const getCajasFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { albaran } = req.query;
+        if (!albaran || typeof albaran !== 'string') {
+            return res.status(400).json({ message: 'El parámetro "albaran" es requerido y debe ser una cadena.' });
+        }
+        const query = 'SELECT * FROM getcajas($1);';
+        const result = yield localDB_config_1.default.query(query, [albaran]);
+        const data = result.rows;
+        if (data.length > 0) {
+            res.status(200).json({ data });
+        }
+        else {
+            res.status(204).json({ message: 'No se encontraron datos para el albarán proporcionado.' });
+        }
+    }
+    catch (error) {
+        console.error('||       Error al ejecutar la consulta para obtener las cajas \n', error);
+        res.status(500).json({ message: 'ERROR AL TRAER LAS CAJAS DE ESTA FACTURA' });
+    }
+});
+exports.getCajasFactura_service = getCajasFactura_service;

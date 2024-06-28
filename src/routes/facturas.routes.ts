@@ -14,7 +14,8 @@ import {
         toNullState_controller,
         forceFactura_controller,
         blockFacturas_controller,
-        unblockFacturas_controller
+        unblockFacturas_controller,
+        getCajasFactura_controller
 } from "../controllers/facturas.controller";
 
 const routerFacturas = express.Router();
@@ -50,6 +51,8 @@ routerFacturas.get('/adminFact', getAdminFacts_controller);
 routerFacturas.post('/app/getCajasOneFact_Entregador', getCajasFAct_controller_Entregador); // /facturas/app/getCAjasOneFact  para entregador
 
 routerFacturas.get('/toNullState', toNullState_controller);
+
+routerFacturas.get('/getCajas', getCajasFactura_controller );
 
 
 //------------------------------------------------- THIS IS A ADMINISTRATOR ROUTE -------------------------------------------------//

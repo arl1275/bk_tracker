@@ -8,7 +8,8 @@ import {
     putDecEnv_service,
     getDecEnv_appEncabezadoService,
     BlockDeclaraciones_service,
-    unBlockdeclaraciones_service
+    unBlockdeclaraciones_service,
+    getFacts_service
 } from "../services/declaracion_env.service";
 
 export const getDecEnv_controller = async (req: Request, res: Response) => { getDecEnvios_service(req, res) };
@@ -27,6 +28,8 @@ export const getDecEnv_appEncabezado =async (req: Request, res: Response) => { g
 
 export const BlockDecEnv_controller = async ( req: Request, res: Response) => { BlockDeclaraciones_service( req, res )}
 
-export const UnblockDecEnv_controller = async ( req : Request, res : Response) => { unBlockdeclaraciones_service( req, res)}
+export const UnblockDecEnv_controller = async ( req : Request, res : Response) => { unBlockdeclaraciones_service( req, res)};
+
+export const getFacts_controller = async ( req : Request, res : Response) => { getFacts_service( req, res)}
 
 

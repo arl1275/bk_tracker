@@ -112,11 +112,10 @@ export const putDecEnv_serive =async ( req : Request, res : Response) => {
 // en uso
 export const getFacts_one_dec =async (  req : Request, res : Response ) => {
     try {
-        const {dec_envio} = req.query;
-        
+        const {dec_envio} = req.query;  
         if(typeof dec_envio === 'string'){
             let nuew= parseInt(dec_envio);
-            //console.log('paso : ', nuew);
+            console.log('paso : ', nuew, '  type :: ', typeof dec_envio);
             const query = 'select * from getFacts_one_DecEnv($1);';
             connDB.query(query, [nuew], (err, result)=>{
                 if(err){
@@ -124,16 +123,42 @@ export const getFacts_one_dec =async (  req : Request, res : Response ) => {
                     res.status(500).json({ message : 'ERROR OBTENIENDO LAS FACTURAS DE LA DECLARACION DE ENVIO'})
                 }else{
                     console.log('SE OBTubieron LAS FACTURAS DE LA DECLARACION DE ENVIO');
-                    //console.log(result.rows);
                     res.status(200).json({ data : result.rows});
                 }
             })
+        }else{
+            res.status(500).json({ message : 'No es una declaracion valida'})
         }
-        
-        
     } catch (err) {
         console.log('ERROR AL OBTENENER RUTA DE FACTURAS : ', err);
         res.status(500).json({ message : 'error para obtener las facturas'})
+    }
+}
+
+
+// en uso
+export const getFacts_service = async ( req : Request , res : Response ) => {
+    try {
+        const { declaracion } = req.query;  
+        let declaracion_ = 0;
+        typeof declaracion === 'string' ? declaracion_ = parseInt(declaracion) : null;
+        if(declaracion_ != 0 ){
+            const query = 'select * from getfacturasdeunadeclaracion($1);';
+            connDB.query(query, [declaracion_], (err, result)=>{
+                if(err){
+                    console.log('ERROR OBTENIENDO LAS FACTURAS DE LA DECLARACION DE ENVIO : ', err);
+                    res.status(500).json({ message : 'ERROR OBTENIENDO LAS FACTURAS DE LA DECLARACION DE ENVIO'})
+                }else{
+                    console.log('SE OBTubieron LAS FACTURAS DE LA DECLARACION DE ENVIO');
+                    res.status(200).json({ data : result.rows});
+                }
+            })
+        }else{
+            res.status(500).json({ message : 'error para obtener las facturas'})
+        }
+    } catch (err) {
+        console.log('ERROR AL OBTENENER RUTA DE FACTURAS : ', err);
+        res.status(500).json({ message : 'error para obtener las facturas....'})
     }
 }
 

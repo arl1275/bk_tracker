@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnblockDecEnv_controller = exports.BlockDecEnv_controller = exports.getDecEnv_appEncabezado = exports.getDecEnv_appService = exports.putDecEnv_controller = exports.getFactsDecEnv = exports.putDecEnv = exports.postNewDecEnv_controller = exports.getDecEnv_controller = void 0;
+exports.getFacts_controller = exports.UnblockDecEnv_controller = exports.BlockDecEnv_controller = exports.getDecEnv_appEncabezado = exports.getDecEnv_appService = exports.putDecEnv_controller = exports.getFactsDecEnv = exports.putDecEnv = exports.postNewDecEnv_controller = exports.getDecEnv_controller = void 0;
 const declaracion_env_service_1 = require("../services/declaracion_env.service");
 const getDecEnv_controller = (req, res) => __awaiter(void 0, void 0, void 0, function* () { (0, declaracion_env_service_1.getDecEnvios_service)(req, res); });
 exports.getDecEnv_controller = getDecEnv_controller;
@@ -29,3 +29,5 @@ const BlockDecEnv_controller = (req, res) => __awaiter(void 0, void 0, void 0, f
 exports.BlockDecEnv_controller = BlockDecEnv_controller;
 const UnblockDecEnv_controller = (req, res) => __awaiter(void 0, void 0, void 0, function* () { (0, declaracion_env_service_1.unBlockdeclaraciones_service)(req, res); });
 exports.UnblockDecEnv_controller = UnblockDecEnv_controller;
+const getFacts_controller = (req, res) => __awaiter(void 0, void 0, void 0, function* () { (0, declaracion_env_service_1.getFacts_service)(req, res); });
+exports.getFacts_controller = getFacts_controller;
