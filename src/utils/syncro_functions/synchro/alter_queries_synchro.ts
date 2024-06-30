@@ -149,11 +149,10 @@ export async function Full_Names_Update() {
 
                 const Factura = FactsToUpdate[x];
                 const AXhead = await executeQuery(get_Ax_head_albaranesFacturas(Factura.albaran, Factura.lista_empaque, Factura.pedidoventa));
-                console.log('|| FACTURA :: ', Factura.factura)
+                console.log('|| FACTURA :: ', Factura.factura, '\n')
                 //console.log(Factura.albaran);
                 //console.log('------AX DATA ------------')
                 //console.log(AXhead);
-
 
                 if (AXhead.length > 0) {
                     for (let y = 0; AXhead.length > y; y++) {
