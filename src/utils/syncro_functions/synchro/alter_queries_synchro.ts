@@ -143,20 +143,19 @@ export async function Full_Names_Update() {
     try {
         const facturasHead: any = await connDB.query(get_head_albaranesAsFact());
         const FactsToUpdate: any = facturasHead.rows
-        //console.log(FactsToUpdate);
-        if (FactsToUpdate.length > 0) {
+       if (FactsToUpdate.length > 0) {
             for (let x = 0; FactsToUpdate.length > x; x++) {
 
                 const Factura = FactsToUpdate[x];
                 const AXhead = await executeQuery(get_Ax_head_albaranesFacturas(Factura.albaran, Factura.lista_empaque, Factura.pedidoventa));
-                console.log('|| FACTURA :: ', Factura.factura, '\n')
+                //console.log('|| FACTURA :: ', Factura.factura, '\n')
                 //console.log(Factura.albaran);
                 //console.log('------AX DATA ------------')
                 //console.log(AXhead);
 
                 if (AXhead.length > 0) {
                     for (let y = 0; AXhead.length > y; y++) {
-                        console.log('||     DATA ::: LOCAL : ', Factura.factura,'||  AX : ', AXhead[y].factura)
+                        //console.log('||     DATA ::: LOCAL : ', Factura.factura,'||  AX : ', AXhead[y].factura)
                             if (Factura.factura != AXhead[y].factura) {
                                 await connDB.query(change_factura_name(), [AXhead[y].factura, Factura.id_factura]);
                                 console.log(`||     SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`)
@@ -172,11 +171,9 @@ export async function Full_Names_Update() {
                     //return [false, { message: '|| ESTO NO DEBERIA PASAR' }];
                 }
             }
-
         } else {
             return [false, { message: '|| SIN FACTURAS PARA ACTUALIZAR' }]
         }
-
     } catch (error) {
         console.log(`|| ERROR AL BUSCAR ACTUALIZACIONES :: ${error}`);
     } finally {
