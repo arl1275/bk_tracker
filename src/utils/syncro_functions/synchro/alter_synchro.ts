@@ -123,7 +123,7 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
     }
 }
 
-async function validinert(pedido: sincroObject) {
+async function validinert( pedido: sincroObject ) {
     //-----------------------------------------------------------------------------------------------------------//
     // THIS FUNCTION IS TO VERIFY IS A PEDIDO ALREADY EXIST, IF EXIST THEN SEEK FOR UPDATES
     // IN CASE NO EXIST IT MAKES ALL FULL INSERTION
@@ -222,7 +222,7 @@ export async function syncroData_AX_() {
 ||                                          **** ACTUALIZANDO NOMBRES ***                                             ||
 ||--------------------------------------------------------------------------------------------------------------------||\n`);
         await Full_Names_Update();
-        const data: false | sincroObject[] = await Preloaded_pedido_AX();
+        const data : false | sincroObject[] = await Preloaded_pedido_AX();
         //console.log(data);
         if (data !== false) {
             console.log(`
