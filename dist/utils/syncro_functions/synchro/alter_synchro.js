@@ -119,7 +119,7 @@ function validinert(pedido) {
                 if (pedidoExist.rows.length > 0) {
                     //console.log('||     SE ESTA REVISANDO PEDIDO : ', pedido.pedido.PedidoVenta );
                     const pedidoventa_id = pedidoExist.rows[0].pedidoventa_id;
-                    console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO');
+                    console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO\n');
                     if (typeof pedidoventa_id === 'number') {
                         // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
                         yield UpdateOrNone_Pedido(pedido);
@@ -137,7 +137,7 @@ function validinert(pedido) {
 ||  PEDIDO : ${pedido.pedido.PedidoVenta} 
 ||  CLIENTE : ${pedido.pedido.NombreCliente}
 ||  CUENTA : ${pedido.pedido.CuentaCliente}
-||--------------------------------------------------------------------------------------------------------------------||`);
+||--------------------------------------------------------------------------------------------------------------------||\n`);
                                 for (let i = 0; pedido.data.length > i; i++) { //pedido.data.length
                                     const detFactt = pedido.data[i];
                                     const id_factura = yield (0, syncro_functions_1.insert_factura_)(detFactt._factura_, idPDV);
@@ -155,7 +155,7 @@ function validinert(pedido) {
                                                     const detCajas = detAlb._cajas_[k];
                                                     const inserted = yield (0, syncro_functions_1.insert_boxes_)(detCajas, id_alb);
                                                     if (inserted) {
-                                                        console.log(`||          CAJA : ${detCajas === null || detCajas === void 0 ? void 0 : detCajas.Caja}     RUTA : ${detCajas === null || detCajas === void 0 ? void 0 : detCajas.ListaEmpaque}     CANTIDAD : ${detCajas === null || detCajas === void 0 ? void 0 : detCajas.cantidad}`);
+                                                        console.log(`||     CAJA : ${detCajas === null || detCajas === void 0 ? void 0 : detCajas.Caja}        RUTA : ${detCajas === null || detCajas === void 0 ? void 0 : detCajas.ListaEmpaque}        CANTIDAD : ${detCajas === null || detCajas === void 0 ? void 0 : detCajas.cantidad}`);
                                                     }
                                                 }
                                                 console.log('||--------------------------------------------------------------------------------------------------------------------||');
@@ -168,7 +168,6 @@ function validinert(pedido) {
                         catch (err) {
                             console.log('||--------------------------------------------------------------------------------------------------------------------||');
                             console.log(`||     ERROR AL MOMENTO DE INSERTAR NORMALMANTE : ${err}`);
-                            console.log('||--------------------------------------------------------------------------------------------------------------------||');
                         }
                     }
                 }
@@ -183,6 +182,9 @@ function validinert(pedido) {
         catch (err) {
             console.log('||     ERROR AL DESGLOSAR DATA', err);
         }
+        finally {
+            console.log('||--------------------------------------------------------------------------------------------------------------------||');
+        }
     });
 }
 function syncroData_AX_() {
@@ -191,7 +193,7 @@ function syncroData_AX_() {
             console.log(`
 ||--------------------------------------------------------------------------------------------------------------------||
 ||                                          **** ACTUALIZANDO NOMBRES ***                                             ||
-||--------------------------------------------------------------------------------------------------------------------||`);
+||--------------------------------------------------------------------------------------------------------------------||\n`);
             yield (0, alter_queries_synchro_1.Full_Names_Update)();
             const data = yield (0, preload_data_ax_1.Preloaded_pedido_AX)();
             //console.log(data);

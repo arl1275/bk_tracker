@@ -85,3 +85,7 @@ export const data_to_repots_of_syncro_facts_entregadas = () => {
         e.link_firma,
         e.link_foto;`
 }
+
+export const ValidateConsolidate = 
+`
+`;

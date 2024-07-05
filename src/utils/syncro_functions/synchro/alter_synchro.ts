@@ -1,6 +1,5 @@
 import { Preloaded_pedido_AX } from "./preload_data_ax";
 import connDB from "../../db/localDB_config";
-import { executeQuery } from "../../db/ax_config";
 import { QueryResult } from 'pg';
 import {
     caja,
@@ -141,14 +140,11 @@ async function validinert(pedido: sincroObject) {
             if (pedidoExist.rows.length > 0) {
                 //console.log('||     SE ESTA REVISANDO PEDIDO : ', pedido.pedido.PedidoVenta );
                 const pedidoventa_id: number | null = pedidoExist.rows[0].pedidoventa_id;
-                console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO');
+                console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO\n');
 
                 if (typeof pedidoventa_id === 'number') {
-
                     // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
-
                     await UpdateOrNone_Pedido(pedido)
-
                 } else if (pedidoventa_id === null) {
                     // IF THE PEDIDO DOES NOT EXIST, THEN WE'LL DO A NORMAL INSERTION
                     try {
@@ -162,7 +158,7 @@ async function validinert(pedido: sincroObject) {
 ||  PEDIDO : ${pedido.pedido.PedidoVenta} 
 ||  CLIENTE : ${pedido.pedido.NombreCliente}
 ||  CUENTA : ${pedido.pedido.CuentaCliente}
-||--------------------------------------------------------------------------------------------------------------------||`
+||--------------------------------------------------------------------------------------------------------------------||\n`
                             );
 
                             for (let i = 0; pedido.data.length > i; i++) { //pedido.data.length
@@ -187,7 +183,7 @@ async function validinert(pedido: sincroObject) {
                                                 const detCajas: caja = detAlb._cajas_[k];
                                                 const inserted = await insert_boxes_(detCajas, id_alb);
                                                 if (inserted) {
-                                                    console.log(`||          CAJA : ${detCajas?.Caja}     RUTA : ${detCajas?.ListaEmpaque}     CANTIDAD : ${detCajas?.cantidad}`)
+                                                    console.log(`||     CAJA : ${detCajas?.Caja}        RUTA : ${detCajas?.ListaEmpaque}        CANTIDAD : ${detCajas?.cantidad}`)
                                                 }
                                             }
                                             console.log('||--------------------------------------------------------------------------------------------------------------------||')
@@ -203,7 +199,6 @@ async function validinert(pedido: sincroObject) {
                     } catch (err) {
                         console.log('||--------------------------------------------------------------------------------------------------------------------||');
                         console.log(`||     ERROR AL MOMENTO DE INSERTAR NORMALMANTE : ${err}`);
-                        console.log('||--------------------------------------------------------------------------------------------------------------------||');
                     }
                 }
             } else {
@@ -215,6 +210,8 @@ async function validinert(pedido: sincroObject) {
         }
     } catch (err) {
         console.log('||     ERROR AL DESGLOSAR DATA', err)
+    }finally{
+        console.log('||--------------------------------------------------------------------------------------------------------------------||');
     }
 }
 

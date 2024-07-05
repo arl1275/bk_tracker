@@ -38,10 +38,10 @@ const cron = __importStar(require("node-cron"));
 function syncroData_AX() {
     return __awaiter(this, void 0, void 0, function* () {
         //await Full_Names_Update();
-        const cronExpression = '*/5 * * * *'; // program to execute every 30 min
+        const cronExpression = '*/5 * * * *'; // program to execute every 5 min
         cron.schedule(cronExpression, () => __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log('||    KRON TRIGGERED');
+                console.log('---------- KRON TRIGGERED ----------\n');
                 yield (0, alter_synchro_1.syncroData_AX_)();
             }
             catch (error) {

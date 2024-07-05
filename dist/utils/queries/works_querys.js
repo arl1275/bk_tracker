@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.data_to_repots_of_syncro_facts_entregadas = exports.data_to_repots_of_syncro_facts = exports.generate_dec_env = void 0;
+exports.ValidateConsolidate = exports.data_to_repots_of_syncro_facts_entregadas = exports.data_to_repots_of_syncro_facts = exports.generate_dec_env = void 0;
 const generate_dec_env = () => {
     return `INSERT INTO declaracion_envios (created_at, declaracionenvio, id_status, id_camion, id_usuario) 
     VALUES (
@@ -87,3 +87,5 @@ const data_to_repots_of_syncro_facts_entregadas = () => {
         e.link_foto;`;
 };
 exports.data_to_repots_of_syncro_facts_entregadas = data_to_repots_of_syncro_facts_entregadas;
+exports.ValidateConsolidate = `
+`;
