@@ -104,9 +104,8 @@ const query_get_albarans_of_a_factura = (factura, pedido) => {
          fecha >= '${mininumDateAllowed}' 
          AND Pais= '${paisFilter}'
          AND Factura = '${factura}'
-         AND PedidoVenta = '${pedido}'
          AND albaran != '' ;`;
-};
+}; //--AND PedidoVenta = '${pedido}'
 exports.query_get_albarans_of_a_factura = query_get_albarans_of_a_factura;
 //-----------------------------------------------------------------------------------------------------//
 // this query is to get all the albaran of one albaran that is beein inserted as factura

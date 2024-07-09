@@ -38,7 +38,7 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
         }
         //  IF THE FACTURA DOES NOT EXIST, THEN THE SYSTEM MAKES THE OBJECT OF PEDIDO
         const pedidoventas_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_pedidoventas_F)(pedido_brute[0].pedidoventa));
-        console.log('valores ingresados en Pedido_Brute :: ', pedido_brute);
+        //console.log('valores ingresados en Pedido_Brute :: ', pedido_brute)
         if (pedidoventas_.length = 1) {
             for (let i = 0; i < pedidoventas_.length; i++) {
                 const pedido = pedidoventas_[i];
@@ -103,22 +103,22 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
                                 if (fact) {
                                     const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact[0], id_pedido);
                                     if (id_factura) {
-                                        console.log(`||         FACTURA : ${fact[0].Factura}`);
+                                        console.log(`||       FACTURA : ${fact[0].Factura}`);
                                         const albarans_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_albarans_of_a_factura_F)(fact[0].Factura));
-                                        for (let k = 0; k < albarans_.length; k++) {
+                                        for (let k = 0; albarans_.length > k; k++) {
                                             const _albaran = albarans_[k];
                                             const id_albaran = yield (0, syncro_functions_1.insert_albaran_)(_albaran, id_factura);
                                             if (id_albaran) {
                                                 console.log(`||                 ALBARAN : ${_albaran.Albaran}   DESTINO : ${_albaran.ciudad}`);
                                                 const cajas_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_boxes_of_an_albaran_F)(_albaran.Albaran, pedido.PedidoVenta)); // get all the cajas of one albaran
-                                                for (let l = 0; l < cajas_.length; l++) {
+                                                for (let l = 0; cajas_.length > l; l++) {
                                                     const _caja = cajas_[l];
                                                     yield (0, syncro_functions_1.insert_boxes_)(_caja, id_albaran);
-                                                    console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
+                                                    console.log(`||                     CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                                 }
-                                                return [true, { message: `SE SINCRONIZO LA FACTURA : ${pedido_brute[0].factura}` }];
                                             }
                                         }
+                                        return [true, { message: `SE SINCRONIZO LA FACTURA : ${pedido_brute[0].factura}` }];
                                     }
                                 }
                                 else {
@@ -185,7 +185,6 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
                                 console.log('||     SIN FACTURAS ENCONTRADAS');
                                 return [false, { message: 'NO SE ENCONTRO FACTURAS DE DICHO PEDIDO' }];
                             }
-                            console.log('||------------------------------------------------------------------------------------------------------------||');
                         }
                         else {
                             console.log('||     ESTO NO DEBE PASAR EN EL FORZADO DE SINCRONIZACION');
@@ -212,6 +211,9 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
     catch (err) {
         console.log('||     ERROR DURANTE LA SINCRONIZACIÓN FORZADA : ', err);
         return [false, { message: 'ERROR DURANTE LA SINCRONIZACION FORZADA' }];
+    }
+    finally {
+        console.log('||------------------------------------------------------------------------------------------------------------||');
     }
 });
 exports.FORCE_insert_process_of_synchro = FORCE_insert_process_of_synchro;

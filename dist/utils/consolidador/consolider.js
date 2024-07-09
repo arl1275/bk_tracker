@@ -1,37 +1,37 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UnConsolidate = exports.Consolidador = exports.ChooseConsolidation = void 0;
-const ChooseConsolidation = (IsToConsolidate, Data) => {
+exports.ChooseConsolidation = void 0;
+const ChooseConsolidation = (factura, IsToConsolidate, Data) => {
+    // The "factura" variable, is used to know, if the process is manual or not
     // The "IsToConsolidate" variable, means, if the values of "Data" are going to be consolidate or unconsolidate.
     // Case "IsToConsolidate" variable is equal to NULL, it means the preprocess has been aborted, then this fuction will return a "FALSE"
     try {
-        if (Data.length > 0) {
-            if (IsToConsolidate === null) {
-                return false;
+        if (IsToConsolidate) {
+            if (Data.length > 0) {
             }
             else {
-                if (IsToConsolidate) {
-                }
-                else {
-                }
+                console.log('|| No hay datos para CONSOLIDAR');
+                return [false, { message: 'No hay datos para CONSOLIDAR' }];
             }
         }
-        else {
-            console.log('|| NO HAY REGISTROS PARA CONSOLIDAR \n');
-            return false;
+        else if (!IsToConsolidate) {
+            if (Data.length > 0) {
+            }
+            else {
+                console.log('|| No hay datos para DESCONSOLIDAR');
+                return [false, { message: 'No hay datos para DESCONSOLIDAR' }];
+            }
+        }
+        else if (IsToConsolidate === null) {
+            return [false, { message: 'Ocurrio un error al consolidar' }];
         }
     }
     catch (err) {
-        console.log('||  HA OCURRIDO UN ERROR AL CONSOLIDAR : ', err);
-        return false;
+        console.log('|| Erro al momento de sincronizar', err);
+        return [false, { message: 'Error al intentar consolidar' }];
+    }
+    finally {
+        console.log('||------------------------------------------------------------------------------------------------------------||');
     }
 };
 exports.ChooseConsolidation = ChooseConsolidation;
-const Consolidador = (values) => {
-    //THIS FUNCTION IS TO IDENTIFY CONSOLIDATIONS OF REGISTERS.
-};
-exports.Consolidador = Consolidador;
-const UnConsolidate = (values) => {
-    // THIS FUNCION IS TO REVERB CONSOLIDATINS PREVIUSLY MAKED
-};
-exports.UnConsolidate = UnConsolidate;

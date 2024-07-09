@@ -401,7 +401,7 @@ let forceFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const { factura } = req.query;
         if (typeof factura === 'string') {
             const fact = factura.toString();
-            console.log('|| FORZANDO :: ', fact);
+            //console.log('|| FORZANDO :: ', fact);
             const result = yield (0, force_syncro_1.ForceSynchro)(fact);
             if (Array.isArray(result) && result.length === 2) {
                 const [success, data] = result;

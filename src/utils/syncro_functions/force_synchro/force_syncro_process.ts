@@ -33,7 +33,7 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
         // Obtienen todos los pedidos de venta de este día (hoy)
         const result = await connDB.query('SELECT factura FROM facturas WHERE factura = $1', [factura]);
 
-        if (result.rows.length > 0) { 
+        if (result.rows.length > 0) {
             return [false, { message: 'Esta FACTURA o ALBARAN ya existe en el sistema.' }];
         }
 
@@ -42,13 +42,13 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
 
         if (factura.startsWith('AL-')) {
             pedido_brute = await executeQuery(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE albaran = '${factura}';`);
-        }else{
-            pedido_brute = await executeQuery(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE factura = '${factura}';`);   
+        } else {
+            pedido_brute = await executeQuery(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE factura = '${factura}';`);
         }
 
         //  IF THE FACTURA DOES NOT EXIST, THEN THE SYSTEM MAKES THE OBJECT OF PEDIDO
         const pedidoventas_: pedidoventa[] = await executeQuery(query_get_pedidoventas_F(pedido_brute[0].pedidoventa));
-        console.log('valores ingresados en Pedido_Brute :: ', pedido_brute)
+        //console.log('valores ingresados en Pedido_Brute :: ', pedido_brute)
 
         if (pedidoventas_.length = 1) {
             for (let i = 0; i < pedidoventas_.length; i++) {
@@ -79,7 +79,7 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
                                 //console.log('|| data insertada como albaran ::: ', pedido_brute[0].factura, pedido_brute[0].albaran)
                                 const AlbAsFact: any = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura_F(pedido_brute[0].albaran, pedido.PedidoVenta));
                                 if (AlbAsFact.length > 0) {
-                                    let factu : factura = { Factura :  AlbAsFact[0]?.Albaran }
+                                    let factu: factura = { Factura: AlbAsFact[0]?.Albaran }
                                     //console.log(' DATA DE LA FACTURA :: ', factu)
                                     const id_factura = await insert_factura_(factu, id_pedido);
 
@@ -117,24 +117,25 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
                                 if (fact) {
                                     const id_factura = await insert_factura_(fact[0], id_pedido);
                                     if (id_factura) {
-                                        console.log(`||         FACTURA : ${fact[0].Factura}`);
-
+                                        console.log(`||       FACTURA : ${fact[0].Factura}`);
                                         const albarans_: albaran[] = await executeQuery(query_get_albarans_of_a_factura_F(fact[0].Factura));
-                                        for (let k = 0; k < albarans_.length; k++) {
+
+                                        for (let k = 0; albarans_.length > k; k++) {
                                             const _albaran = albarans_[k];
                                             const id_albaran = await insert_albaran_(_albaran, id_factura);
                                             if (id_albaran) {
+                                                console.log('\n');
                                                 console.log(`||                 ALBARAN : ${_albaran.Albaran}   DESTINO : ${_albaran.ciudad}`);
                                                 const cajas_: caja[] = await executeQuery(query_get_boxes_of_an_albaran_F(_albaran.Albaran, pedido.PedidoVenta));    // get all the cajas of one albaran
-                                                for (let l = 0; l < cajas_.length; l++) {
+                                                for (let l = 0; cajas_.length > l ; l++) {
                                                     const _caja = cajas_[l];
                                                     await insert_boxes_(_caja, id_albaran);
-                                                    console.log(`||                 CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
+                                                    console.log(`||                     CAJA :  ${_caja.Caja}   CANTIDAD : ${_caja.cantidad}    RUTA : ${_caja.ListaEmpaque} `);
                                                 }
-                                                return [true, { message: `SE SINCRONIZO LA FACTURA : ${pedido_brute[0].factura}` }]
                                             }
-                                        }
 
+                                        }
+                                        return [true, { message: `SE SINCRONIZO LA FACTURA : ${pedido_brute[0].factura}` }]
                                     }
                                 } else {
                                     console.log('|| FACTURA NO EXISTE EN AX');
@@ -207,8 +208,6 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
                                 console.log('||     SIN FACTURAS ENCONTRADAS');
                                 return [false, { message: 'NO SE ENCONTRO FACTURAS DE DICHO PEDIDO' }]
                             }
-
-                            console.log('||------------------------------------------------------------------------------------------------------------||')
                         } else {
                             console.log('||     ESTO NO DEBE PASAR EN EL FORZADO DE SINCRONIZACION');
                             return [false, { message: 'ESTE ES UN ERROR IMPOSIBLE' }];
@@ -233,6 +232,8 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
     } catch (err) {
         console.log('||     ERROR DURANTE LA SINCRONIZACIÓN FORZADA : ', err);
         return [false, { message: 'ERROR DURANTE LA SINCRONIZACION FORZADA' }];
+    }finally{
+        console.log('||------------------------------------------------------------------------------------------------------------||')
     }
 
 }

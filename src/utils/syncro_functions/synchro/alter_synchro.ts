@@ -49,13 +49,13 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
 ||    ACTUALIZANDO UN PEDIDO DE VENTA : ${pedido_.pedido.PedidoVenta}`)
 
             if (typeof pedidoventa_id === 'number') {
-
+                
                 for (let i = 0; pedido_.data.length > i; i++) {
                     // THIS PART WILL LOOK FOR ALL THE FACTURAS OF THAT PEDIDOVENTAS
                     const detalleFacturas: detFact = pedido_.data[i];
                     const existFact = await connDB.query(val_if_fact_exist(), [detalleFacturas._factura_.Factura, pedido_.pedido.PedidoVenta]);
                     const existFact_id: number | null = existFact.rows[0].factura_id;
-
+                    
                     if (typeof existFact_id === 'number') {     // if there is coincidence that means the preload and locadb data has no diferences
 
                         for (let j = 0; detalleFacturas.detalleFact.length > j; j++) {
@@ -144,7 +144,8 @@ async function validinert( pedido: sincroObject ) {
 
                 if (typeof pedidoventa_id === 'number') {
                     // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
-                    await UpdateOrNone_Pedido(pedido)
+                    await UpdateOrNone_Pedido(pedido);
+
                 } else if (pedidoventa_id === null) {
                     // IF THE PEDIDO DOES NOT EXIST, THEN WE'LL DO A NORMAL INSERTION
                     try {
@@ -241,7 +242,6 @@ export async function syncroData_AX_() {
     } catch (err) {
         console.log('||         ERROR AL EJECUTAR LA SINCRONIZACION : ', err);
     } finally {
-        console.log(`
-**********************************************************************************************************************`)
+        console.log(`||---------------------------------------- FINALIZADO ----------------------------------------||\n`)
     }
 }

@@ -89,8 +89,8 @@ const query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F = (pedido, factura) => {
        FROM
            IMGetAllPackedBoxesInSB
        WHERE
-       pedidoventa = '${pedido}'
-       AND factura = '${factura}'`;
+       factura = '${factura}'
+       AND pedidoventa = '${pedido}';`;
 };
 exports.query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F = query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F;
 //-----------------------------------------------------------------------------------------------------//
@@ -131,8 +131,8 @@ const query_get_albaran_of_albaran_inserted_as_factura_F = (albaran, pedido_vent
             (CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
         )    
     AND Albaran = '${albaran}'
-    AND PedidoVenta = '${pedido_venta}';
-`;
+    ;
+`; //--AND PedidoVenta = '${pedido_venta}'
 };
 exports.query_get_albaran_of_albaran_inserted_as_factura_F = query_get_albaran_of_albaran_inserted_as_factura_F;
 //-----------------------------------------------------------------------------------------------------//
@@ -152,7 +152,7 @@ const query_get_boxes_of_an_albaran_F = (albaran, pedido) => {
       Pais = '${paisFilter}'
       --AND fecha >= '${mininumDateAllowed}' -- COMMENT THIS LINE TO FORCE SINCRO
       AND Albaran = '${albaran}'
-      AND pedidoventa = '${pedido}'
+      --AND pedidoventa = '${pedido}'
   GROUP BY
       ListaEmpaque,
       Caja,

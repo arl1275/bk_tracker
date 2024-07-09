@@ -395,7 +395,7 @@ export let forceFactura_service = async (req: Request, res: Response) => {
         const { factura } = req.query;
         if (typeof factura === 'string') {
             const fact: string = factura.toString();
-            console.log('|| FORZANDO :: ', fact);
+            //console.log('|| FORZANDO :: ', fact);
             const result = await ForceSynchro(fact);
 
             if (Array.isArray(result) && result.length === 2) {
