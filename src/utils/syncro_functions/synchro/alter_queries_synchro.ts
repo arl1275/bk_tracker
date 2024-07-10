@@ -152,7 +152,7 @@ export async function Full_Names_Update() {
                 if (AXhead.length > 0) {
                     for (let y = 0; AXhead.length > y; y++) {
                         //console.log('||     DATA ::: LOCAL : ', Factura.factura,'||  AX : ', AXhead[y].factura)
-                            if (Factura.factura != AXhead[y].factura) {
+                        if (Factura.factura != AXhead[y].factura) {
                                 await connDB.query(change_factura_name(), [AXhead[y].factura, Factura.id_factura]);
                                 console.log(`||     SE ACTUALIZO EL NOMBRE DE FACUTA :: ${Factura.factura} ===> ${AXhead[y].factura}`)
                         } else {
@@ -170,7 +170,7 @@ export async function Full_Names_Update() {
     } catch (error) {
         console.log(`|| ERROR AL BUSCAR ACTUALIZACIONES :: ${error}`);
     } finally {
-        console.log('||                                              FINALIZACION DE ACTUALIZACIONES                                       ||')
+        console.log('||                                   FINALIZACION DE ACTUALIZACIONES DE NOMBRES                                       ||')
         console.log('||--------------------------------------------------------------------------------------------------------------------||')
     }
 }

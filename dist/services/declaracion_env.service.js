@@ -125,7 +125,7 @@ const getFacts_one_dec = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const { dec_envio } = req.query;
         if (typeof dec_envio === 'string') {
             let nuew = parseInt(dec_envio);
-            console.log('paso : ', nuew, '  type :: ', typeof dec_envio);
+            //console.log('paso : ', nuew, '  type :: ', typeof dec_envio);
             const query = 'select * from getFacts_one_DecEnv($1);';
             localDB_config_1.default.query(query, [nuew], (err, result) => {
                 if (err) {
@@ -133,7 +133,7 @@ const getFacts_one_dec = (req, res) => __awaiter(void 0, void 0, void 0, functio
                     res.status(500).json({ message: 'ERROR OBTENIENDO LAS FACTURAS DE LA DECLARACION DE ENVIO' });
                 }
                 else {
-                    console.log('SE OBTubieron LAS FACTURAS DE LA DECLARACION DE ENVIO');
+                    console.log('SE OBTUBIERON LAS FACTURAS DE LA DECLARACION DE ENVIO');
                     res.status(200).json({ data: result.rows });
                 }
             });

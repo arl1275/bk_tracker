@@ -4,14 +4,10 @@
 //---------------------------------------------------------------------------------//
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.change_factura_name = exports.insert_boxes = exports.insert_albaran = exports.insert_factura = exports.insert_pedido_venta = exports.get_Ax_head_albaranesFacturas = exports.get_head_albaranesAsFact = exports.val_if_caja = exports.val_if_albaran = exports.val_if_fact_exist = exports.val_if_pedido_venta = exports.ForceSincroFact_albaran = exports.ForceSincroFact_factura = exports.get_boxes_one_fact = exports.query_get_boxes_of_an_albaran = exports.query_get_albaran_of_albaran_inserted_as_factura = exports.query_get_albarans_of_a_factura = exports.query_get_facts_of_a_pedidoVenta = exports.query_get_pedidoventas = void 0;
-//---------------------------------------------------------//
-//                  DEFAULT DATA FILTERS                   //
-//---------------------------------------------------------//
-const utils_1 = require("../../handle_passwords/utils");
 const clients_1 = require("../../special_clients/clients");
 const paisFilter = 'Honduras'; // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula'; // valor para setear las ubicaciones
-const mininumDateAllowed = (0, utils_1.obtenerFechaActual)(15); // valor para captar las facturas mas antiguas
+const mininumDateAllowed = '2024-06-07'; //obtenerFechaActual( 15 );      // valor para captar las facturas mas antiguas
 //---------------------------------------------------------//
 //-----------------------------------------------------------------------------------------------------//
 //                                                                                                     //
@@ -35,14 +31,16 @@ WHERE
       ( CuentaCliente IN (${clients_1.special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
   )
   AND Factura IS NOT NULL
-  AND fecha >= '${mininumDateAllowed}'
+  AND fecha > '2024-06-06 10:41:37'
+	AND fecha < '2024-06-07 10:41:43'
+  --'${mininumDateAllowed}'
 
   --  _____________________________________________________________________________________________  --
   --||                                                                                             ||--
   --||        THIS IS TO FORCE SINCRONIZACION JUST ADD THE PEDIDOS THAT U WANT TO FORCE SINCRO     ||--
   --||_____________________________________________________________________________________________||--
 
--- AND pedidoventa = '+' 
+--AND pedidoventa = '+' 
   
   --||_____________________________________________________________________________________________||-- 
 

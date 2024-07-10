@@ -241,7 +241,5 @@ export async function syncroData_AX_() {
 
     } catch (err) {
         console.log('||         ERROR AL EJECUTAR LA SINCRONIZACION : ', err);
-    } finally {
-        console.log(`||---------------------------------------- FINALIZADO ----------------------------------------||\n`)
-    }
+    } 
 }

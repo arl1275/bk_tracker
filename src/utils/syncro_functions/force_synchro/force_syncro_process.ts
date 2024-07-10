@@ -124,7 +124,6 @@ export const FORCE_insert_process_of_synchro = async (factura: string) => {
                                             const _albaran = albarans_[k];
                                             const id_albaran = await insert_albaran_(_albaran, id_factura);
                                             if (id_albaran) {
-                                                console.log('\n');
                                                 console.log(`||                 ALBARAN : ${_albaran.Albaran}   DESTINO : ${_albaran.ciudad}`);
                                                 const cajas_: caja[] = await executeQuery(query_get_boxes_of_an_albaran_F(_albaran.Albaran, pedido.PedidoVenta));    // get all the cajas of one albaran
                                                 for (let l = 0; cajas_.length > l ; l++) {

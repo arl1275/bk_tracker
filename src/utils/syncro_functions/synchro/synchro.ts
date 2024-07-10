@@ -7,10 +7,12 @@ export async function syncroData_AX() {
 
   cron.schedule(cronExpression, async () => {
     try {
-      console.log('---------- KRON TRIGGERED ----------\n')
+      console.log('------------------------------ KRON TRIGGERED ------------------------------\n')
       await syncroData_AX_();
     } catch (error) {
       console.error('||    Error during syncroData_AX:', error);
+    }finally{
+      console.log('------------------------------ KRON FINNISHED ------------------------------\n')
     }
   })
 

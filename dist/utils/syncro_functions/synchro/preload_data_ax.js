@@ -45,7 +45,8 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                         let albaranes_ = []; // this is to save all albaranes of one factura to be process
                         let detalleAlbaran = []; // this is to save the detail of one albaran
                         const fact = facturas_[j]; // this is to save one factura to be process
-                        //console.log(`||    FACTURA : ${fact.Factura}`)
+                        //  console.log('|| Factura : ', fact.Factura);
+                        //  console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
                         if (fact.Factura.startsWith('AL')) {
                             let alb_ = yield (0, ax_config_1.executeQuery)((0, simple_queries_synchro_1.query_get_albaran_of_albaran_inserted_as_factura)(fact.Factura, pedido.PedidoVenta));
                             albaranes_.push(alb_[0]);
@@ -65,6 +66,7 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                                 //console.log('||     DETALLE DE CAJAS ');
                                 if (caja_s.length > 0) {
                                     //console.log('|| CAJA :: ', caja_s);
+                                    //caja_s.forEach((item : caja)=>{ console.log('||             _CAJA_: ', item.NumeroCaja, '     CAJA : ', item.Caja)})
                                     let detail_oneAlb = { _albaran_: albaranes_[k], _cajas_: caja_s };
                                     detalleAlbaran.push(detail_oneAlb);
                                 }
@@ -73,7 +75,7 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                                     return false;
                                 }
                             }
-                            //console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
+                            console.log(`||--------------------------------------------------------------------------------------------------------------------||`);
                         }
                         else {
                             console.log('||     NO HAY ALBARANES PRECARGADOS');

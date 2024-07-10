@@ -163,7 +163,7 @@ function Full_Names_Update() {
             console.log(`|| ERROR AL BUSCAR ACTUALIZACIONES :: ${error}`);
         }
         finally {
-            console.log('||                                              FINALIZACION DE ACTUALIZACIONES                                       ||');
+            console.log('||                                   FINALIZACION DE ACTUALIZACIONES DE NOMBRES                                       ||');
             console.log('||--------------------------------------------------------------------------------------------------------------------||');
         }
     });

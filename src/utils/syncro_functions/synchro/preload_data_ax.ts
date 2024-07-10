@@ -31,7 +31,7 @@ export const Preloaded_pedido_AX = async () => {
         let preloadData: sincroObject[] = [];                               // this is to save all the details of all pedidos de venta
         let pdventas_: pedidoventa[] = [];                                  // this is to save the details of all pedidos de venta
         pdventas_ = await executeQuery(query_get_pedidoventas());
-
+        
         if (pdventas_.length > 0) {
             console.log('||--------------------------------------------------------------------------------------------------------------------||');
             console.log('||                                                 GENERANDO LA PRECARGA                                              ||');
@@ -42,13 +42,17 @@ export const Preloaded_pedido_AX = async () => {
                 let facturas_: factura[] = [];                                  // this is to save all the facturas of the pedidoVentas that is going to process
                 let detalleFactura: detFact[] = [];                             // this is to save the details of the facturas of one pedidoVentas
                 //console.log('|| PEDIDO : ', pedido.PedidoVenta, ' :: ', pedido.NombreCliente );
-                facturas_ = await executeQuery(query_get_facts_of_a_pedidoVenta(pedido.PedidoVenta));
+
+                facturas_ = await executeQuery( query_get_facts_of_a_pedidoVenta(pedido.PedidoVenta) );
+
                  if (facturas_.length > 0) {
                      for (let j = 0; j < facturas_.length; j++) {
+                        
                          let albaranes_: albaran[] = [];                        // this is to save all albaranes of one factura to be process
                          let detalleAlbaran: detAlbaran[] = []                  // this is to save the detail of one albaran
                          const fact = facturas_[j];                             // this is to save one factura to be process
-                         //console.log(`||    FACTURA : ${fact.Factura}`)
+                        //  console.log('|| Factura : ', fact.Factura);
+                        //  console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
                          if (fact.Factura.startsWith('AL')) {
                              let alb_: albaran[] = await executeQuery(query_get_albaran_of_albaran_inserted_as_factura(fact.Factura, pedido.PedidoVenta));
                              albaranes_.push(alb_[0]);
@@ -67,6 +71,7 @@ export const Preloaded_pedido_AX = async () => {
                                 //console.log('||     DETALLE DE CAJAS ');
                                 if (caja_s.length > 0) {    
                                     //console.log('|| CAJA :: ', caja_s);
+                                    //caja_s.forEach((item : caja)=>{ console.log('||             _CAJA_: ', item.NumeroCaja, '     CAJA : ', item.Caja)})
                                     let detail_oneAlb: detAlbaran = { _albaran_: albaranes_[k], _cajas_: caja_s };
                                     detalleAlbaran.push(detail_oneAlb);
                                 }else{
@@ -74,7 +79,7 @@ export const Preloaded_pedido_AX = async () => {
                                     return false;
                                 }
                             }
-                            //console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
+                            console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
                         } else {
                             console.log('||     NO HAY ALBARANES PRECARGADOS')
                             return false;

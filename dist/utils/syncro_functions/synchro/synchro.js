@@ -41,11 +41,14 @@ function syncroData_AX() {
         const cronExpression = '*/5 * * * *'; // program to execute every 5 min
         cron.schedule(cronExpression, () => __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log('---------- KRON TRIGGERED ----------\n');
+                console.log('------------------------------ KRON TRIGGERED ------------------------------\n');
                 yield (0, alter_synchro_1.syncroData_AX_)();
             }
             catch (error) {
                 console.error('||    Error during syncroData_AX:', error);
+            }
+            finally {
+                console.log('------------------------------ KRON FINNISHED ------------------------------\n');
             }
         }));
     });
