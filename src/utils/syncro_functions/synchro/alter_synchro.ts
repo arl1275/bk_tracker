@@ -159,7 +159,7 @@ async function validinert( pedido: sincroObject ) {
 ||  PEDIDO : ${pedido.pedido.PedidoVenta} 
 ||  CLIENTE : ${pedido.pedido.NombreCliente}
 ||  CUENTA : ${pedido.pedido.CuentaCliente}
-||--------------------------------------------------------------------------------------------------------------------||\n`
+||--------------------------------------------------------------------------------------------------------------------||`
                             );
 
                             for (let i = 0; pedido.data.length > i; i++) { //pedido.data.length

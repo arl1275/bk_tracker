@@ -1,7 +1,6 @@
 //imports
 import { Request, Response, NextFunction} from 'express';
 import bodyParser = require('body-parser');
-import { syncroData_AX } from './utils/syncro_functions/synchro/synchro';
 import { syncroData_AX_ } from './utils/syncro_functions/synchro/alter_synchro';
 
 require("dotenv").config({path: './.env'});

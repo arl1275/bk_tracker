@@ -14,7 +14,7 @@ import { special_clients } from "../../special_clients/clients";
 
 const paisFilter = 'Honduras';                             // valor para filtrar por pais
 const ciudadFilter = 'San Pedro Sula';                     // valor para setear las ubicaciones
-const mininumDateAllowed =  '2024-06-07'//obtenerFechaActual( 15 );      // valor para captar las facturas mas antiguas
+const mininumDateAllowed =  obtenerFechaActual( 15 );      // valor para captar las facturas mas antiguas
 
 //---------------------------------------------------------//
 
@@ -42,9 +42,7 @@ WHERE
       ( CuentaCliente IN (${special_clients.map(client => `'${client.CuentaCliente}'`).join(', ')}))
   )
   AND Factura IS NOT NULL
-  AND fecha > '2024-06-06 10:41:37'
-	AND fecha < '2024-06-07 10:41:43'
-  --'${mininumDateAllowed}'
+  AND fecha > '${mininumDateAllowed}'
 
   --  _____________________________________________________________________________________________  --
   --||                                                                                             ||--
