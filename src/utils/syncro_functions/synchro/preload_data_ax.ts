@@ -79,7 +79,6 @@ export const Preloaded_pedido_AX = async () => {
                                     return false;
                                 }
                             }
-                            console.log(`||--------------------------------------------------------------------------------------------------------------------||`)
                         } else {
                             console.log('||     NO HAY ALBARANES PRECARGADOS')
                             return false;

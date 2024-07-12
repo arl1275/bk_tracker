@@ -140,7 +140,7 @@ async function validinert( pedido: sincroObject ) {
             if (pedidoExist.rows.length > 0) {
                 //console.log('||     SE ESTA REVISANDO PEDIDO : ', pedido.pedido.PedidoVenta );
                 const pedidoventa_id: number | null = pedidoExist.rows[0].pedidoventa_id;
-                console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO\n');
+                console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO');
 
                 if (typeof pedidoventa_id === 'number') {
                     // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO

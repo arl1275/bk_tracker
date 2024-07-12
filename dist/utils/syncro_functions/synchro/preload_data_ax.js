@@ -75,7 +75,6 @@ const Preloaded_pedido_AX = () => __awaiter(void 0, void 0, void 0, function* ()
                                     return false;
                                 }
                             }
-                            console.log(`||--------------------------------------------------------------------------------------------------------------------||`);
                         }
                         else {
                             console.log('||     NO HAY ALBARANES PRECARGADOS');

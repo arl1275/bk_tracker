@@ -6,7 +6,7 @@ THIS FILE IS TO EXPLAIN HOW SYNCHRO OF FACTURAS WORKS
 //----------------------------------------------------------------------------------------//
 
 The preload data, is a sample of the data this sample is just a part of all data; this data is limitaded by date...
-currently is around 7 days before, this preload also works to update data of facturas.
+currently is around 15 days before, this preload also works to update data of facturas.
 the preload is an array that has the next structure
 
 [{

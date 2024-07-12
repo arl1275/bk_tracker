@@ -137,7 +137,7 @@ function validinert(pedido) {
 ||  PEDIDO : ${pedido.pedido.PedidoVenta} 
 ||  CLIENTE : ${pedido.pedido.NombreCliente}
 ||  CUENTA : ${pedido.pedido.CuentaCliente}
-||--------------------------------------------------------------------------------------------------------------------||\n`);
+||--------------------------------------------------------------------------------------------------------------------||`);
                                 for (let i = 0; pedido.data.length > i; i++) { //pedido.data.length
                                     const detFactt = pedido.data[i];
                                     const id_factura = yield (0, syncro_functions_1.insert_factura_)(detFactt._factura_, idPDV);
