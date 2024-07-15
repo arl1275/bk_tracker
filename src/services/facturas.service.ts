@@ -7,6 +7,7 @@ import { QueryResult } from "pg";
 import { sendEmail_transito } from "../utils/reports/mail_body_transit";
 import { sendEmail_Entregados } from "../utils/reports/mail.body_syncro";
 import { ForceSynchro } from "../utils/syncro_functions/force_synchro/force_syncro";
+import { UPLOADER_LOG } from "../utils/LogsHandler/Logs_queries";
 
 
 //----------------------------------------------------
@@ -99,18 +100,21 @@ export let change_transito_service = async (req: Request, res: Response) => {
     try {
         let data_to_mail: number[] = []; // Array para guardar las referencias de las facturas
         const data = req.body;
+        const { message } = req.query;
 
         const query = 'SELECT * FROM change_state_to_entransito($1);'; // La variable $1 es la referencia de la factura
+        let Mesaje : string = '';
+        typeof message === 'string' ? Mesaje = message.toString() : Mesaje = 'DESCONOCIDO'
 
         if (data.length > 0) {
             for (let i = 0; data.length > i; i++) {
                 const factura_ = parseInt(data[i]);
                 try {
-                    console.log('SE ENVIO A TRANSITO:', factura_);
                     await connDB.query(query, [factura_]);
-                    console.log('tipo de id ::: ', typeof factura_);
+                    //console.log('tipo de id ::: ', typeof Mesaje, Mesaje);
+                    await UPLOADER_LOG(factura_, Mesaje)
                     data_to_mail.push(factura_);
-
+                    console.log('|| SE ENVIO A TRANSITO:', factura_);
                 } catch (err) {
                     console.log('NO SE PUDO ENVIAR A TRANSITO:', err);
                     res.status(500).json({ message: 'ERROR AL ENVIAR A TRANSITO' });

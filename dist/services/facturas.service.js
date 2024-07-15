@@ -19,6 +19,7 @@ const cloudinary_config_1 = require("../utils/db/cloudinary_config");
 const mail_body_transit_1 = require("../utils/reports/mail_body_transit");
 const mail_body_syncro_1 = require("../utils/reports/mail.body_syncro");
 const force_syncro_1 = require("../utils/syncro_functions/force_synchro/force_syncro");
+const Logs_queries_1 = require("../utils/LogsHandler/Logs_queries");
 //----------------------------------------------------
 //          GENERAL FUNCTIONS
 //----------------------------------------------------
@@ -114,15 +115,19 @@ let change_transito_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
     try {
         let data_to_mail = []; // Array para guardar las referencias de las facturas
         const data = req.body;
+        const { message } = req.query;
         const query = 'SELECT * FROM change_state_to_entransito($1);'; // La variable $1 es la referencia de la factura
+        let Mesaje = '';
+        typeof message === 'string' ? Mesaje = message.toString() : Mesaje = 'DESCONOCIDO';
         if (data.length > 0) {
             for (let i = 0; data.length > i; i++) {
                 const factura_ = parseInt(data[i]);
                 try {
-                    console.log('SE ENVIO A TRANSITO:', factura_);
                     yield localDB_config_1.default.query(query, [factura_]);
-                    console.log('tipo de id ::: ', typeof factura_);
+                    console.log('tipo de id ::: ', typeof Mesaje, Mesaje);
+                    yield (0, Logs_queries_1.UPLOADER_LOG)(factura_, Mesaje);
                     data_to_mail.push(factura_);
+                    console.log('|| SE ENVIO A TRANSITO:', factura_);
                 }
                 catch (err) {
                     console.log('NO SE PUDO ENVIAR A TRANSITO:', err);
