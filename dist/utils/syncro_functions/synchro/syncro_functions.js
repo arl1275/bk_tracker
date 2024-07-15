@@ -87,9 +87,9 @@ const insert_pedidoVenta = (data) => __awaiter(void 0, void 0, void 0, function*
     });
 });
 exports.insert_pedidoVenta = insert_pedidoVenta;
-const insert_factura_ = (data, id_) => __awaiter(void 0, void 0, void 0, function* () {
+const insert_factura_ = (data, id_, id_log) => __awaiter(void 0, void 0, void 0, function* () {
     return new Promise((resolve, reject) => {
-        localDB_config_1.default.query((0, simple_queries_synchro_1.insert_factura)(), [data.Factura, id_], (err, result) => {
+        localDB_config_1.default.query((0, simple_queries_synchro_1.insert_factura)(), [data.Factura, id_, id_log], (err, result) => {
             if (!err && result.rows.length > 0 && result.rows[0].id) {
                 const val = result.rows[0].id;
                 resolve(val); // Resolve with the ID

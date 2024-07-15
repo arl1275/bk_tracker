@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import { generate_dec_env } from "../utils/queries/works_querys";
+import { UPLOADER_LOG } from "../utils/LogsHandler/Logs_queries";
 import connDB from "../utils/db/localDB_config";
 
+// THIS FUNCTION IS TO CREATE A DECLARACION DE ENVIO
+// This function will bound factura table register with a unik register in the declaracion_envios Table.
+//  and this function will as well, update the Log of the register Factura.
 
 export const postNewDecEnv_service = async (req: Request, res: Response) => {
     try {
-        const { declaracion_env, id_cam, id_user } = req.body;
+        const { declaracion_env, id_cam, id_user, message } = req.body;
         let _id_: number = 0;
         let _dec_ : number = 0;
        
@@ -33,6 +37,8 @@ export const postNewDecEnv_service = async (req: Request, res: Response) => {
                 const id_fact : number = element.id_factura
 
                 try {
+                    // THIS PART IS TO UPLOAD THE LOGS OF THE FACTURA.
+                    typeof message === 'string' ? await UPLOADER_LOG(id_fact, message) : console.log('|| valor invalido para LOG')
 
                     await new Promise((resolve, reject) => {           
                         connDB.query( query , [ id_fact , _id_ ], ( err, result ) => {

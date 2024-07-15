@@ -304,10 +304,11 @@ const insert_pedido_venta = () => {
   VALUES ( CURRENT_TIMESTAMP, $1, $2, $3) returning id;`;
 };
 exports.insert_pedido_venta = insert_pedido_venta;
+// THIA FUNCTION IS TO INSERT A FACTURA, WHERE "id_logs" is the id to bound the register with the log table
 const insert_factura = () => {
     return `INSERT INTO 
-  facturas (created_at, factura, _closed, id_pedidoventas)
-  VALUES ( CURRENT_TIMESTAMP, $1, false, $2) returning id;`;
+  facturas (created_at, factura, _closed, id_pedidoventas, id_logs)
+  VALUES ( CURRENT_TIMESTAMP, $1, false, $2, $3) returning id;`;
 };
 exports.insert_factura = insert_factura;
 const insert_albaran = () => {

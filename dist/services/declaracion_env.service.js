@@ -14,10 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unBlockdeclaraciones_service = exports.BlockDeclaraciones_service = exports.getDecEnv_appEncabezadoService = exports.putDecEnv_service = exports.getDecEnvios_service = exports.getFacts_service = exports.getFacts_one_dec = exports.putDecEnv_serive = exports.getDecEnv_serive = exports.postNewDecEnv_service = void 0;
 const works_querys_1 = require("../utils/queries/works_querys");
+const Logs_queries_1 = require("../utils/LogsHandler/Logs_queries");
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
+// THIS FUNCTION IS TO CREATE A DECLARACION DE ENVIO
+// This function will bound factura table register with a unik register in the declaracion_envios Table.
+//  and this function will as well, update the Log of the register Factura.
 const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { declaracion_env, id_cam, id_user } = req.body;
+        const { declaracion_env, id_cam, id_user, message } = req.body;
         let _id_ = 0;
         let _dec_ = 0;
         const result = yield new Promise((resolve, reject) => {
@@ -41,6 +45,8 @@ const postNewDecEnv_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
                 const element = declaracion_env[i];
                 const id_fact = element.id_factura;
                 try {
+                    // THIS PART IS TO UPLOAD THE LOGS OF THE FACTURA.
+                    typeof message === 'string' ? yield (0, Logs_queries_1.UPLOADER_LOG)(id_fact, message) : console.log('|| valor invalido para LOG');
                     yield new Promise((resolve, reject) => {
                         localDB_config_1.default.query(query, [id_fact, _id_], (err, result) => {
                             if (err) {

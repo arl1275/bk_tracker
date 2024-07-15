@@ -18,6 +18,7 @@ const localDB_config_1 = __importDefault(require("../../db/localDB_config"));
 const simple_queries_synchro_1 = require("./simple_queries_synchro");
 const syncro_functions_1 = require("./syncro_functions");
 const alter_queries_synchro_1 = require("./alter_queries_synchro");
+const Logs_queries_1 = require("../../LogsHandler/Logs_queries");
 function UpdateOrNone_Pedido(pedido_) {
     return __awaiter(this, void 0, void 0, function* () {
         //----------------------------------------------------------------------------------------------------------------------------------//
@@ -119,7 +120,7 @@ function validinert(pedido) {
                 if (pedidoExist.rows.length > 0) {
                     //console.log('||     SE ESTA REVISANDO PEDIDO : ', pedido.pedido.PedidoVenta );
                     const pedidoventa_id = pedidoExist.rows[0].pedidoventa_id;
-                    console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO\n');
+                    console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO,');
                     if (typeof pedidoventa_id === 'number') {
                         // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
                         yield UpdateOrNone_Pedido(pedido);
@@ -140,7 +141,8 @@ function validinert(pedido) {
 ||--------------------------------------------------------------------------------------------------------------------||`);
                                 for (let i = 0; pedido.data.length > i; i++) { //pedido.data.length
                                     const detFactt = pedido.data[i];
-                                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(detFactt._factura_, idPDV);
+                                    let idLog = yield (0, Logs_queries_1.CrearLog_returning_id)(detFactt._factura_.Factura, false);
+                                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(detFactt._factura_, idPDV, idLog);
                                     if (id_factura) {
                                         console.log(`||  FACTURA : ${detFactt._factura_.Factura}`);
                                         for (let j = 0; detFactt.detalleFact.length > j; j++) { // detFactt.detalleFact.length

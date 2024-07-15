@@ -77,10 +77,10 @@ export const insert_pedidoVenta = async (data : pedidoventa) => {
   
 }
 
-export const insert_factura_ = async (data: factura, id_ : number) => {
+export const insert_factura_ = async (data: factura, id_ : number, id_log : number) => {
   return new Promise<number>((resolve, reject) => {
     connDB.query(
-      insert_factura(), [ data.Factura, id_ ],
+      insert_factura(), [ data.Factura, id_, id_log ],
       (err, result) => {
         if (!err && result.rows.length > 0 && result.rows[0].id) {
           const val = result.rows[0].id;

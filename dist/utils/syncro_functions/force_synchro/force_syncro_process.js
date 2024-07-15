@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FORCE_insert_process_of_synchro = void 0;
 const ax_config_1 = require("../../db/ax_config");
+const Logs_queries_1 = require("../../LogsHandler/Logs_queries");
 const force_syncro_queries_1 = require("./force_syncro_queries");
 const syncro_functions_1 = require("../synchro/syncro_functions");
 const localDB_config_1 = __importDefault(require("../../db/localDB_config"));
@@ -34,6 +35,7 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
             pedido_brute = yield (0, ax_config_1.executeQuery)(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE albaran = '${factura}';`);
         }
         else {
+            // console.log(' SE FORZO COMO FACTURA')
             pedido_brute = yield (0, ax_config_1.executeQuery)(`SELECT DISTINCT pedidoventa, factura, albaran FROM IMGetAllPackedBoxesInSB WHERE factura = '${factura}';`);
         }
         //  IF THE FACTURA DOES NOT EXIST, THEN THE SYSTEM MAKES THE OBJECT OF PEDIDO
@@ -67,7 +69,8 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
                                 if (AlbAsFact.length > 0) {
                                     let factu = { Factura: (_a = AlbAsFact[0]) === null || _a === void 0 ? void 0 : _a.Albaran };
                                     //console.log(' DATA DE LA FACTURA :: ', factu)
-                                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(factu, id_pedido);
+                                    let idLog = yield (0, Logs_queries_1.CrearLog_returning_id)(factu.Factura, true);
+                                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(factu, id_pedido, idLog);
                                     if (id_factura) {
                                         const _albaran = AlbAsFact[0];
                                         const id_albaran = yield (0, syncro_functions_1.insert_albaran_)(_albaran, id_factura);
@@ -101,7 +104,8 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
                                 // this part, syncro when the value from Front-end is a factura.
                                 let fact = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F)(pedido.PedidoVenta, pedido_brute[0].factura));
                                 if (fact) {
-                                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact[0], id_pedido);
+                                    let idLog = yield (0, Logs_queries_1.CrearLog_returning_id)(fact[0].Factura, true);
+                                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact[0], id_pedido, idLog);
                                     if (id_factura) {
                                         console.log(`||       FACTURA : ${fact[0].Factura}`);
                                         const albarans_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_albarans_of_a_factura_F)(fact[0].Factura));
@@ -138,7 +142,8 @@ const FORCE_insert_process_of_synchro = (factura) => __awaiter(void 0, void 0, v
                                 for (let j = 0; facturas_.length > j; j++) {
                                     const fact = facturas_[j];
                                     if (fact) {
-                                        const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact, id_pedido); // insert the factura and return the id
+                                        let idLog = yield (0, Logs_queries_1.CrearLog_returning_id)(fact.Factura, true);
+                                        const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact, id_pedido, idLog); // insert the factura and return the id
                                         if (id_factura) {
                                             let albaran_;
                                             if (fact.Factura.startsWith('AL')) { // if an albaran was inserted as factura, the get the albaran of that albaran

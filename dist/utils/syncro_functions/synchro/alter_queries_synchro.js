@@ -22,6 +22,7 @@ const localDB_config_1 = __importDefault(require("../../db/localDB_config"));
 const force_syncro_queries_1 = require("../force_synchro/force_syncro_queries");
 const syncro_functions_1 = require("../synchro/syncro_functions");
 const simple_queries_synchro_1 = require("./simple_queries_synchro");
+const Logs_queries_1 = require("../../LogsHandler/Logs_queries");
 function quickFacturaInsert(id_pedido, pedido_, facturaDetalle) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -37,7 +38,8 @@ function quickFacturaInsert(id_pedido, pedido_, facturaDetalle) {
                 console.log('||         INGRESO A INSERCION POR FACTURA : ', factura);
                 let fact = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F)(pedido.PedidoVenta, factura));
                 if (fact) {
-                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact[0], id_pedido);
+                    let idLog = yield (0, Logs_queries_1.CrearLog_returning_id)(fact[0].Factura, true);
+                    const id_factura = yield (0, syncro_functions_1.insert_factura_)(fact[0], id_pedido, idLog);
                     if (id_factura) {
                         console.log(`||         FACTURA : ${fact[0].Factura}`);
                         const albarans_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_albarans_of_a_factura_F)(fact[0].Factura));
@@ -65,7 +67,8 @@ function quickFacturaInsert(id_pedido, pedido_, facturaDetalle) {
                 const albaran_ = yield (0, ax_config_1.executeQuery)((0, force_syncro_queries_1.query_get_albaran_of_albaran_inserted_as_factura_F)(albaran, pedido.PedidoVenta));
                 if (albaran_.length > 0) {
                     const fact = { Factura: albaran_[0].Albaran };
-                    const id_fact = yield (0, syncro_functions_1.insert_factura_)(fact, id_pedido);
+                    let idLog = yield (0, Logs_queries_1.CrearLog_returning_id)(fact.Factura, true);
+                    const id_fact = yield (0, syncro_functions_1.insert_factura_)(fact, id_pedido, idLog);
                     if (id_fact) {
                         console.log('||         INGRESO A INSERCION POR ALBARAN : ', fact);
                         const id_albaran = yield (0, syncro_functions_1.insert_albaran_)(albaran_[0], id_fact);

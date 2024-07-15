@@ -29,6 +29,7 @@ import {
     insert_boxes_
 } from '../synchro/syncro_functions';
 import { change_factura_name, get_Ax_head_albaranesFacturas, get_head_albaranesAsFact } from './simple_queries_synchro';
+import { CrearLog_returning_id } from '../../LogsHandler/Logs_queries';
 
 export async function quickFacturaInsert(id_pedido: number, pedido_: pedidoventa, facturaDetalle: detFact) {
     try {
@@ -45,7 +46,8 @@ export async function quickFacturaInsert(id_pedido: number, pedido_: pedidoventa
             console.log('||         INGRESO A INSERCION POR FACTURA : ', factura);
             let fact: factura[] = await executeQuery(query_get_fact_of_a_pedidoVenta_UNIK_RESPONSE_F(pedido.PedidoVenta, factura));
             if (fact) {
-                const id_factura = await insert_factura_(fact[0], id_pedido);
+                let idLog : number = await CrearLog_returning_id(fact[0].Factura, true);
+                const id_factura = await insert_factura_(fact[0], id_pedido, idLog);
                 if (id_factura) {
                     console.log(`||         FACTURA : ${fact[0].Factura}`);
 
@@ -76,7 +78,8 @@ export async function quickFacturaInsert(id_pedido: number, pedido_: pedidoventa
 
             if (albaran_.length > 0) {
                 const fact: factura = { Factura: albaran_[0].Albaran }
-                const id_fact = await insert_factura_(fact, id_pedido);
+                let idLog : number = await CrearLog_returning_id(fact.Factura, true);
+                const id_fact = await insert_factura_(fact, id_pedido, idLog);
 
                 if (id_fact) {
                     console.log('||         INGRESO A INSERCION POR ALBARAN : ', fact);

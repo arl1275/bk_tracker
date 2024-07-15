@@ -24,6 +24,7 @@ import {
     quickBoxesInsert,
     Full_Names_Update
 } from "./alter_queries_synchro";
+import { CrearLog_returning_id } from "../../LogsHandler/Logs_queries";
 
 
 async function UpdateOrNone_Pedido(pedido_: sincroObject) {
@@ -49,13 +50,13 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
 ||    ACTUALIZANDO UN PEDIDO DE VENTA : ${pedido_.pedido.PedidoVenta}`)
 
             if (typeof pedidoventa_id === 'number') {
-                
+
                 for (let i = 0; pedido_.data.length > i; i++) {
                     // THIS PART WILL LOOK FOR ALL THE FACTURAS OF THAT PEDIDOVENTAS
                     const detalleFacturas: detFact = pedido_.data[i];
                     const existFact = await connDB.query(val_if_fact_exist(), [detalleFacturas._factura_.Factura, pedido_.pedido.PedidoVenta]);
                     const existFact_id: number | null = existFact.rows[0].factura_id;
-                    
+
                     if (typeof existFact_id === 'number') {     // if there is coincidence that means the preload and locadb data has no diferences
 
                         for (let j = 0; detalleFacturas.detalleFact.length > j; j++) {
@@ -123,7 +124,7 @@ async function UpdateOrNone_Pedido(pedido_: sincroObject) {
     }
 }
 
-async function validinert( pedido: sincroObject ) {
+async function validinert(pedido: sincroObject) {
     //-----------------------------------------------------------------------------------------------------------//
     // THIS FUNCTION IS TO VERIFY IS A PEDIDO ALREADY EXIST, IF EXIST THEN SEEK FOR UPDATES
     // IN CASE NO EXIST IT MAKES ALL FULL INSERTION
@@ -140,7 +141,7 @@ async function validinert( pedido: sincroObject ) {
             if (pedidoExist.rows.length > 0) {
                 //console.log('||     SE ESTA REVISANDO PEDIDO : ', pedido.pedido.PedidoVenta );
                 const pedidoventa_id: number | null = pedidoExist.rows[0].pedidoventa_id;
-                console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO');
+                console.log('||  ', typeof pedidoventa_id === "number" ? ' EXISTE ESTE PEDIDO' : 'NO EXISTE ESTE PEDIDO,');
 
                 if (typeof pedidoventa_id === 'number') {
                     // IF THE PEDIDO EXIST, WE WILL HANDLE IT IN ANOTHER FUNCTION TO CHECK ALL THE DATA OF THAT PEDIDO
@@ -164,7 +165,9 @@ async function validinert( pedido: sincroObject ) {
 
                             for (let i = 0; pedido.data.length > i; i++) { //pedido.data.length
                                 const detFactt: detFact = pedido.data[i];
-                                const id_factura = await insert_factura_(detFactt._factura_, idPDV);
+                                let idLog : number =  await CrearLog_returning_id(detFactt._factura_.Factura, false);
+                                
+                                const id_factura = await insert_factura_(detFactt._factura_, idPDV, idLog);
 
                                 if (id_factura) {
 
@@ -211,7 +214,7 @@ async function validinert( pedido: sincroObject ) {
         }
     } catch (err) {
         console.log('||     ERROR AL DESGLOSAR DATA', err)
-    }finally{
+    } finally {
         console.log('||--------------------------------------------------------------------------------------------------------------------||');
     }
 }
@@ -223,7 +226,7 @@ export async function syncroData_AX_() {
 ||                                          **** ACTUALIZANDO NOMBRES ***                                             ||
 ||--------------------------------------------------------------------------------------------------------------------||\n`);
         await Full_Names_Update();
-        const data : false | sincroObject[] = await Preloaded_pedido_AX();
+        const data: false | sincroObject[] = await Preloaded_pedido_AX();
         //console.log(data);
         if (data !== false) {
             console.log(`
@@ -241,5 +244,5 @@ export async function syncroData_AX_() {
 
     } catch (err) {
         console.log('||         ERROR AL EJECUTAR LA SINCRONIZACION : ', err);
-    } 
+    }
 }
