@@ -1,7 +1,7 @@
 import { Request, Response, query } from "express";
 import connDB from "../utils/db/localDB_config";
 import format from "pg-format";
-import { caja, factura, pedidoventa } from "../interfaces/db_interfeces/Axproveider";
+import { factura} from "../interfaces/db_interfeces/Axproveider";
 import { uploadFileToCloudinary } from "../utils/db/cloudinary_config";
 import { QueryResult } from "pg";
 import { sendEmail_transito } from "../utils/reports/mail_body_transit";
@@ -227,7 +227,7 @@ export let subir_fotos = async (req: Request, res: Response) => {
         const data = req.body;
         const query = 'SELECT * FROM sincro_fact($1, $2, $3, $4, $5);';
         let fact_list_to_mail: number[] = []; // Array para guardar las facturas para enviar un correo electrónico
-
+        //console.log(data);
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
 
@@ -236,7 +236,8 @@ export let subir_fotos = async (req: Request, res: Response) => {
 
             if (firma_ != null && foto_ != null) {
                 try {
-                    await new Promise<void>((resolve, reject) => {
+                    await new Promise<void>(async (resolve, reject) => {
+                        // this is to update the Register of Factura
                         connDB.query(query, [element.factura_id, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
                             if (err) {
                                 console.log('ERROR AL CREAR FOTOS:', err);
@@ -246,7 +247,11 @@ export let subir_fotos = async (req: Request, res: Response) => {
                                 resolve();
                             }
                         });
+                        //  This is to update the detail of the log of the factura.
+                        let Detalle : string = element?.Comment.toString();                        
+                        await UPLOADER_LOG(element.factura_id, Detalle);
                     });
+
                 } catch (error) {
                     throw error;
                 }
@@ -257,7 +262,7 @@ export let subir_fotos = async (req: Request, res: Response) => {
             }
         }
 
-        console.log('data to send file:', fact_list_to_mail);
+        //console.log('data to send file:', fact_list_to_mail);
         console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZARON');
         await sendEmail_Entregados(fact_list_to_mail);
         res.status(200).json({ message: 'SE GENERO LA SINCRONIZACION' });

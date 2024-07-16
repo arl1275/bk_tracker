@@ -124,7 +124,7 @@ let change_transito_service = (req, res) => __awaiter(void 0, void 0, void 0, fu
                 const factura_ = parseInt(data[i]);
                 try {
                     yield localDB_config_1.default.query(query, [factura_]);
-                    console.log('tipo de id ::: ', typeof Mesaje, Mesaje);
+                    //console.log('tipo de id ::: ', typeof Mesaje, Mesaje);
                     yield (0, Logs_queries_1.UPLOADER_LOG)(factura_, Mesaje);
                     data_to_mail.push(factura_);
                     console.log('|| SE ENVIO A TRANSITO:', factura_);
@@ -241,13 +241,15 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const data = req.body;
         const query = 'SELECT * FROM sincro_fact($1, $2, $3, $4, $5);';
         let fact_list_to_mail = []; // Array para guardar las facturas para enviar un correo electrónico
+        console.log(data);
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
             const firma_ = yield (0, cloudinary_config_1.uploadFileToCloudinary)(element.nameSing, 'bodega_despacho', element.factura);
             const foto_ = yield (0, cloudinary_config_1.uploadFileToCloudinary)(element.namePic, 'bodega_despacho', element.factura + '_foto');
             if (firma_ != null && foto_ != null) {
                 try {
-                    yield new Promise((resolve, reject) => {
+                    yield new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+                        // this is to update the Register of Factura
                         localDB_config_1.default.query(query, [element.factura_id, foto_, firma_, 'N/A', element.fech_hora_entrega], (err, result) => {
                             if (err) {
                                 console.log('ERROR AL CREAR FOTOS:', err);
@@ -258,7 +260,10 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                                 resolve();
                             }
                         });
-                    });
+                        //  This is to update the detail of the log of the factura.
+                        let Detalle = element === null || element === void 0 ? void 0 : element.Comment.toString();
+                        yield (0, Logs_queries_1.UPLOADER_LOG)(element.factura_id, Detalle);
+                    }));
                 }
                 catch (error) {
                     throw error;
@@ -270,7 +275,7 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 return;
             }
         }
-        console.log('data to send file:', fact_list_to_mail);
+        //console.log('data to send file:', fact_list_to_mail);
         console.log('SE GENERARON LAS FOTOS Y SE SINCRONIZARON');
         yield (0, mail_body_syncro_1.sendEmail_Entregados)(fact_list_to_mail);
         res.status(200).json({ message: 'SE GENERO LA SINCRONIZACION' });
