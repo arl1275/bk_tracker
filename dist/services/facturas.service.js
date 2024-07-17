@@ -241,7 +241,7 @@ let subir_fotos = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const data = req.body;
         const query = 'SELECT * FROM sincro_fact($1, $2, $3, $4, $5);';
         let fact_list_to_mail = []; // Array para guardar las facturas para enviar un correo electrónico
-        console.log(data);
+        //console.log(data);
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
             const firma_ = yield (0, cloudinary_config_1.uploadFileToCloudinary)(element.nameSing, 'bodega_despacho', element.factura);
