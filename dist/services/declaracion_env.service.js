@@ -248,10 +248,11 @@ const getDecEnv_appEncabezadoService = (req, res) => __awaiter(void 0, void 0, v
 exports.getDecEnv_appEncabezadoService = getDecEnv_appEncabezadoService;
 let BlockDeclaraciones_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { declaraciones_id } = req.body;
-        if (Array.isArray(declaraciones_id) && declaraciones_id.length > 0) {
+        const { data } = req.body;
+        if (Array.isArray(data) && data.length > 0) {
             const query = 'SELECT * FROM blockdecenvio($1)';
-            const validIDs = declaraciones_id.filter(id => parseInt(id) > 0);
+            const validIDs = [];
+            data.map((item) => validIDs.push(parseInt(item.id)));
             if (validIDs.length === 0) {
                 return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
             }
@@ -261,11 +262,11 @@ let BlockDeclaraciones_service = (req, res) => __awaiter(void 0, void 0, void 0,
                     yield localDB_config_1.default.query(query, [id]);
                 }));
                 yield Promise.all(promises);
-                res.status(200).json({ message: 'SE BLOQUEARON LAS DECLARACIONES CORRECTAMENTE' });
+                res.status(200).json({ message: 'Se bloquearon las declaraciones de envio' });
             }
             catch (err) {
                 console.error('|| ERROR AL BLOQUEAR DECLARACIONES :: ', err);
-                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+                res.status(500).json({ message: 'ERROR al bloquear una o más declaraciones' });
             }
         }
         else {
@@ -274,16 +275,17 @@ let BlockDeclaraciones_service = (req, res) => __awaiter(void 0, void 0, void 0,
     }
     catch (error) {
         console.error('|| ERROR AL BLOQUEAR DECLARACIONES :: ', error);
-        res.status(500).json({ message: 'ERROR AL BLOQUEAR DECLARACIONES' });
+        res.status(500).json({ message: 'Error al bloquear las declaraciones' });
     }
 });
 exports.BlockDeclaraciones_service = BlockDeclaraciones_service;
 let unBlockdeclaraciones_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { declaraciones_id } = req.body;
-        if (Array.isArray(declaraciones_id) && declaraciones_id.length > 0) {
+        const { data } = req.body;
+        if (Array.isArray(data) && data.length > 0) {
             const query = 'SELECT * FROM unblockdecenvio($1)';
-            const validIDs = declaraciones_id.filter(id => parseInt(id) > 0);
+            const validIDs = [];
+            data.map((item) => validIDs.push(parseInt(item.id)));
             if (validIDs.length === 0) {
                 return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
             }
@@ -293,20 +295,20 @@ let unBlockdeclaraciones_service = (req, res) => __awaiter(void 0, void 0, void 
                     yield localDB_config_1.default.query(query, [id]);
                 }));
                 yield Promise.all(promises);
-                res.status(200).json({ message: 'SE BLOQUEARON LAS FACTURAS CORRECTAMENTE' });
+                res.status(200).json({ message: 'Se bloquearon las declaraciones correctamente' });
             }
             catch (err) {
                 console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', err);
-                res.status(500).json({ message: 'ERROR al bloquear una o más facturas' });
+                res.status(500).json({ message: 'ERROR al desbloquear una o más declaraciones' });
             }
         }
         else {
-            res.status(400).json({ message: 'La lista de facturas es inválida o está vacía.' });
+            res.status(400).json({ message: 'La lista de declaraciones es inválida o está vacía.' });
         }
     }
     catch (error) {
-        console.error('|| ERROR AL BLOQUEAR FACTURAS :: ', error);
-        res.status(500).json({ message: 'ERROR AL BLOQUEAR FACTURAS' });
+        console.error('|| ERROR, al desbloquear declaraciones :: ', error);
+        res.status(500).json({ message: 'Error al desbloquear las declaraciones' });
     }
 });
 exports.unBlockdeclaraciones_service = unBlockdeclaraciones_service;

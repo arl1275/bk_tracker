@@ -431,11 +431,13 @@ export let forceFactura_service = async (req: Request, res: Response) => {
 
 export let BlockFacturas_service = async (req: Request, res: Response) => {
     try {
-        const { facturas_id } = req.body;
+        const { data } = req.body;
 
-        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+        if (Array.isArray( data ) && data.length > 0) {
             const query = 'SELECT * FROM blockfactura($1)';
-            const validIDs: number[] = facturas_id.filter(id => parseInt(id) > 0);
+            const validIDs: number[] = [];
+            data.map((item)=> validIDs.push(parseInt(item.id)));
+            console.log(' DATA:: ', data, validIDs);
 
             if (validIDs.length === 0) {
                 return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
@@ -466,11 +468,12 @@ export let BlockFacturas_service = async (req: Request, res: Response) => {
 
 export let unBlockFacturas_service = async (req: Request, res: Response) => {
     try {
-        const { facturas_id } = req.body;
+        const { data } = req.body;
 
-        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+        if (Array.isArray(data) && data.length > 0) {
             const query = 'SELECT * FROM unblockfactura($1)';
-            const validIDs: number[] = facturas_id.filter(id => parseInt(id) > 0);
+            const validIDs: number[] = [];
+            data.map((item) => validIDs.push(parseInt(item.id)))
 
             if (validIDs.length === 0) {
                 return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
@@ -515,5 +518,24 @@ export const getCajasFactura_service = async (req: Request, res: Response) => {
     } catch (error) {
         console.error('||       Error al ejecutar la consulta para obtener las cajas \n', error);
         res.status(500).json({ message: 'ERROR AL TRAER LAS CAJAS DE ESTA FACTURA' });
+    }
+};
+
+export const FinalizarFactura_Service = async (req: Request, res: Response) => {
+    try {
+        const { data } = req.body;
+        const query = 'UPDATE facturas SET _closed = TRUE WHERE id = $1;';
+        //console.log(' DATA BRUTE : ', data, ' tipo :::', typeof data)
+        const Ids: any[] = Array.isArray(data) ? data : [];
+        //console.log(' DATA NETA : ', Ids)
+        if (Ids.length > 0) {
+            await Promise.all(Ids.map((item: any) => connDB.query(query, [parseInt(item.id)])));
+            res.status(200).json({ message: 'Se finalizaron las facturas' });
+        } else {
+            res.status(400).json({ message: 'Los datos proporcionados no son un arreglo o están vacíos' });
+        }
+    } catch (error) {
+        console.error('|| Error FINALIZAR FACTURAS', error);
+        res.status(500).json({ message: 'ERROR AL FINALIZAR FACTURAS' });
     }
 };

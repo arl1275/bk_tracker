@@ -14,7 +14,8 @@ import {
     forceFactura_service,
     BlockFacturas_service,
     unBlockFacturas_service,
-    getCajasFactura_service
+    getCajasFactura_service,
+    FinalizarFactura_Service
 } from "../services/facturas.service";
 
 
@@ -49,6 +50,8 @@ export const forceFactura_controller = ( req : Request, res : Response ) => { fo
 export const blockFacturas_controller = ( req : Request, res : Response) => { BlockFacturas_service(req, res)}
 
 export const unblockFacturas_controller  = ( req : Request, res : Response) => { unBlockFacturas_service(req, res)}
+
+export const FinalizarFactura_controller = ( req : Request, res : Response) => { FinalizarFactura_Service(req, res)}
 
 
 

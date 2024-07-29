@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCajasFactura_service = exports.unBlockFacturas_service = exports.BlockFacturas_service = exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service_Entregador = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact_Guardia = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
+exports.FinalizarFactura_Service = exports.getCajasFactura_service = exports.unBlockFacturas_service = exports.BlockFacturas_service = exports.forceFactura_service = exports.change_state_to_null = exports.getAdminFacts_service = exports.getCajasOneFact_service_Entregador = exports.getHistoFact_service = exports.subir_fotos = exports.get_facturas_en_transito = exports.get_cajas_one_fact_Guardia = exports.change_sincronizado_service = exports.change_transito_service = exports.change_preparacion_service = exports.get_facturas_all = exports.get_facturas_actives = exports.get_all_facturas_service = void 0;
 const localDB_config_1 = __importDefault(require("../utils/db/localDB_config"));
 const pg_format_1 = __importDefault(require("pg-format"));
 const cloudinary_config_1 = require("../utils/db/cloudinary_config");
@@ -438,10 +438,12 @@ let forceFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.forceFactura_service = forceFactura_service;
 let BlockFacturas_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { facturas_id } = req.body;
-        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+        const { data } = req.body;
+        if (Array.isArray(data) && data.length > 0) {
             const query = 'SELECT * FROM blockfactura($1)';
-            const validIDs = facturas_id.filter(id => parseInt(id) > 0);
+            const validIDs = [];
+            data.map((item) => validIDs.push(parseInt(item.id)));
+            console.log(' DATA:: ', data, validIDs);
             if (validIDs.length === 0) {
                 return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
             }
@@ -470,10 +472,11 @@ let BlockFacturas_service = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.BlockFacturas_service = BlockFacturas_service;
 let unBlockFacturas_service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { facturas_id } = req.body;
-        if (Array.isArray(facturas_id) && facturas_id.length > 0) {
+        const { data } = req.body;
+        if (Array.isArray(data) && data.length > 0) {
             const query = 'SELECT * FROM unblockfactura($1)';
-            const validIDs = facturas_id.filter(id => parseInt(id) > 0);
+            const validIDs = [];
+            data.map((item) => validIDs.push(parseInt(item.id)));
             if (validIDs.length === 0) {
                 return res.status(400).json({ message: 'No hay IDs válidos para bloquear.' });
             }
@@ -522,3 +525,24 @@ const getCajasFactura_service = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.getCajasFactura_service = getCajasFactura_service;
+const FinalizarFactura_Service = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { data } = req.body;
+        const query = 'UPDATE facturas SET _closed = TRUE WHERE id = $1;';
+        //console.log(' DATA BRUTE : ', data, ' tipo :::', typeof data)
+        const Ids = Array.isArray(data) ? data : [];
+        //console.log(' DATA NETA : ', Ids)
+        if (Ids.length > 0) {
+            yield Promise.all(Ids.map((item) => localDB_config_1.default.query(query, [parseInt(item.id)])));
+            res.status(200).json({ message: 'Se finalizaron las facturas' });
+        }
+        else {
+            res.status(400).json({ message: 'Los datos proporcionados no son un arreglo o están vacíos' });
+        }
+    }
+    catch (error) {
+        console.error('|| Error FINALIZAR FACTURAS', error);
+        res.status(500).json({ message: 'ERROR AL FINALIZAR FACTURAS' });
+    }
+});
+exports.FinalizarFactura_Service = FinalizarFactura_Service;

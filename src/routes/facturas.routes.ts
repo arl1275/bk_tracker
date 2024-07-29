@@ -1,5 +1,4 @@
 const express = require('express')
-import { Request, Response } from "express";
 import {
         get_all_facturas_controller,
         get_all_facturas_actives,
@@ -15,7 +14,8 @@ import {
         forceFactura_controller,
         blockFacturas_controller,
         unblockFacturas_controller,
-        getCajasFactura_controller
+        getCajasFactura_controller,
+        FinalizarFactura_controller
 } from "../controllers/facturas.controller";
 
 const routerFacturas = express.Router();
@@ -65,6 +65,8 @@ routerFacturas.post('/admin/forceSyncroFact', forceFactura_controller)         /
 
 routerFacturas.post('/admin/blockFacturas', blockFacturas_controller);
 
-routerFacturas.post('/admin/unblockFacturas', unblockFacturas_controller)
+routerFacturas.post('/admin/unblockFacturas', unblockFacturas_controller);
+
+routerFacturas.post('/admin/finalizarfactura', FinalizarFactura_controller);
 
 export default routerFacturas;

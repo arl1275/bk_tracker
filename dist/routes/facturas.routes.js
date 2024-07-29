@@ -30,4 +30,5 @@ routerFacturas.post('/admin/forceSyncroFact', facturas_controller_1.forceFactura
 //------------------------------------------------- THIS IS TO BLOCK FACTURAS  -------------------------------------------------//
 routerFacturas.post('/admin/blockFacturas', facturas_controller_1.blockFacturas_controller);
 routerFacturas.post('/admin/unblockFacturas', facturas_controller_1.unblockFacturas_controller);
+routerFacturas.post('/admin/finalizarfactura', facturas_controller_1.FinalizarFactura_controller);
 exports.default = routerFacturas;

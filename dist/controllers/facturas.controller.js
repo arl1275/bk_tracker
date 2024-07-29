@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unblockFacturas_controller = exports.blockFacturas_controller = exports.forceFactura_controller = exports.getCajasFactura_controller = exports.toNullState_controller = exports.getAdminFacts_controller = exports.getCajasFAct_controller_Entregador = exports.getHistoFact_controller = exports.postFotos_controller = exports.getTransFact_controller = exports.toTransito_controller = exports.get_cajas_controller_Guardia = exports.get_all_facturas_ = exports.get_all_facturas_actives = exports.get_all_facturas_controller = void 0;
+exports.FinalizarFactura_controller = exports.unblockFacturas_controller = exports.blockFacturas_controller = exports.forceFactura_controller = exports.getCajasFactura_controller = exports.toNullState_controller = exports.getAdminFacts_controller = exports.getCajasFAct_controller_Entregador = exports.getHistoFact_controller = exports.postFotos_controller = exports.getTransFact_controller = exports.toTransito_controller = exports.get_cajas_controller_Guardia = exports.get_all_facturas_ = exports.get_all_facturas_actives = exports.get_all_facturas_controller = void 0;
 const facturas_service_1 = require("../services/facturas.service");
 const get_all_facturas_controller = (req, res) => { (0, facturas_service_1.get_all_facturas_service)(req, res); };
 exports.get_all_facturas_controller = get_all_facturas_controller;
@@ -33,3 +33,5 @@ const blockFacturas_controller = (req, res) => { (0, facturas_service_1.BlockFac
 exports.blockFacturas_controller = blockFacturas_controller;
 const unblockFacturas_controller = (req, res) => { (0, facturas_service_1.unBlockFacturas_service)(req, res); };
 exports.unblockFacturas_controller = unblockFacturas_controller;
+const FinalizarFactura_controller = (req, res) => { (0, facturas_service_1.FinalizarFactura_Service)(req, res); };
+exports.FinalizarFactura_controller = FinalizarFactura_controller;
